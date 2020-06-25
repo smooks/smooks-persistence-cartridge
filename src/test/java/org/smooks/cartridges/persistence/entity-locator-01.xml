@@ -42,15 +42,15 @@
   =========================LICENSE_END==================================
   -->
 
-<smooks-resource-list xmlns="http://www.milyn.org/xsd/smooks-1.1.xsd"
-	xmlns:jb="http://www.milyn.org/xsd/smooks/javabean-1.1.xsd"
-	xmlns:dao="http://www.milyn.org/xsd/smooks/persistence-1.2.xsd">
+<smooks-resource-list xmlns="https://www.smooks.org/xsd/smooks-1.2.xsd"
+	xmlns:jb="https://www.smooks.org/xsd/smooks/javabean-1.6.xsd"
+	xmlns:dao="https://www.smooks.org/xsd/smooks/persistence-1.5.xsd">
 
 
-	<jb:bindings beanId="dAnde" class="java.util.HashMap" createOnElement="a">
+	<jb:bean beanId="dAnde" class="java.util.HashMap" createOnElement="a">
 		<jb:value property="d" decoder="Integer" data="d" />
 		<jb:value property="e" decoder="Integer" data="e" />
-	</jb:bindings>
+	</jb:bean>
 
 	<dao:locator beanId="entity" lookup="something" lookupOnElement="b">
 		<dao:params>

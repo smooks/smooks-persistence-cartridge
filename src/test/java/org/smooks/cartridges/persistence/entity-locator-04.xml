@@ -42,11 +42,11 @@
   =========================LICENSE_END==================================
   -->
 
-<smooks-resource-list xmlns="http://www.milyn.org/xsd/smooks-1.1.xsd"
-	xmlns:jb="http://www.milyn.org/xsd/smooks/javabean-1.1.xsd"
-	xmlns:dao="http://www.milyn.org/xsd/smooks/persistence-1.2.xsd">
+<smooks-resource-list xmlns="https://www.smooks.org/xsd/smooks-1.2.xsd"
+	xmlns:jb="https://www.smooks.org/xsd/smooks/javabean-1.6.xsd"
+	xmlns:dao="https://www.smooks.org/xsd/smooks/persistence-1.5.xsd">
 
-	<dao:locator beanId="entity" lookupOnElement="$document" >
+	<dao:locator beanId="entity" lookupOnElement="#document" >
 		<dao:query>from SomeThing where arg1=:1 and arg2=:2</dao:query>
 		<dao:params type="POSITIONAL">
 			<dao:expression name="1">'value-1'</dao:expression>

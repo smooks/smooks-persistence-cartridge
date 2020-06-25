@@ -46,7 +46,7 @@
                       xmlns:jb="https://www.smooks.org/xsd/smooks/javabean-1.6.xsd"
                       xmlns:dao="https://www.smooks.org/xsd/smooks/persistence-1.5.xsd">
 
-    <jb:bean beanId="theList" class="java.util.ArrayList" createOnElement="$document">
+    <jb:bean beanId="theList" class="java.util.ArrayList" createOnElement="#document">
         <jb:wiring beanIdRef="entity" />
     </jb:bean>
 
