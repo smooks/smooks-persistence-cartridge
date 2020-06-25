@@ -48,6 +48,6 @@ package org.smooks.cartridges.persistence;
  */
 public class Constants {
 
-	public static final String PERSISTENCE_NAMESPACE = "http://www.milyn.org/xsd/smooks/persistence-1.2.xsd";
+	public static final String PERSISTENCE_NAMESPACE = "https://www.smooks.org/xsd/smooks/persistence-1.5.xsd";
 
 }

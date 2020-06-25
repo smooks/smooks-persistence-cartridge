@@ -72,9 +72,8 @@ import org.testng.annotations.Test;
 
 /**
  * @author <a href="mailto:maurice.zeijen@smies.com">maurice.zeijen@smies.com</a>
- *
  */
-@Test(groups="unit")
+@Test(groups = "unit")
 public class EntityLocatorTest extends BaseTestCase {
 	private static final boolean ENABLE_REPORTING = false;
 
@@ -101,22 +100,22 @@ public class EntityLocatorTest extends BaseTestCase {
 
 		Smooks smooks = new Smooks(getResourceAsStream("entity-locator-01.xml"));
 
-        try {
-            ExecutionContext executionContext = smooks.createExecutionContext();
+		try {
+			ExecutionContext executionContext = smooks.createExecutionContext();
 
-            PersistenceUtil.setDAORegister(executionContext, new SingleDaoRegister<Object>(dao));
+			PersistenceUtil.setDAORegister(executionContext, new SingleDaoRegister<Object>(dao));
 
-            enableReporting(executionContext, "test_entity_locate.html");
+			enableReporting(executionContext, "test_entity_locate.html");
 
-            Source source = new StreamSource(getClass().getResourceAsStream("input-message-01.xml" ) );
-            smooks.filterSource(executionContext, source);
+			Source source = new StreamSource(getClass().getResourceAsStream("input-message-01.xml"));
+			smooks.filterSource(executionContext, source);
 
-            Assert.assertSame(result, executionContext.getBeanContext().getBean("entity"));
-        } finally {
-            smooks.close();
-        }
+			Assert.assertSame(result, executionContext.getBeanContext().getBean("entity"));
+		} finally {
+			smooks.close();
+		}
 
-        verify(dao).lookup("something", expectedMap);
+		verify(dao).lookup("something", expectedMap);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -128,26 +127,26 @@ public class EntityLocatorTest extends BaseTestCase {
 
 		Smooks smooks = new Smooks(getResourceAsStream("entity-locator-02.xml"));
 
-        try {
-            ExecutionContext executionContext = smooks.createExecutionContext();
+		try {
+			ExecutionContext executionContext = smooks.createExecutionContext();
 
-            //We put an object on the 'entity' location to check if the locater removes it because it found
-            //no result
-            executionContext.getBeanContext().addBean("entity", new Object(), null);
+			//We put an object on the 'entity' location to check if the locater removes it because it found
+			//no result
+			executionContext.getBeanContext().addBean("entity", new Object(), null);
 
-            PersistenceUtil.setDAORegister(executionContext, new SingleDaoRegister<Object>(dao));
+			PersistenceUtil.setDAORegister(executionContext, new SingleDaoRegister<Object>(dao));
 
-            enableReporting(executionContext, "test_entity_locate_query_no_result.html");
+			enableReporting(executionContext, "test_entity_locate_query_no_result.html");
 
-            Source source = new StreamSource(getClass().getResourceAsStream("input-message-01.xml" ) );
-            smooks.filterSource(executionContext, source);
+			Source source = new StreamSource(getClass().getResourceAsStream("input-message-01.xml"));
+			smooks.filterSource(executionContext, source);
 
-            Assert.assertNull(executionContext.getBeanContext().getBean("entity"));
-        } finally {
-            smooks.close();
-        }
+			Assert.assertNull(executionContext.getBeanContext().getBean("entity"));
+		} finally {
+			smooks.close();
+		}
 
-        verify(dao).lookupByQuery(eq("from SomeThing"), anyMap());
+		verify(dao).lookupByQuery(eq("from SomeThing"), anyMap());
 	}
 
 	@SuppressWarnings("unchecked")
@@ -159,25 +158,24 @@ public class EntityLocatorTest extends BaseTestCase {
 
 		Smooks smooks = new Smooks(getResourceAsStream("entity-locator-03.xml"));
 
-        try {
-            ExecutionContext executionContext = smooks.createExecutionContext();
+		try {
+			ExecutionContext executionContext = smooks.createExecutionContext();
 
-            PersistenceUtil.setDAORegister(executionContext, new SingleDaoRegister<Object>(dao));
+			PersistenceUtil.setDAORegister(executionContext, new SingleDaoRegister<Object>(dao));
 
-            Source source = new StreamSource(getClass().getResourceAsStream("input-message-01.xml" ) );
+			Source source = new StreamSource(getClass().getResourceAsStream("input-message-01.xml"));
 
-            smooks.filterSource(executionContext, source);
+			smooks.filterSource(executionContext, source);
 
-        }catch (SmooksException e) {
+		} catch (SmooksException e) {
 			Assert.assertSame(ExceptionUtils.getCause(e).getClass(), NoLookupResultException.class);
 
 			return;
+		} finally {
+			smooks.close();
 		}
-        finally {
-            smooks.close();
-        }
 
-        Assert.fail("NoLookupResultException was not thrown.");
+		Assert.fail("NoLookupResultException was not thrown.");
 	}
 
 	@Test
@@ -188,22 +186,22 @@ public class EntityLocatorTest extends BaseTestCase {
 
 		Smooks smooks = new Smooks(getResourceAsStream("entity-locator-04.xml"));
 
-        try {
-            ExecutionContext executionContext = smooks.createExecutionContext();
+		try {
+			ExecutionContext executionContext = smooks.createExecutionContext();
 
-            PersistenceUtil.setDAORegister(executionContext, new SingleDaoRegister<Object>(dao));
+			PersistenceUtil.setDAORegister(executionContext, new SingleDaoRegister<Object>(dao));
 
-            Source source = new StreamSource(getClass().getResourceAsStream("input-message-01.xml" ) );
+			Source source = new StreamSource(getClass().getResourceAsStream("input-message-01.xml"));
 
-            enableReporting(executionContext, "test_entity_locate_query_positional_parameter.html");
+			enableReporting(executionContext, "test_entity_locate_query_positional_parameter.html");
 
-            smooks.filterSource(executionContext, source);
+			smooks.filterSource(executionContext, source);
 
-        }finally {
-            smooks.close();
-        }
+		} finally {
+			smooks.close();
+		}
 
-        verify(dao).lookupByQuery(eq("from SomeThing where arg1=:1 and arg2=:2"), eq("value-1"), eq("value-2"));
+		verify(dao).lookupByQuery(eq("from SomeThing where arg1=:1 and arg2=:2"), eq("value-1"), eq("value-2"));
 	}
 
 	@Test
@@ -214,22 +212,22 @@ public class EntityLocatorTest extends BaseTestCase {
 
 		Smooks smooks = new Smooks(getResourceAsStream("entity-locator-05.xml"));
 
-        try {
-            ExecutionContext executionContext = smooks.createExecutionContext();
+		try {
+			ExecutionContext executionContext = smooks.createExecutionContext();
 
-            PersistenceUtil.setDAORegister(executionContext, MapDaoRegister.builder().put("some", dao).build());
+			PersistenceUtil.setDAORegister(executionContext, MapDaoRegister.builder().put("some", dao).build());
 
-            Source source = new StreamSource(getClass().getResourceAsStream("input-message-01.xml" ) );
+			Source source = new StreamSource(getClass().getResourceAsStream("input-message-01.xml"));
 
-            enableReporting(executionContext, "test_entity_locate_positional_parameter.html");
+			enableReporting(executionContext, "test_entity_locate_positional_parameter.html");
 
-            smooks.filterSource(executionContext, source);
+			smooks.filterSource(executionContext, source);
 
-        }finally {
-            smooks.close();
-        }
+		} finally {
+			smooks.close();
+		}
 
-        verify(dao).lookup(eq("test"), eq("value-1"), eq("value-2"));
+		verify(dao).lookup(eq("test"), eq("value-1"), eq("value-2"));
 	}
 
 	/**
@@ -241,7 +239,7 @@ public class EntityLocatorTest extends BaseTestCase {
 	}
 
 	private void enableReporting(ExecutionContext executionContext, String reportFilePath) throws IOException {
-		if(ENABLE_REPORTING) {
+		if (ENABLE_REPORTING) {
 			executionContext.setEventListener(new HtmlReportGenerator("target/" + reportFilePath));
 		}
 	}

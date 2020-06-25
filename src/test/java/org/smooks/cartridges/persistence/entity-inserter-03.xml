@@ -42,9 +42,9 @@
   =========================LICENSE_END==================================
   -->
 
-<smooks-resource-list xmlns="http://www.milyn.org/xsd/smooks-1.1.xsd"
-	xmlns:dao="http://www.milyn.org/xsd/smooks/persistence-1.2.xsd">
+<smooks-resource-list xmlns="https://www.smooks.org/xsd/smooks-1.2.xsd"
+	xmlns:dao="https://www.smooks.org/xsd/smooks/persistence-1.5.xsd">
 
-	<dao:inserter beanId="toInsert1"  insertedBeanId="inserted1"  insertOnElement="root" />
+	<dao:inserter beanId="toInsert1" insertedBeanId="inserted1" insertOnElement="root" />
 
 </smooks-resource-list>
