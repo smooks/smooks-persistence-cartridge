@@ -44,7 +44,7 @@
 
 <smooks-resource-list xmlns="https://www.smooks.org/xsd/smooks-1.2.xsd"
 	xmlns:jb="https://www.smooks.org/xsd/smooks/javabean-1.6.xsd"
-	xmlns:dao="https://www.smooks.org/xsd/smooks/persistence-1.5.xsd">
+	xmlns:dao="https://www.smooks.org/xsd/smooks/persistence-2.0.xsd">
 
 	<!-- The updater is set first to see if Smooks gets the ordering right because it
 	     needs to instantiate the String first. -->

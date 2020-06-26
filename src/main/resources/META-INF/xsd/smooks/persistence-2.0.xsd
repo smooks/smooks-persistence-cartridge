@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
            xmlns:smooks="https://www.smooks.org/xsd/smooks-1.2.xsd"
-           xmlns:smooks-persistence="https://www.smooks.org/xsd/smooks/persistence-1.5.xsd"
-           targetNamespace="https://www.smooks.org/xsd/smooks/persistence-1.5.xsd"
+           xmlns:smooks-persistence="https://www.smooks.org/xsd/smooks/persistence-2.0.xsd"
+           targetNamespace="https://www.smooks.org/xsd/smooks/persistence-2.0.xsd"
            elementFormDefault="qualified">
 
     <xs:import namespace="https://www.smooks.org/xsd/smooks-1.2.xsd"/>
@@ -528,16 +528,6 @@
 				<xs:documentation xml:lang="en">
 					In case of NAMED parameters the name of
 					the parameter must be defined here.
-				</xs:documentation>
-			</xs:annotation>
-		</xs:attribute>
-		<xs:attribute name="index" type="xs:string" use="optional">
-			<xs:annotation>
-				<xs:documentation xml:lang="en">
-					DEPRECATED
-					<p />
-					This attribute is in here by mistake and has
-					no function.
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
