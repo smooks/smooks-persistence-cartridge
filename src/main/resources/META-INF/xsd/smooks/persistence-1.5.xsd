@@ -531,16 +531,6 @@
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
-		<xs:attribute name="index" type="xs:string" use="optional">
-			<xs:annotation>
-				<xs:documentation xml:lang="en">
-					DEPRECATED
-					<p />
-					This attribute is in here by mistake and has
-					no function.
-				</xs:documentation>
-			</xs:annotation>
-		</xs:attribute>
 		<xs:attribute name="data" type="xs:string" use="optional">
 			<xs:annotation>
 				<xs:documentation xml:lang="en">
