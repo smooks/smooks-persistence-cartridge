@@ -42,14 +42,12 @@
  */
 package org.smooks.cartridges.persistence;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.smooks.SmooksException;
 import org.smooks.cartridges.persistence.util.PersistenceUtil;
-import org.smooks.cdr.annotation.AppContext;
-import org.smooks.cdr.annotation.ConfigParam;
-import org.smooks.cdr.annotation.ConfigParam.Use;
 import org.smooks.container.ApplicationContext;
 import org.smooks.container.ExecutionContext;
-import org.smooks.delivery.annotation.Initialize;
 import org.smooks.delivery.annotation.VisitAfterIf;
 import org.smooks.delivery.annotation.VisitBeforeIf;
 import org.smooks.delivery.dom.DOMElementVisitor;
@@ -61,11 +59,13 @@ import org.smooks.event.report.annotation.VisitBeforeReport;
 import org.smooks.scribe.invoker.DaoInvoker;
 import org.smooks.scribe.invoker.DaoInvokerFactory;
 import org.smooks.scribe.register.DaoRegister;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import javax.inject.Named;
 import java.io.IOException;
+import java.util.Optional;
 
 /**
  * DAO Flusher
@@ -101,15 +101,16 @@ public class DaoFlusher implements DOMElementVisitor, SAXVisitBefore, SAXVisitAf
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DaoFlusher.class);
 
-    @ConfigParam(name = "dao", use = Use.OPTIONAL)
-    private String daoName;
+    @Inject
+	@Named("dao")
+    private Optional<String> daoName;
 
-    @AppContext
+    @Inject
     private ApplicationContext appContext;
 
     private ApplicationContextObjectStore objectStore;
 
-    @Initialize
+    @PostConstruct
     public void initialize() {
     	objectStore = new ApplicationContextObjectStore(appContext);
     }
@@ -140,8 +141,8 @@ public class DaoFlusher implements DOMElementVisitor, SAXVisitBefore, SAXVisitAf
 
 		if(LOGGER.isDebugEnabled()) {
 			String msg = "Flushing org.smooks.persistence.test.dao";
-			if(daoName != null) {
-				msg += " with name '" + daoName + "'";
+			if(daoName.isPresent()) {
+				msg += " with name '" + daoName.get() + "'";
 			}
 			msg += ".";
 			LOGGER.debug(msg);
@@ -151,14 +152,14 @@ public class DaoFlusher implements DOMElementVisitor, SAXVisitBefore, SAXVisitAf
 
 		Object dao = null;
 		try {
-			if(daoName == null) {
+			if(!daoName.isPresent()) {
 				dao = emr.getDefaultDao();
 			} else {
-				dao = emr.getDao(daoName);
+				dao = emr.getDao(daoName.get());
 			}
 
 			if(dao == null) {
-				throw new IllegalStateException("The DAO register returned null while getting the DAO [" + daoName + "]");
+				throw new IllegalStateException("The DAO register returned null while getting the DAO [" + daoName.orElse(null) + "]");
 			}
 
 			flush(dao);

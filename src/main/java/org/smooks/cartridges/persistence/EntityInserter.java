@@ -42,16 +42,14 @@
  */
 package org.smooks.cartridges.persistence;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.smooks.SmooksException;
 import org.smooks.cartridges.persistence.util.PersistenceUtil;
 import org.smooks.cdr.SmooksConfigurationException;
-import org.smooks.cdr.annotation.AppContext;
-import org.smooks.cdr.annotation.ConfigParam;
-import org.smooks.cdr.annotation.ConfigParam.Use;
 import org.smooks.container.ApplicationContext;
 import org.smooks.container.ExecutionContext;
 import org.smooks.delivery.Fragment;
-import org.smooks.delivery.annotation.Initialize;
 import org.smooks.delivery.annotation.VisitAfterIf;
 import org.smooks.delivery.annotation.VisitBeforeIf;
 import org.smooks.delivery.dom.DOMElementVisitor;
@@ -70,12 +68,14 @@ import org.smooks.scribe.invoker.DaoInvoker;
 import org.smooks.scribe.invoker.DaoInvokerFactory;
 import org.smooks.scribe.register.DaoRegister;
 import org.smooks.util.CollectionsUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import javax.inject.Named;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -123,19 +123,22 @@ public class EntityInserter implements DOMElementVisitor, SAXVisitBefore, SAXVis
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EntityInserter.class);
 
-    @ConfigParam(name = "beanId")
+    @Inject
+	@Named("beanId")
     private String beanIdName;
 
-    @ConfigParam(name = "insertedBeanId", use = Use.OPTIONAL)
-    private String insertedBeanIdName;
+    @Inject
+	@Named("insertedBeanId")
+	private Optional<String> insertedBeanIdName;
 
-    @ConfigParam(name = "dao", use = Use.OPTIONAL)
-    private String daoName;
+    @Inject
+	@Named("dao")
+    private Optional<String> daoName;
 
-    @ConfigParam(use = Use.OPTIONAL)
-    private String name;
+    @Inject
+    private Optional<String> name;
 
-    @AppContext
+    @Inject
     private ApplicationContext appContext;
 
     private ObjectStore objectStore;
@@ -144,15 +147,13 @@ public class EntityInserter implements DOMElementVisitor, SAXVisitBefore, SAXVis
 
     private BeanId insertedBeanId;
 
-    @Initialize
+    @PostConstruct
     public void initialize() throws SmooksConfigurationException {
     	BeanIdStore beanIdStore = appContext.getBeanIdStore();
 
     	beanId = beanIdStore.register(beanIdName);
 
-    	if(insertedBeanIdName != null) {
-    		insertedBeanId = beanIdStore.register(insertedBeanIdName);
-    	}
+		insertedBeanIdName.ifPresent(s -> insertedBeanId = beanIdStore.register(s));
 
     	objectStore = new ApplicationContextObjectStore(appContext);
     }
@@ -161,10 +162,10 @@ public class EntityInserter implements DOMElementVisitor, SAXVisitBefore, SAXVis
 	 * @see org.smooks.delivery.ordering.Producer#getProducts()
 	 */
 	public Set<? extends Object> getProducts() {
-		if(insertedBeanIdName == null) {
+		if(!insertedBeanIdName.isPresent()) {
 			return Collections.emptySet();
 		} else {
-			return CollectionsUtil.toSet(insertedBeanIdName);
+			return CollectionsUtil.toSet(insertedBeanIdName.get());
 		}
 	}
 
@@ -211,10 +212,10 @@ public class EntityInserter implements DOMElementVisitor, SAXVisitBefore, SAXVis
 
 		Object dao = null;
 		try {
-			if(daoName == null) {
+			if(!daoName.isPresent()) {
 				dao = emr.getDefaultDao();
 			} else {
-				dao = emr.getDao(daoName);
+				dao = emr.getDao(daoName.get());
 			}
 
 			if(dao == null) {
@@ -223,7 +224,7 @@ public class EntityInserter implements DOMElementVisitor, SAXVisitBefore, SAXVis
 
 			final DaoInvoker daoInvoker = DaoInvokerFactory.getInstance().create(dao, objectStore);
 
-			Object result = name == null ? daoInvoker.insert(bean) : daoInvoker.insert(name, bean) ;
+			Object result = !name.isPresent() ? daoInvoker.insert(bean) : daoInvoker.insert(name.get(), bean) ;
 
 			if(insertedBeanId != null) {
 				if(result == null) {

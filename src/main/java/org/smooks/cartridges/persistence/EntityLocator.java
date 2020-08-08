@@ -42,23 +42,14 @@
  */
 package org.smooks.cartridges.persistence;
 
-import java.io.IOException;
-import java.util.Collection;
-import java.util.Set;
-
-import javax.persistence.NonUniqueResultException;
-
 import org.apache.commons.lang.StringUtils;
 import org.smooks.SmooksException;
+import org.smooks.cartridges.persistence.parameter.*;
 import org.smooks.cartridges.persistence.util.PersistenceUtil;
 import org.smooks.cdr.SmooksConfigurationException;
-import org.smooks.cdr.annotation.AppContext;
-import org.smooks.cdr.annotation.ConfigParam;
-import org.smooks.cdr.annotation.ConfigParam.Use;
 import org.smooks.container.ApplicationContext;
 import org.smooks.container.ExecutionContext;
 import org.smooks.delivery.Fragment;
-import org.smooks.delivery.annotation.Initialize;
 import org.smooks.delivery.dom.DOMElementVisitor;
 import org.smooks.delivery.ordering.Consumer;
 import org.smooks.delivery.ordering.Producer;
@@ -69,16 +60,20 @@ import org.smooks.event.report.annotation.VisitAfterReport;
 import org.smooks.event.report.annotation.VisitBeforeReport;
 import org.smooks.javabean.context.BeanContext;
 import org.smooks.javabean.repository.BeanId;
-import org.smooks.cartridges.persistence.parameter.NamedParameterContainer;
-import org.smooks.cartridges.persistence.parameter.ParameterContainer;
-import org.smooks.cartridges.persistence.parameter.ParameterIndex;
-import org.smooks.cartridges.persistence.parameter.ParameterManager;
-import org.smooks.cartridges.persistence.parameter.PositionalParameterContainer;
 import org.smooks.scribe.invoker.DaoInvoker;
 import org.smooks.scribe.invoker.DaoInvokerFactory;
 import org.smooks.scribe.register.DaoRegister;
 import org.smooks.util.CollectionsUtil;
 import org.w3c.dom.Element;
+
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.persistence.NonUniqueResultException;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.Optional;
+import java.util.Set;
 
 /**
  * DAO Locator
@@ -126,31 +121,34 @@ import org.w3c.dom.Element;
 @VisitAfterReport(summary = "Looking up entity to put under beanId '${resource.parameters.beanId}'.", detailTemplate="reporting/EntityLocator_after.html")
 public class EntityLocator implements DOMElementVisitor, SAXVisitBefore, SAXVisitAfter, Producer, Consumer {
 
-	@ConfigParam()
-	private int id;
+	@Inject
+	private Integer id;
 
-	@ConfigParam(name="beanId")
+	@Inject
+	@Named("beanId")
     private String beanIdName;
 
-    @ConfigParam(name = "dao", use = Use.OPTIONAL)
-    private String daoName;
+    @Inject
+	@Named("dao")
+    private Optional<String> daoName;
 
-    @ConfigParam(name="lookup", use = Use.OPTIONAL)
-    private String lookupName;
+    @Inject
+	@Named("lookup")
+    private Optional<String> lookupName;
 
-    @ConfigParam(use = Use.OPTIONAL)
-    private String query;
+    @Inject
+    private Optional<String> query;
 
-    @ConfigParam(defaultVal = OnNoResult.NULLIFY_STR, decoder = OnNoResult.DataDecoder.class)
-    private OnNoResult onNoResult;
+    @Inject
+    private OnNoResult onNoResult = OnNoResult.NULLIFY;
 
-    @ConfigParam(defaultVal = "false")
-    private boolean uniqueResult;
+    @Inject
+    private Boolean uniqueResult = false;
 
-    @ConfigParam(defaultVal = ParameterListType.NAMED_STR, decoder = ParameterListType.DataDecoder.class)
-    private ParameterListType parameterListType;
+    @Inject
+    private ParameterListType parameterListType = ParameterListType.NAMED;
 
-    @AppContext
+    @Inject
     private ApplicationContext appContext;
 
     private ApplicationContextObjectStore objectStore;
@@ -158,14 +156,15 @@ public class EntityLocator implements DOMElementVisitor, SAXVisitBefore, SAXVisi
     private ParameterIndex<?, ?> parameterIndex;
 
     private BeanId beanId;
-    @Initialize
+    
+    @PostConstruct
     public void initialize() throws SmooksConfigurationException {
 
-    	if(StringUtils.isEmpty(lookupName) && StringUtils.isEmpty(query)) {
+    	if(StringUtils.isEmpty(lookupName.orElse(null)) && StringUtils.isEmpty(query.orElse(null))) {
     		throw new SmooksConfigurationException("A lookup name or  a query  needs to be set to be able to lookup anything");
     	}
 
-    	if(StringUtils.isNotEmpty(lookupName) && StringUtils.isNotEmpty(query)) {
+    	if(StringUtils.isNotEmpty(lookupName.orElse(null)) && StringUtils.isNotEmpty(query.orElse(null))) {
     		throw new SmooksConfigurationException("Both the lookup name and the query can't be set at the same time");
     	}
 
@@ -230,10 +229,10 @@ public class EntityLocator implements DOMElementVisitor, SAXVisitBefore, SAXVisi
 
 		Object dao = null;
 		try {
-			if(daoName == null) {
+			if(!daoName.isPresent()) {
 				dao = emr.getDefaultDao();
 			} else {
-				dao = emr.getDao(daoName);
+				dao = emr.getDao(daoName.get());
 			}
 
 			if(dao == null) {
@@ -242,7 +241,7 @@ public class EntityLocator implements DOMElementVisitor, SAXVisitBefore, SAXVisi
 
 			Object result = lookup(dao, executionContext);
 
-			if(result != null && uniqueResult == true) {
+			if(result != null && uniqueResult) {
 				if(result instanceof Collection){
 					Collection<Object> resultCollection = (Collection<Object>) result;
 
@@ -254,14 +253,14 @@ public class EntityLocator implements DOMElementVisitor, SAXVisitBefore, SAXVisi
 						}
 					} else {
 						String exception;
-						if(daoName == null) {
+						if(!daoName.isPresent()) {
 							exception = "The " + getDaoNameFromAdapter(dao) + " DAO";
 						} else {
-							exception = "The DAO '" + daoName + "'";
+							exception = "The DAO '" + daoName.get() + "'";
 						}
 						exception += " returned multiple results for the ";
-						if(lookupName != null) {
-							exception += "lookup '" + lookupName + "'";
+						if(lookupName.isPresent()) {
+							exception += "lookup '" + lookupName.get() + "'";
 						} else {
 							exception += "query '" + query + "'";
 						}
@@ -308,17 +307,17 @@ public class EntityLocator implements DOMElementVisitor, SAXVisitBefore, SAXVisi
 		ParameterContainer<?> container = ParameterManager.getParameterContainer(id, executionContext);
 		DaoInvoker daoInvoker = DaoInvokerFactory.getInstance().create(dao, objectStore);
 
-		if(query == null) {
+		if(!query.isPresent()) {
 			if(parameterListType == ParameterListType.NAMED) {
-				return daoInvoker.lookup(lookupName, ((NamedParameterContainer) container).getParameterMap());
+				return daoInvoker.lookup(lookupName.orElse(null), ((NamedParameterContainer) container).getParameterMap());
 			} else {
-				return daoInvoker.lookup(lookupName, ((PositionalParameterContainer) container).getValues());
+				return daoInvoker.lookup(lookupName.orElse(null), ((PositionalParameterContainer) container).getValues());
 			}
 		} else {
 			if(parameterListType == ParameterListType.NAMED) {
-				return daoInvoker.lookupByQuery(query, ((NamedParameterContainer) container).getParameterMap());
+				return daoInvoker.lookupByQuery(query.orElse(null), ((NamedParameterContainer) container).getParameterMap());
 			} else {
-				return daoInvoker.lookupByQuery(query, ((PositionalParameterContainer) container).getValues());
+				return daoInvoker.lookupByQuery(query.orElse(null), ((PositionalParameterContainer) container).getValues());
 			}
 		}
 	}

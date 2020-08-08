@@ -42,18 +42,21 @@
  */
 package org.smooks.cartridges.persistence.config.ext;
 
-import java.util.UUID;
-
 import org.smooks.SmooksException;
+import org.smooks.cartridges.persistence.Constants;
 import org.smooks.cdr.SmooksResourceConfiguration;
 import org.smooks.cdr.extension.ExtensionContext;
+import org.smooks.cdr.registry.lookup.NameTypeConverterFactoryLookup;
+import org.smooks.container.ApplicationContext;
 import org.smooks.container.ExecutionContext;
+import org.smooks.converter.TypeConverter;
 import org.smooks.delivery.dom.DOMVisitBefore;
-import org.smooks.javabean.DataDecoder;
-import org.smooks.cartridges.persistence.Constants;
 import org.smooks.xml.DomUtils;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+
+import javax.inject.Inject;
+import java.util.UUID;
 
 /**
  * @author <a href="mailto:maurice.zeijen@smies.com">maurice.zeijen@smies.com</a>
@@ -66,6 +69,9 @@ import org.w3c.dom.NodeList;
  */
 public class DecodeParamResolver implements DOMVisitBefore {
 
+    @Inject
+    private ApplicationContext applicationContext;
+    
     public void visitBefore(Element element, ExecutionContext executionContext) throws SmooksException {
         NodeList decodeParams = element.getElementsByTagNameNS(Constants.PERSISTENCE_NAMESPACE, "decodeParam");
 
@@ -76,8 +82,8 @@ public class DecodeParamResolver implements DOMVisitBefore {
 
             extensionContext.addResource(decoderConfig);
             try {
-                String type = populatorConfig.getStringParameter("type");
-                DataDecoder decoder = DataDecoder.Factory.create(type);
+                String type = populatorConfig.getParameterValue("type", String.class);
+                TypeConverter<?, ?> typeConverter = applicationContext.getRegistry().lookup(new NameTypeConverterFactoryLookup(type)).createTypeConverter();
                 String reType = UUID.randomUUID().toString();
 
                 // Need to retype the populator configuration so as to get the
@@ -89,7 +95,7 @@ public class DecodeParamResolver implements DOMVisitBefore {
                 // Configure the new decoder config...
                 decoderConfig.setSelector("decoder:" + reType);
                 decoderConfig.setTargetProfile(extensionContext.getDefaultProfile());
-                decoderConfig.setResource(decoder.getClass().getName());
+                decoderConfig.setResource(typeConverter.getClass().getName());
                 for(int i = 0; i < decodeParams.getLength(); i++) {
                     Element decoderParam = (Element) decodeParams.item(i);
                     decoderConfig.setParameter(decoderParam.getAttribute("name"), DomUtils.getAllText(decoderParam, true));

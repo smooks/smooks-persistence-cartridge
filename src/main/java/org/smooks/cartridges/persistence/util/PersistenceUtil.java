@@ -66,7 +66,7 @@ public final class PersistenceUtil {
 
 	public static String getDAORegisterAttributeName(final ContentDeliveryConfig config) {
 
-		return ParameterAccessor.getStringParameter(PARAM_NAME_DAO_REGISTERY, PARAM_VALUE_DAO_REGISTERY, config);
+		return ParameterAccessor.getParameterValue(PARAM_NAME_DAO_REGISTERY, String.class, PARAM_VALUE_DAO_REGISTERY, config);
 
 	}
 

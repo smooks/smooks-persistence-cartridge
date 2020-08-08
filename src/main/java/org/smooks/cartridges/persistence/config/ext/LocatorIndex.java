@@ -64,13 +64,13 @@ public class LocatorIndex {
 
 	public static LocatorIndex getLocatorIndex(ApplicationContext applicationContext) {
 
-		LocatorIndex counter = (LocatorIndex) applicationContext.getAttribute(CONTEXT);
+		LocatorIndex counter = (LocatorIndex) applicationContext.getRegistry().lookup(CONTEXT);
 
 		if(counter == null) {
 
 			counter = new LocatorIndex();
 
-			applicationContext.setAttribute(CONTEXT, counter);
+			applicationContext.getRegistry().registerObject(CONTEXT, counter);
 
 		}
 

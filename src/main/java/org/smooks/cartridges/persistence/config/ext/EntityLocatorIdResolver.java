@@ -44,7 +44,6 @@ package org.smooks.cartridges.persistence.config.ext;
 
 import org.smooks.SmooksException;
 import org.smooks.cdr.SmooksResourceConfiguration;
-import org.smooks.cdr.annotation.AppContext;
 import org.smooks.cdr.extension.ExtensionContext;
 import org.smooks.cdr.extension.ResourceConfigUtil;
 import org.smooks.container.ApplicationContext;
@@ -52,13 +51,15 @@ import org.smooks.container.ExecutionContext;
 import org.smooks.delivery.dom.DOMVisitBefore;
 import org.w3c.dom.Element;
 
+import javax.inject.Inject;
+
 /**
  * @author <a href="mailto:maurice.zeijen@smies.com">maurice.zeijen@smies.com</a>
  *
  */
 public class EntityLocatorIdResolver implements DOMVisitBefore {
 
-	@AppContext
+	@Inject
 	private ApplicationContext applicationContext;
 
 	/* (non-Javadoc)
