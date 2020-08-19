@@ -42,9 +42,9 @@
  */
 package org.smooks.cartridges.persistence.parameter;
 
+import org.smooks.cartridges.persistence.ParameterListType;
 import org.smooks.container.ApplicationContext;
 import org.smooks.container.ExecutionContext;
-import org.smooks.cartridges.persistence.ParameterListType;
 
 /**
  * @author <a href="mailto:maurice.zeijen@smies.com">maurice.zeijen@smies.com</a>
@@ -81,14 +81,14 @@ public class ParameterManager {
 			throw new IllegalStateException("Unknown ParameterListType '" + type + "'.");
 		}
 
-		applicationContext.setAttribute(getParameterIndexName(id), index);
+		applicationContext.getRegistry().registerObject(getParameterIndexName(id), index);
 
 		return index;
 	}
 
 	@SuppressWarnings("unchecked")
 	public static ParameterIndex<?, ? extends Parameter<?>> getParameterIndex(int id, ApplicationContext applicationContext) {
-		return (ParameterIndex<?, ? extends Parameter<?>>) applicationContext.getAttribute(getParameterIndexName(id));
+		return (ParameterIndex<?, ? extends Parameter<?>>) applicationContext.getRegistry().lookup(getParameterIndexName(id));
 	}
 
 	public static void initializeParameterContainer(int id, ParameterListType type, ExecutionContext executionContext) {
@@ -98,10 +98,10 @@ public class ParameterManager {
 
 			switch (type) {
 			case NAMED:
-				container = new NamedParameterContainer((NamedParameterIndex) getParameterIndex(id, executionContext.getContext()));
+				container = new NamedParameterContainer((NamedParameterIndex) getParameterIndex(id, executionContext.getApplicationContext()));
 				break;
 			case POSITIONAL:
-				container = new PositionalParameterContainer((PositionalParameterIndex) getParameterIndex(id, executionContext.getContext()));
+				container = new PositionalParameterContainer((PositionalParameterIndex) getParameterIndex(id, executionContext.getApplicationContext()));
 				break;
 			default:
 				throw new IllegalStateException("Unknown ParameterListType '" + type + "'.");

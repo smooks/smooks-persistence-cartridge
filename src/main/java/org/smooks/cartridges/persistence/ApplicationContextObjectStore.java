@@ -42,10 +42,10 @@
  */
 package org.smooks.cartridges.persistence;
 
-import java.util.Map;
-
 import org.smooks.container.ApplicationContext;
 import org.smooks.scribe.ObjectStore;
+
+import java.util.Map;
 
 /**
  * @author <a href="mailto:maurice.zeijen@smies.com">maurice.zeijen@smies.com</a>
@@ -63,31 +63,27 @@ public class ApplicationContextObjectStore implements ObjectStore {
 	 * @see org.smooks.scribe.ObjectStore#get(java.lang.Object)
 	 */
 	public Object get(Object key) {
-		return applicationContext.getAttribute(key);
+		return applicationContext.getRegistry().lookup(key);
 	}
 
 	/* (non-Javadoc)
 	 * @see org.smooks.scribe.ObjectStore#getAll()
 	 */
 	public Map<Object, Object> getAll() {
-		return applicationContext.getAttributes();
+		return applicationContext.getRegistry().lookup(registryEntries -> registryEntries);
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.smooks.scribe.ObjectStore#remove(java.lang.Object)
 	 */
 	public void remove(Object key) {
-		applicationContext.removeAttribute(key);
+		applicationContext.getRegistry().deRegisterObject(key);
 	}
 
 	/* (non-Javadoc)
 	 * @see org.smooks.scribe.ObjectStore#set(java.lang.Object, java.lang.Object)
 	 */
 	public void set(Object key, Object value) {
-		applicationContext.setAttribute(key, value);
+		applicationContext.getRegistry().registerObject(key, value);
 	}
-
-
-
-
 }

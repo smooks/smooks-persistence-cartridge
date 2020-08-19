@@ -43,17 +43,17 @@
 package org.smooks.cartridges.persistence.config.ext;
 
 import org.smooks.SmooksException;
+import org.smooks.cartridges.javabean.BeanInstancePopulator;
 import org.smooks.cdr.ConfigSearch;
 import org.smooks.cdr.Parameter;
 import org.smooks.cdr.SmooksConfigurationException;
 import org.smooks.cdr.SmooksResourceConfiguration;
-import org.smooks.cdr.annotation.ConfigParam;
 import org.smooks.cdr.extension.ExtensionContext;
 import org.smooks.container.ExecutionContext;
 import org.smooks.delivery.dom.DOMVisitBefore;
-import org.smooks.cartridges.javabean.BeanInstancePopulator;
 import org.w3c.dom.Element;
 
+import javax.inject.Inject;
 import java.util.List;
 
 /**
@@ -70,7 +70,7 @@ import java.util.List;
  */
 public class SetSelectorFromBeanPopulatorWiring implements DOMVisitBefore {
 
-    @ConfigParam
+    @Inject
     private String selectorAttrName;
 
     public void visitBefore(Element element, ExecutionContext executionContext) throws SmooksException {
@@ -78,7 +78,7 @@ public class SetSelectorFromBeanPopulatorWiring implements DOMVisitBefore {
         SmooksResourceConfiguration config = extensionContext.getResourceStack().peek();
 
         if(config.getSelector() == null || config.getSelector().equals("none")) {
-            Parameter beanIdParam = config.getParameter("beanId");
+            Parameter<String> beanIdParam = config.getParameter("beanId", String.class);
             String beanId = beanIdParam.getValue();
 
             SmooksResourceConfiguration beanCreatorConfig = findBeanCreatorConfig(beanId, extensionContext);

@@ -42,17 +42,20 @@
  */
 package org.smooks.cartridges.persistence;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.smooks.SmooksException;
+import org.smooks.cartridges.javabean.BeanRuntimeInfo;
 import org.smooks.cartridges.persistence.observers.BeanCreateLifecycleObserver;
 import org.smooks.cartridges.persistence.parameter.*;
 import org.smooks.cdr.SmooksConfigurationException;
-import org.smooks.cdr.annotation.AnnotationConstants;
-import org.smooks.cdr.annotation.AppContext;
-import org.smooks.cdr.annotation.ConfigParam;
-import org.smooks.cdr.annotation.ConfigParam.Use;
+import org.smooks.cdr.registry.lookup.NameTypeConverterFactoryLookup;
+import org.smooks.cdr.registry.lookup.SourceTargetTypeConverterFactoryLookup;
 import org.smooks.container.ApplicationContext;
 import org.smooks.container.ExecutionContext;
-import org.smooks.delivery.annotation.Initialize;
+import org.smooks.converter.TypeConverter;
+import org.smooks.converter.TypeConverterException;
+import org.smooks.converter.factory.TypeConverterFactory;
 import org.smooks.delivery.dom.DOMElementVisitor;
 import org.smooks.delivery.ordering.Consumer;
 import org.smooks.delivery.ordering.Producer;
@@ -62,22 +65,21 @@ import org.smooks.delivery.sax.SAXVisitAfter;
 import org.smooks.delivery.sax.SAXVisitBefore;
 import org.smooks.event.report.annotation.VisitAfterReport;
 import org.smooks.event.report.annotation.VisitBeforeReport;
-import org.smooks.expression.MVELExpressionEvaluator;
-import org.smooks.cartridges.javabean.BeanRuntimeInfo;
-import org.smooks.javabean.DataDecodeException;
-import org.smooks.javabean.DataDecoder;
+import org.smooks.expression.ExpressionEvaluator;
 import org.smooks.javabean.context.BeanContext;
 import org.smooks.javabean.context.BeanIdStore;
 import org.smooks.javabean.repository.BeanId;
 import org.smooks.util.CollectionsUtil;
 import org.smooks.xml.DomUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import javax.inject.Named;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -99,34 +101,38 @@ public class EntityLocatorParameterVisitor implements DOMElementVisitor, SAXVisi
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(EntityLocatorParameterVisitor.class);
 
-	@ConfigParam(name="entityLookupperId")
-    private int entityLocatorId;
+	@Inject
+    @Named("entityLookupperId")
+    private Integer entityLocatorId;
 
-	@ConfigParam(use = Use.OPTIONAL)
-	private String name;
+	@Inject
+	private Optional<String> name;
 
-	@ConfigParam
+	@Inject
 	private Integer index;
 
-    @ConfigParam(defaultVal = ParameterListType.NAMED_STR, decoder = ParameterListType.DataDecoder.class)
-    private ParameterListType parameterListType;
+    @Inject
+    private ParameterListType parameterListType = ParameterListType.NAMED;
 
-    @ConfigParam(name="wireBeanId", use = Use.OPTIONAL)
-    private String wireBeanIdName;
+    @Inject
+    @Named("wireBeanId")
+    private Optional<String> wireBeanIdName;
 
-    @ConfigParam(defaultVal = AnnotationConstants.NULL_STRING)
-    private MVELExpressionEvaluator expression;
+    @Inject
+    private Optional<ExpressionEvaluator> expression;
 
-    @ConfigParam(defaultVal = AnnotationConstants.NULL_STRING)
-    private String valueAttributeName;
+    @Inject
+    private Optional<String> valueAttributeName;
 
-    @ConfigParam(name="type", use = Use.OPTIONAL)
-    private String typeAlias;
+    @Inject
+    @Named("type")
+    private Optional<String> typeAlias;
 
-    @ConfigParam(name="default", use = Use.OPTIONAL)
-    private String defaultVal;
+    @Inject
+    @Named("default")
+    private Optional<String> defaultVal;
 
-    @AppContext
+    @Inject
     private ApplicationContext appContext;
 
     private Parameter<?> parameter;
@@ -139,7 +145,7 @@ public class EntityLocatorParameterVisitor implements DOMElementVisitor, SAXVisi
 
     private boolean isAttribute = true;
 
-    private DataDecoder decoder;
+    private TypeConverter<String, ?> typeConverter;
 
     private boolean beanWiring;
 
@@ -147,28 +153,28 @@ public class EntityLocatorParameterVisitor implements DOMElementVisitor, SAXVisi
      * Set the resource configuration on the bean populator.
      * @throws SmooksConfigurationException Incorrectly configured resource.
      */
-    @Initialize
+    @PostConstruct
     public void initialize() throws SmooksConfigurationException {
 
     	if(LOGGER.isDebugEnabled()) {
     		LOGGER.debug("Initializing EntityLocatorParameterVisitor with name '"+ name +"'");
     	}
 
-        beanWiring = wireBeanIdName != null;
-        isAttribute = (valueAttributeName != null);
+        beanWiring = wireBeanIdName.isPresent();
+        isAttribute = valueAttributeName.isPresent();
 
         beanIdStore = appContext.getBeanIdStore();
 
         if(parameterListType == ParameterListType.NAMED) {
         	NamedParameterIndex parameterIndex = (NamedParameterIndex) ParameterManager.getParameterIndex(entityLocatorId, appContext);
-        	parameter = parameterIndex.register(name);
+        	parameter = parameterIndex.register(name.orElse(null));
         } else {
         	PositionalParameterIndex parameterIndex = (PositionalParameterIndex) ParameterManager.getParameterIndex(entityLocatorId, appContext);
         	parameter = parameterIndex.register(index);
         }
 
-		if(wireBeanIdName != null) {
-            wireBeanId = beanIdStore.register(wireBeanIdName);
+		if(wireBeanIdName.isPresent()) {
+            wireBeanId = beanIdStore.register(wireBeanIdName.get());
         }
     }
 
@@ -176,12 +182,12 @@ public class EntityLocatorParameterVisitor implements DOMElementVisitor, SAXVisi
      * @see org.smooks.delivery.ordering.Consumer#consumes(java.lang.String)
      */
     public boolean consumes(Object object) {
-    	if(wireBeanIdName != null && object.equals(wireBeanIdName)) {
-    		return true;
-    	} else if(expression != null && expression.getExpression().indexOf(object.toString()) != -1) {
-    		return true;
-    	}
-    	return false;
+        if (object.equals(wireBeanIdName)) {
+            return true;
+        } else if (expression.isPresent() && expression.get().getExpression().contains(object.toString())) {
+            return true;
+        }
+        return false;
     }
 
     /* (non-Javadoc)
@@ -233,12 +239,12 @@ public class EntityLocatorParameterVisitor implements DOMElementVisitor, SAXVisi
         String dataString;
 
         if (isAttribute) {
-            dataString = DomUtils.getAttributeValue(element, valueAttributeName);
+            dataString = DomUtils.getAttributeValue(element, valueAttributeName.orElse(null));
         } else {
             dataString = DomUtils.getAllText(element, false);
         }
 
-        if(expression != null) {
+        if(expression.isPresent()) {
             bindExpressionValue(executionContext);
         } else {
             populateAndSetPropertyValue(dataString, executionContext);
@@ -249,13 +255,13 @@ public class EntityLocatorParameterVisitor implements DOMElementVisitor, SAXVisi
         String dataString;
 
         if (isAttribute) {
-            dataString = SAXUtil.getAttribute(valueAttributeName, element.getAttributes());
+            dataString = SAXUtil.getAttribute(valueAttributeName.orElse(null), element.getAttributes());
         } else {
             dataString = element.getTextContent();
         }
 
 
-        if(expression != null) {
+        if(expression.isPresent()) {
             bindExpressionValue(executionContext);
         } else {
             populateAndSetPropertyValue(dataString, executionContext);
@@ -280,7 +286,7 @@ public class EntityLocatorParameterVisitor implements DOMElementVisitor, SAXVisi
 
     private void bindExpressionValue(ExecutionContext executionContext) {
         Map<String, Object> beanMap = executionContext.getBeanContext().getBeanMap();
-        Object dataObject = expression.getValue(beanMap);
+        Object dataObject = expression.get().getValue(beanMap);
 
         if(dataObject instanceof String) {
             populateAndSetPropertyValue((String) dataObject, executionContext);
@@ -307,42 +313,47 @@ public class EntityLocatorParameterVisitor implements DOMElementVisitor, SAXVisi
     	container.put(parameter, dataObject);
     }
 
-    private Object decodeDataString(String dataString, ExecutionContext executionContext) throws DataDecodeException {
-        if((dataString == null || dataString.equals("")) && defaultVal != null) {
-        	if(defaultVal.equals("null")) {
+    private Object decodeDataString(String dataString, ExecutionContext executionContext) throws TypeConverterException {
+        if((dataString == null || dataString.equals("")) && defaultVal.isPresent()) {
+        	if(defaultVal.get().equals("null")) {
         		return null;
         	}
-            dataString = defaultVal;
+            dataString = defaultVal.get();
         }
 
-        if (decoder == null) {
-            decoder = getDecoder(executionContext);
+        if (typeConverter == null) {
+            typeConverter = getTypeConverter(executionContext);
         }
 
-        return decoder.decode(dataString);
+        return typeConverter.convert(dataString);
     }
 
 
-	private DataDecoder getDecoder(ExecutionContext executionContext) throws DataDecodeException {
-		@SuppressWarnings("unchecked")
-		List decoders = executionContext.getDeliveryConfig().getObjects("decoder:" + typeAlias);
+    private TypeConverter<String, ?> getTypeConverter(ExecutionContext executionContext) throws TypeConverterException {
+        @SuppressWarnings("unchecked")
+        List decoders = executionContext.getDeliveryConfig().getObjects("decoder:" + typeAlias.orElse(null));
 
         if (decoders == null || decoders.isEmpty()) {
-            decoder = DataDecoder.Factory.create(typeAlias);
-        } else if (!(decoders.get(0) instanceof DataDecoder)) {
-            throw new DataDecodeException("Configured decoder '" + typeAlias + ":" + decoders.get(0).getClass().getName() + "' is not an instance of " + DataDecoder.class.getName());
+            final TypeConverterFactory<String, ?> typeConverterFactory = (TypeConverterFactory<String, ?>) appContext.getRegistry().lookup(new NameTypeConverterFactoryLookup(typeAlias.orElse(null)));
+            if (typeConverterFactory == null) {
+                typeConverter = (TypeConverter) appContext.getRegistry().lookup(new SourceTargetTypeConverterFactoryLookup<>(Object.class, Object.class)).createTypeConverter();
+            } else {
+                typeConverter = typeConverterFactory.createTypeConverter();
+            }
+        } else if (!(decoders.get(0) instanceof TypeConverter)) {
+            throw new TypeConverterException("Configured type converter factory '" + typeAlias.orElse(null) + ":" + decoders.get(0).getClass().getName() + "' is not an instance of " + TypeConverterFactory.class.getName());
         } else {
-            decoder = (DataDecoder) decoders.get(0);
+            typeConverter = ((TypeConverter<String, ?>) decoders.get(0));
         }
 
-        return decoder;
+        return typeConverter;
     }
 
 	private BeanRuntimeInfo getWiredBeanRuntimeInfo() {
 		if(wiredBeanRuntimeInfo == null) {
             // Don't need to synchronize this.  Worse thing that can happen is we initialize it
             // more than once...
-            wiredBeanRuntimeInfo = BeanRuntimeInfo.getBeanRuntimeInfo(wireBeanIdName, appContext);
+            wiredBeanRuntimeInfo = BeanRuntimeInfo.getBeanRuntimeInfo(wireBeanIdName.orElse(null), appContext);
 		}
 		return wiredBeanRuntimeInfo;
 	}

@@ -42,8 +42,6 @@
  */
 package org.smooks.cartridges.persistence;
 
-import org.smooks.javabean.DataDecodeException;
-
 /**
  * @author maurice
  *
@@ -55,23 +53,5 @@ public enum OnNoResult {
 
 	public static final String NULLIFY_STR = "NULLIFY";
 	public static final String EXCEPTION_STR = "EXCEPTION";
-
-	/**
-	 * A Data decoder for this Enum
-	 *
-	 * @author <a href="mailto:maurice.zeijen@smies.com">maurice.zeijen@smies.com</a>
-	 *
-	 */
-	public static class DataDecoder implements org.smooks.javabean.DataDecoder {
-
-		/* (non-Javadoc)
-		 * @see org.smooks.javabean.DataDecoder#decode(java.lang.String)
-		 */
-		public Object decode(final String data) throws DataDecodeException {
-			final String value = data.toUpperCase();
-
-			return valueOf(value);
-		}
-
-	}
+	
 }

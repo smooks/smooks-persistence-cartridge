@@ -42,16 +42,14 @@
  */
 package org.smooks.cartridges.persistence;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.smooks.SmooksException;
 import org.smooks.cartridges.persistence.util.PersistenceUtil;
 import org.smooks.cdr.SmooksConfigurationException;
-import org.smooks.cdr.annotation.AppContext;
-import org.smooks.cdr.annotation.ConfigParam;
-import org.smooks.cdr.annotation.ConfigParam.Use;
 import org.smooks.container.ApplicationContext;
 import org.smooks.container.ExecutionContext;
 import org.smooks.delivery.Fragment;
-import org.smooks.delivery.annotation.Initialize;
 import org.smooks.delivery.annotation.VisitAfterIf;
 import org.smooks.delivery.annotation.VisitBeforeIf;
 import org.smooks.delivery.dom.DOMElementVisitor;
@@ -69,12 +67,14 @@ import org.smooks.scribe.invoker.DaoInvoker;
 import org.smooks.scribe.invoker.DaoInvokerFactory;
 import org.smooks.scribe.register.DaoRegister;
 import org.smooks.util.CollectionsUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import javax.inject.Named;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.Optional;
 import java.util.Set;
 
 
@@ -125,19 +125,22 @@ public class EntityDeleter implements DOMElementVisitor, SAXVisitBefore, SAXVisi
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EntityDeleter.class);
 
-    @ConfigParam(name = "beanId")
+    @Inject
+	@Named("beanId")
     private String beanIdName;
 
-    @ConfigParam(name = "deletedBeanId", use = Use.OPTIONAL)
-    private String deletedBeanIdName;
+    @Inject
+	@Named("deletedBeanId")
+	private Optional<String> deletedBeanIdName;
 
-    @ConfigParam(name = "dao", use = Use.OPTIONAL)
-    private String daoName;
+    @Inject
+	@Named("dao")
+	private Optional<String> daoName;
 
-    @ConfigParam(use = Use.OPTIONAL)
-    private String name;
+    @Inject
+    private Optional<String> name;
 
-    @AppContext
+    @Inject
     private ApplicationContext appContext;
 
     private ApplicationContextObjectStore objectStore;
@@ -146,16 +149,14 @@ public class EntityDeleter implements DOMElementVisitor, SAXVisitBefore, SAXVisi
 
     private BeanId deletedBeanId;
 
-    @Initialize
+    @PostConstruct
     public void initialize() throws SmooksConfigurationException {
 
     	BeanIdStore beanIdStore = appContext.getBeanIdStore();
 
     	beanId = beanIdStore.register(beanIdName);
 
-    	if(deletedBeanIdName != null) {
-    		deletedBeanId = beanIdStore.register(deletedBeanIdName);
-    	}
+		deletedBeanIdName.ifPresent(s -> deletedBeanId = beanIdStore.register(s));
 
     	objectStore = new ApplicationContextObjectStore(appContext);
     }
@@ -164,11 +165,7 @@ public class EntityDeleter implements DOMElementVisitor, SAXVisitBefore, SAXVisi
 	 * @see org.smooks.delivery.ordering.Producer#getProducts()
 	 */
 	public Set<String> getProducts() {
-		if(deletedBeanIdName == null) {
-			return Collections.emptySet();
-		} else {
-			return CollectionsUtil.toSet(deletedBeanIdName);
-		}
+		return deletedBeanIdName.map(CollectionsUtil::toSet).orElse(Collections.emptySet());
 	}
 
 
@@ -215,19 +212,19 @@ public class EntityDeleter implements DOMElementVisitor, SAXVisitBefore, SAXVisi
 
 		Object dao = null;
 		try {
-			if(daoName == null) {
+			if(!daoName.isPresent()) {
 				dao = emr.getDefaultDao();
 			} else {
-				dao = emr.getDao(daoName);
+				dao = emr.getDao(daoName.get());
 			}
 
 			if(dao == null) {
 				String msg = "The DAO register returned null while getting the ";
 
-				if(daoName == null) {
+				if(!daoName.isPresent()) {
 					msg += "default DAO";
 				} else {
-					msg += "DAO '" + daoName + "'";
+					msg += "DAO '" + daoName.get() + "'";
 				}
 
 				throw new NullPointerException(msg);
@@ -235,7 +232,7 @@ public class EntityDeleter implements DOMElementVisitor, SAXVisitBefore, SAXVisi
 
 			DaoInvoker daoInvoker = DaoInvokerFactory.getInstance().create(dao, objectStore);
 
-			Object result = (name != null) ? daoInvoker.delete(name, bean) : daoInvoker.delete(bean);
+			Object result = (name.isPresent()) ? daoInvoker.delete(name.get(), bean) : daoInvoker.delete(bean);
 
 			if(deletedBeanId != null) {
 				if(result == null) {
