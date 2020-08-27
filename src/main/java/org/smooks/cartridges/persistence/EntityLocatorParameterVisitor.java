@@ -49,8 +49,8 @@ import org.smooks.cartridges.javabean.BeanRuntimeInfo;
 import org.smooks.cartridges.persistence.observers.BeanCreateLifecycleObserver;
 import org.smooks.cartridges.persistence.parameter.*;
 import org.smooks.cdr.SmooksConfigurationException;
-import org.smooks.cdr.registry.lookup.NameTypeConverterFactoryLookup;
-import org.smooks.cdr.registry.lookup.SourceTargetTypeConverterFactoryLookup;
+import org.smooks.cdr.registry.lookup.converter.NameTypeConverterFactoryLookup;
+import org.smooks.cdr.registry.lookup.converter.SourceTargetTypeConverterFactoryLookup;
 import org.smooks.container.ApplicationContext;
 import org.smooks.container.ExecutionContext;
 import org.smooks.converter.TypeConverter;
@@ -145,7 +145,7 @@ public class EntityLocatorParameterVisitor implements DOMElementVisitor, SAXVisi
 
     private boolean isAttribute = true;
 
-    private TypeConverter<String, ?> typeConverter;
+    private TypeConverter<? super String, ?> typeConverter;
 
     private boolean beanWiring;
 
@@ -329,14 +329,14 @@ public class EntityLocatorParameterVisitor implements DOMElementVisitor, SAXVisi
     }
 
 
-    private TypeConverter<String, ?> getTypeConverter(ExecutionContext executionContext) throws TypeConverterException {
+    private TypeConverter<? super String, ?> getTypeConverter(ExecutionContext executionContext) throws TypeConverterException {
         @SuppressWarnings("unchecked")
         List decoders = executionContext.getDeliveryConfig().getObjects("decoder:" + typeAlias.orElse(null));
 
         if (decoders == null || decoders.isEmpty()) {
-            final TypeConverterFactory<String, ?> typeConverterFactory = (TypeConverterFactory<String, ?>) appContext.getRegistry().lookup(new NameTypeConverterFactoryLookup(typeAlias.orElse(null)));
+            final TypeConverterFactory<String, ?> typeConverterFactory = appContext.getRegistry().lookup(new NameTypeConverterFactoryLookup<>(typeAlias.orElse(null)));
             if (typeConverterFactory == null) {
-                typeConverter = (TypeConverter) appContext.getRegistry().lookup(new SourceTargetTypeConverterFactoryLookup<>(Object.class, Object.class)).createTypeConverter();
+                typeConverter = appContext.getRegistry().lookup(new SourceTargetTypeConverterFactoryLookup<>(Object.class, Object.class)).createTypeConverter();
             } else {
                 typeConverter = typeConverterFactory.createTypeConverter();
             }
