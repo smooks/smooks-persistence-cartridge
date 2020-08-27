@@ -46,7 +46,7 @@ import org.smooks.SmooksException;
 import org.smooks.cartridges.persistence.Constants;
 import org.smooks.cdr.SmooksResourceConfiguration;
 import org.smooks.cdr.extension.ExtensionContext;
-import org.smooks.cdr.registry.lookup.NameTypeConverterFactoryLookup;
+import org.smooks.cdr.registry.lookup.converter.NameTypeConverterFactoryLookup;
 import org.smooks.container.ApplicationContext;
 import org.smooks.container.ExecutionContext;
 import org.smooks.converter.TypeConverter;
@@ -83,7 +83,7 @@ public class DecodeParamResolver implements DOMVisitBefore {
             extensionContext.addResource(decoderConfig);
             try {
                 String type = populatorConfig.getParameterValue("type", String.class);
-                TypeConverter<?, ?> typeConverter = applicationContext.getRegistry().lookup(new NameTypeConverterFactoryLookup(type)).createTypeConverter();
+                TypeConverter<?, ?> typeConverter = applicationContext.getRegistry().lookup(new NameTypeConverterFactoryLookup<>(type)).createTypeConverter();
                 String reType = UUID.randomUUID().toString();
 
                 // Need to retype the populator configuration so as to get the
