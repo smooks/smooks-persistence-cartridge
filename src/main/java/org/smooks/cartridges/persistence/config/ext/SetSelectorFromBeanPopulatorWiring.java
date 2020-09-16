@@ -77,7 +77,7 @@ public class SetSelectorFromBeanPopulatorWiring implements DOMVisitBefore {
         ExtensionContext extensionContext = ExtensionContext.getExtensionContext(executionContext);
         SmooksResourceConfiguration config = extensionContext.getResourceStack().peek();
 
-        if(config.getSelector() == null || config.getSelector().equals("none")) {
+        if(config.getSelectorPath().getSelector() == null || config.getSelectorPath().getSelector().equals("none")) {
             Parameter<String> beanIdParam = config.getParameter("beanId", String.class);
             String beanId = beanIdParam.getValue();
 
@@ -88,7 +88,7 @@ public class SetSelectorFromBeanPopulatorWiring implements DOMVisitBefore {
                         "This can mean that no <jb:wiring> is present that wires the bean with the bean id or that it is configured after the <" + element.getNodeName() + ">. " +
                          "In this case you must set the selector in the '" + selectorAttrName + "' attribute.");
             } else {
-                config.setSelector(beanCreatorConfig.getSelector());
+                config.setSelector(beanCreatorConfig.getSelectorPath().getSelector());
             }
         }
     }

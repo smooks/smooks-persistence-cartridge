@@ -117,8 +117,8 @@ import java.util.Set;
  *
  * @author <a href="mailto:maurice.zeijen@smies.com">maurice.zeijen@smies.com</a>
  */
-@VisitBeforeIf(	condition = "parameters.containsKey('deleteBefore') && parameters.deleteBefore.value == 'true'")
-@VisitAfterIf( condition = "!parameters.containsKey('deleteBefore') || parameters.deleteBefore.value != 'true'")
+@VisitBeforeIf(	condition = "deleteBefore")
+@VisitAfterIf( condition = "!deleteBefore")
 @VisitBeforeReport(summary = "Deleting bean under beanId '${resource.parameters.beanId}'.", detailTemplate="reporting/EntityDeleter.html")
 @VisitAfterReport(summary = "Deleting bean under beanId '${resource.parameters.beanId}'.", detailTemplate="reporting/EntityDeleter.html")
 public class EntityDeleter implements DOMElementVisitor, SAXVisitBefore, SAXVisitAfter, Consumer, Producer {
@@ -142,6 +142,9 @@ public class EntityDeleter implements DOMElementVisitor, SAXVisitBefore, SAXVisi
 
     @Inject
     private ApplicationContext appContext;
+    
+    @Inject
+	private Boolean deleteBefore = false;
 
     private ApplicationContextObjectStore objectStore;
 
@@ -251,8 +254,7 @@ public class EntityDeleter implements DOMElementVisitor, SAXVisitBefore, SAXVisi
 		}
 	}
 
-
-
-
-
+	public Boolean getDeleteBefore() {
+		return deleteBefore;
+	}
 }
