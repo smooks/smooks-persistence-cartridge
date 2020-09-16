@@ -93,8 +93,8 @@ import java.util.Optional;
  *
  * @author <a href="mailto:maurice.zeijen@smies.com">maurice.zeijen@smies.com</a>
  */
-@VisitBeforeIf(	condition = "parameters.containsKey('flushBefore') && parameters.flushBefore.value == 'true'")
-@VisitAfterIf( condition = "!parameters.containsKey('flushBefore') || parameters.flushBefore.value != 'true'")
+@VisitBeforeIf(	condition = "flushBefore")
+@VisitAfterIf( condition = "!flushBefore")
 @VisitBeforeReport(summary = "Flushing <#if !resource.parameters.dao??>default </#if>DAO<#if resource.parameters.dao??> '${resource.parameters.dao}'</#if>.", detailTemplate="reporting/DaoFlusher.html")
 @VisitAfterReport(summary = "Flushing <#if !resource.parameters.dao??>default </#if>DAO<#if resource.parameters.dao??> '${resource.parameters.dao}'</#if>.", detailTemplate="reporting/DaoFlusher.html")
 public class DaoFlusher implements DOMElementVisitor, SAXVisitBefore, SAXVisitAfter {
@@ -108,6 +108,9 @@ public class DaoFlusher implements DOMElementVisitor, SAXVisitBefore, SAXVisitAf
     @Inject
     private ApplicationContext appContext;
 
+	@Inject
+	private Boolean flushBefore = false;
+    
     private ApplicationContextObjectStore objectStore;
 
     @PostConstruct
@@ -180,4 +183,7 @@ public class DaoFlusher implements DOMElementVisitor, SAXVisitBefore, SAXVisitAf
 		daoInvoker.flush();
 	}
 
+	public Boolean getFlushBefore() {
+		return flushBefore;
+	}
 }

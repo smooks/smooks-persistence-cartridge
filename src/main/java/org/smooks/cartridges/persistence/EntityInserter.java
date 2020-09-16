@@ -115,8 +115,8 @@ import java.util.Set;
  *
  * @author <a href="mailto:maurice.zeijen@smies.com">maurice.zeijen@smies.com</a>
  */
-@VisitBeforeIf(	condition = "parameters.containsKey('insertBefore') && parameters.insertBefore.value == 'true'")
-@VisitAfterIf( condition = "!parameters.containsKey('insertBefore') || parameters.insertBefore.value != 'true'")
+@VisitBeforeIf(	condition = "insertBefore")
+@VisitAfterIf( condition = "!insertBefore")
 @VisitBeforeReport(summary = "Inserting bean under beanId '${resource.parameters.beanId}'.", detailTemplate="reporting/EntityInserter.html")
 @VisitAfterReport(summary = "Inserting bean under beanId '${resource.parameters.beanId}'.", detailTemplate="reporting/EntityInserter.html")
 public class EntityInserter implements DOMElementVisitor, SAXVisitBefore, SAXVisitAfter, Consumer, Producer {
@@ -141,6 +141,9 @@ public class EntityInserter implements DOMElementVisitor, SAXVisitBefore, SAXVis
     @Inject
     private ApplicationContext appContext;
 
+	@Inject
+	private Boolean insertBefore = false;
+	
     private ObjectStore objectStore;
 
     private BeanId beanId;
@@ -241,5 +244,7 @@ public class EntityInserter implements DOMElementVisitor, SAXVisitBefore, SAXVis
 		}
 	}
 
-
+	public Boolean getInsertBefore() {
+		return insertBefore;
+	}
 }

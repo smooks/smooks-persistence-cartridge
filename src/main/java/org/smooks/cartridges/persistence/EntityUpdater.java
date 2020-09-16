@@ -116,8 +116,8 @@ import java.util.Set;
  *
  * @author <a href="mailto:maurice.zeijen@smies.com">maurice.zeijen@smies.com</a>
  */
-@VisitBeforeIf(	condition = "parameters.containsKey('updateBefore') && parameters.updateBefore.value == 'true'")
-@VisitAfterIf( condition = "!parameters.containsKey('updateBefore') || parameters.updateBefore.value != 'true'")
+@VisitBeforeIf(	condition = "updateBefore")
+@VisitAfterIf( condition = "!updateBefore")
 @VisitBeforeReport(summary = "Updating bean under beanId '${resource.parameters.beanId}'.", detailTemplate="reporting/EntityUpdater.html")
 @VisitAfterReport(summary = "Updating bean under beanId '${resource.parameters.beanId}'.", detailTemplate="reporting/EntityUpdater.html")
 public class EntityUpdater implements DOMElementVisitor, SAXVisitBefore, SAXVisitAfter, Producer, Consumer {
@@ -141,6 +141,9 @@ public class EntityUpdater implements DOMElementVisitor, SAXVisitBefore, SAXVisi
 
     @Inject
     private ApplicationContext appContext;
+    
+    @Inject
+	private Boolean updateBefore = false;
 
     private ObjectStore objectStore;
 
@@ -159,7 +162,11 @@ public class EntityUpdater implements DOMElementVisitor, SAXVisitBefore, SAXVisi
     	objectStore = new ApplicationContextObjectStore(appContext);
     }
 
-    /* (non-Javadoc)
+	public Boolean getUpdateBefore() {
+		return updateBefore;
+	}
+
+	/* (non-Javadoc)
 	 * @see org.smooks.delivery.ordering.Producer#getProducts()
 	 */
 	public Set<? extends Object> getProducts() {
