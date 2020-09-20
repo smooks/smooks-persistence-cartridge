@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-           xmlns:smooks="https://www.smooks.org/xsd/smooks-1.2.xsd"
-           xmlns:smooks-persistence="https://www.smooks.org/xsd/smooks/persistence-2.0.xsd"
+           xmlns:smooks="https://www.smooks.org/xsd/smooks-2.0.xsd"
+           xmlns:persistence="https://www.smooks.org/xsd/smooks/persistence-2.0.xsd"
            targetNamespace="https://www.smooks.org/xsd/smooks/persistence-2.0.xsd"
            elementFormDefault="qualified">
 
-    <xs:import namespace="https://www.smooks.org/xsd/smooks-1.2.xsd"/>
+    <xs:import namespace="https://www.smooks.org/xsd/smooks-2.0.xsd"/>
 
     <xs:annotation>
         <xs:documentation xml:lang="en">Smooks Persistence Configuration</xs:documentation>
     </xs:annotation>
 
-    <xs:element name="inserter" type="smooks-persistence:inserter" substitutionGroup="smooks:abstract-resource-config">
+    <xs:element name="inserter" type="persistence:inserter" substitutionGroup="smooks:abstract-resource-config">
     	<xs:annotation>
 			<xs:documentation xml:lang="en">
 				This DAO inserter calls the insert method of a DAO, using a entity bean from
@@ -74,13 +74,6 @@
        					</xs:documentation>
        				</xs:annotation>
        			</xs:attribute>
-       			<xs:attribute name="insertOnElementNS" type="xs:anyURI">
-       				<xs:annotation>
-       					<xs:documentation xml:lang="en">
-       						Namespace control for the "InsertOnElement" attribute.
-       					</xs:documentation>
-       				</xs:annotation>
-       			</xs:attribute>
 				<xs:attribute name="insertBefore" type="xs:boolean" use="optional" default="false">
        				<xs:annotation>
        					<xs:documentation xml:lang="en">
@@ -93,7 +86,7 @@
 
     </xs:complexType>
 
-	<xs:element name="updater" type="smooks-persistence:updater" substitutionGroup="smooks:abstract-resource-config">
+	<xs:element name="updater" type="persistence:updater" substitutionGroup="smooks:abstract-resource-config">
     	<xs:annotation>
 			<xs:documentation xml:lang="en">
 			</xs:documentation>
@@ -151,13 +144,6 @@
        					</xs:documentation>
        				</xs:annotation>
        			</xs:attribute>
-       			<xs:attribute name="updateOnElementNS" type="xs:anyURI">
-       				<xs:annotation>
-       					<xs:documentation xml:lang="en">
-       						Namespace control for the "updateOnElement" attribute.
-       					</xs:documentation>
-       				</xs:annotation>
-       			</xs:attribute>
 				<xs:attribute name="updateBefore" type="xs:boolean" use="optional" default="false">
        				<xs:annotation>
        					<xs:documentation xml:lang="en">
@@ -170,7 +156,7 @@
 
     </xs:complexType>
 
-    <xs:element name="deleter" type="smooks-persistence:deleter" substitutionGroup="smooks:abstract-resource-config">
+    <xs:element name="deleter" type="persistence:deleter" substitutionGroup="smooks:abstract-resource-config">
     	<xs:annotation>
 			<xs:documentation xml:lang="en">
 				This DAO deleter calls the delete method of a DAO, using a entity bean from
@@ -230,13 +216,6 @@
        					</xs:documentation>
        				</xs:annotation>
        			</xs:attribute>
-       			<xs:attribute name="deleteOnElementNS" type="xs:anyURI">
-       				<xs:annotation>
-       					<xs:documentation xml:lang="en">
-       						Namespace control for the "deleteOnElement" attribute.
-       					</xs:documentation>
-       				</xs:annotation>
-       			</xs:attribute>
 				<xs:attribute name="deleteBefore" type="xs:boolean" use="optional" default="false">
        				<xs:annotation>
        					<xs:documentation xml:lang="en">
@@ -249,7 +228,7 @@
 
     </xs:complexType>
 
-    <xs:element name="flusher" type="smooks-persistence:flusher" substitutionGroup="smooks:abstract-resource-config">
+    <xs:element name="flusher" type="persistence:flusher" substitutionGroup="smooks:abstract-resource-config">
     	<xs:annotation>
 			<xs:documentation xml:lang="en">
 				This DAO flusher calls the flush method of a DAO.
@@ -280,13 +259,6 @@
        					</xs:documentation>
        				</xs:annotation>
        			</xs:attribute>
-       			<xs:attribute name="flushOnElementNS" type="xs:anyURI">
-       				<xs:annotation>
-       					<xs:documentation xml:lang="en">
-       						Namespace control for the "flushOnElement" attribute.
-       					</xs:documentation>
-       				</xs:annotation>
-       			</xs:attribute>
 				<xs:attribute name="flushBefore" type="xs:boolean" use="optional" default="false">
        				<xs:annotation>
        					<xs:documentation xml:lang="en">
@@ -299,7 +271,7 @@
 
     </xs:complexType>
 
-    <xs:element name="locator" type="smooks-persistence:locator" substitutionGroup="smooks:abstract-resource-config">
+    <xs:element name="locator" type="persistence:locator" substitutionGroup="smooks:abstract-resource-config">
     	<xs:annotation>
 			<xs:documentation xml:lang="en">
 				Can locate data/records by execution lookup methods or invoking
@@ -344,7 +316,7 @@
     						</xs:documentation>
     					</xs:annotation>
     				</xs:element>
-    				<xs:element name="params" type="smooks-persistence:parameters" maxOccurs="1" minOccurs="0">
+    				<xs:element name="params" type="persistence:parameters" maxOccurs="1" minOccurs="0">
     					<xs:annotation>
     						<xs:documentation xml:lang="en">
     							The lookup method/query parameters.
@@ -375,7 +347,7 @@
     				</xs:annotation>
     			</xs:attribute>
     			<xs:attribute name="onNoResult"
-    				type="smooks-persistence:OnNoResult" use="optional"	default="NULLIFY">
+    				type="persistence:OnNoResult" use="optional"	default="NULLIFY">
     				<xs:annotation>
     					<xs:documentation xml:lang="en">
 							Defines the action when no result is found.
@@ -399,14 +371,6 @@
                             for the bean creator that wires the result of this lookup and use the
                             same selector. This only works if the bean creator is defined before the locator in
                             the configuration.
-    					</xs:documentation>
-    				</xs:annotation>
-    			</xs:attribute>
-    			<xs:attribute name="lookupOnElementNS"
-    				type="xs:anyURI">
-    				<xs:annotation>
-    					<xs:documentation xml:lang="en">
-    						Namespace control for the "lookupOnElement" attribute.
     					</xs:documentation>
     				</xs:annotation>
     			</xs:attribute>
@@ -470,7 +434,7 @@
     		</xs:documentation>
     	</xs:annotation>
     	<xs:choice maxOccurs="unbounded" minOccurs="1">
-    		<xs:element name="value" type="smooks-persistence:valueParameter">
+    		<xs:element name="value" type="persistence:valueParameter">
     			<xs:annotation>
     				<xs:documentation xml:lang="en">
     					A value parameter that retrieves its value
@@ -478,14 +442,14 @@
     				</xs:documentation>
     			</xs:annotation>
     		</xs:element>
-    		<xs:element name="wiring" type="smooks-persistence:wiringParameter">
+    		<xs:element name="wiring" type="persistence:wiringParameter">
     			<xs:annotation>
     				<xs:documentation xml:lang="en">
     					Uses an object from the bean context as parameter.
     				</xs:documentation>
     			</xs:annotation>
     		</xs:element>
-    		<xs:element name="expression"  type="smooks-persistence:expressionParameter">
+    		<xs:element name="expression"  type="persistence:expressionParameter">
     			<xs:annotation>
     				<xs:documentation xml:lang="en">
     					Uses the result from a MVEL expression as parameter.
@@ -496,7 +460,7 @@
     			</xs:annotation>
     		</xs:element>
     	</xs:choice>
-    	<xs:attribute name="type" type="smooks-persistence:parameterType" default="NAMED">
+    	<xs:attribute name="type" type="persistence:parameterType" default="NAMED">
 			<xs:annotation>
 				<xs:documentation xml:lang="en">
 					If the parameters are named or positional.
@@ -513,7 +477,7 @@
     		</xs:documentation>
     	</xs:annotation>
 		<xs:sequence>
-			<xs:element name="decodeParam" type="smooks-persistence:decoderParameter"
+			<xs:element name="decodeParam" type="persistence:decoderParameter"
 				maxOccurs="1"
 				minOccurs="0">
 				<xs:annotation>
@@ -552,13 +516,6 @@
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
-		<xs:attribute name="dataNS" type="xs:string" use="optional">
-			<xs:annotation>
-				<xs:documentation xml:lang="en">
-					The namespace for the data selector.
-				</xs:documentation>
-			</xs:annotation>
-		</xs:attribute>
     </xs:complexType>
 
     <xs:complexType name="wiringParameter">
@@ -587,13 +544,6 @@
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
- 		<xs:attribute name="wireOnElementNS" type="xs:string">
-			<xs:annotation>
-				<xs:documentation xml:lang="en">
-					The namespace of the wireOnElement selector.
-				</xs:documentation>
-			</xs:annotation>
-		</xs:attribute>
     </xs:complexType>
 
     <xs:complexType name="expressionParameter">
@@ -613,13 +563,6 @@
 							The element on which the expression will be executed.
 							By default this happens on the
 							same element the locator is defined one.
-						</xs:documentation>
-					</xs:annotation>
-				</xs:attribute>
-        		<xs:attribute name="execOnElementNS" type="xs:string">
-					<xs:annotation>
-						<xs:documentation xml:lang="en">
-							The namespace of the execOnElement selector.
 						</xs:documentation>
 					</xs:annotation>
 				</xs:attribute>

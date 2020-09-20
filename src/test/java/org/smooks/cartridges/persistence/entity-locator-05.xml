@@ -42,9 +42,8 @@
   =========================LICENSE_END==================================
   -->
 
-<smooks-resource-list xmlns="https://www.smooks.org/xsd/smooks-1.2.xsd"
-	xmlns:jb="https://www.smooks.org/xsd/smooks/javabean-1.6.xsd"
-	xmlns:dao="https://www.smooks.org/xsd/smooks/persistence-2.0.xsd">
+<smooks-resource-list xmlns="https://www.smooks.org/xsd/smooks-2.0.xsd"
+					  xmlns:dao="https://www.smooks.org/xsd/smooks/persistence-2.0.xsd">
 
 	<dao:locator dao="some" lookup="test" beanId="entity" lookupOnElement="#document" >
 		<dao:params type="POSITIONAL">

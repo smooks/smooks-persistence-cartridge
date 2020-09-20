@@ -107,7 +107,7 @@ import java.util.Set;
  * <h3>Configuration Example</h3>
  * <pre>
  * &lt;?xml version=&quot;1.0&quot;?&gt;
- * &lt;smooks-resource-list xmlns=&quot;https://www.smooks.org/xsd/smooks-1.2.xsd&quot;
+ * &lt;smooks-resource-list xmlns=&quot;https://www.smooks.org/xsd/smooks-2.0.xsd&quot;
  *   xmlns:dao=&quot;https://www.smooks.org/xsd/smooks/persistence-2.0.xsd&quot;&gt;
  *
  *      &lt;dao:deleter dao=&quot;dao&quot; name=&quot;deleteIt&quot; beanId=&quot;toDelete1&quot; deleteOnElement=&quot;root&quot; deletedBeanId=&quot;deleted&quot; deleteBefore=&quot;false&quot; /&gt;
