@@ -84,7 +84,7 @@ import java.util.Optional;
  * <h3>Configuration Example</h3>
  * <pre>
  * &lt;?xml version=&quot;1.0&quot;?&gt;
- * &lt;smooks-resource-list xmlns=&quot;https://www.smooks.org/xsd/smooks-1.2.xsd&quot;
+ * &lt;smooks-resource-list xmlns=&quot;https://www.smooks.org/xsd/smooks-2.0.xsd&quot;
  *   xmlns:dao=&quot;https://www.smooks.org/xsd/smooks/persistence-2.0.xsd&quot;&gt;
  *
  *      &lt;dao:flusher dao=&quot;dao&quot; flushOnElement=&quot;root&quot; flushBefore=&quot;false&quot; /&gt;
