@@ -52,12 +52,10 @@ import org.smooks.container.ExecutionContext;
 import org.smooks.delivery.Fragment;
 import org.smooks.delivery.annotation.VisitAfterIf;
 import org.smooks.delivery.annotation.VisitBeforeIf;
-import org.smooks.delivery.dom.DOMElementVisitor;
 import org.smooks.delivery.ordering.Consumer;
 import org.smooks.delivery.ordering.Producer;
-import org.smooks.delivery.sax.SAXElement;
-import org.smooks.delivery.sax.SAXVisitAfter;
-import org.smooks.delivery.sax.SAXVisitBefore;
+import org.smooks.delivery.sax.ng.AfterVisitor;
+import org.smooks.delivery.sax.ng.BeforeVisitor;
 import org.smooks.event.report.annotation.VisitAfterReport;
 import org.smooks.event.report.annotation.VisitBeforeReport;
 import org.smooks.javabean.context.BeanContext;
@@ -73,7 +71,6 @@ import org.w3c.dom.Element;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
-import java.io.IOException;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
@@ -120,7 +117,7 @@ import java.util.Set;
 @VisitAfterIf( condition = "!updateBefore")
 @VisitBeforeReport(summary = "Updating bean under beanId '${resource.parameters.beanId}'.", detailTemplate="reporting/EntityUpdater.html")
 @VisitAfterReport(summary = "Updating bean under beanId '${resource.parameters.beanId}'.", detailTemplate="reporting/EntityUpdater.html")
-public class EntityUpdater implements DOMElementVisitor, SAXVisitBefore, SAXVisitAfter, Producer, Consumer {
+public class EntityUpdater implements AfterVisitor, BeforeVisitor, Producer, Consumer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EntityUpdater.class);
 
@@ -184,19 +181,13 @@ public class EntityUpdater implements DOMElementVisitor, SAXVisitBefore, SAXVisi
 		return object.equals(beanIdName);
 	}
 
+	@Override
     public void visitBefore(final Element element, final ExecutionContext executionContext) throws SmooksException {
     	update(executionContext, new Fragment(element));
     }
 
+    @Override
     public void visitAfter(final Element element, final ExecutionContext executionContext) throws SmooksException {
-    	update(executionContext, new Fragment(element));
-    }
-
-    public void visitBefore(final SAXElement element, final ExecutionContext executionContext) throws SmooksException, IOException {
-    	update(executionContext, new Fragment(element));
-    }
-
-    public void visitAfter(final SAXElement element, final ExecutionContext executionContext) throws SmooksException, IOException {
     	update(executionContext, new Fragment(element));
     }
 
@@ -208,7 +199,7 @@ public class EntityUpdater implements DOMElementVisitor, SAXVisitBefore, SAXVisi
 	@SuppressWarnings("unchecked")
 	private void update(final ExecutionContext executionContext, Fragment source) {
 
-		if(LOGGER.isDebugEnabled()) {
+		if (LOGGER.isDebugEnabled()) {
 			LOGGER.debug("Updating bean under BeanId '" + beanIdName + "' with DAO '" + daoName + "'.");
 		}
 
@@ -220,34 +211,32 @@ public class EntityUpdater implements DOMElementVisitor, SAXVisitBefore, SAXVisi
 
 		Object dao = null;
 		try {
-			if(!daoName.isPresent()) {
+			if (!daoName.isPresent()) {
 				dao = emr.getDefaultDao();
 			} else {
 				dao = emr.getDao(daoName.get());
 			}
 
-			if(dao == null) {
+			if (dao == null) {
 				throw new IllegalStateException("The DAO register returned null while getting the DAO '" + daoName + "'");
 			}
 
 			final DaoInvoker daoInvoker = DaoInvokerFactory.getInstance().create(dao, objectStore);
 
-			Object result = !name.isPresent() ? daoInvoker.update(bean) : daoInvoker.update(name.get(), bean) ;
+			Object result = !name.isPresent() ? daoInvoker.update(bean) : daoInvoker.update(name.get(), bean);
 
-			if(updatedBeanId != null) {
-				if(result == null) {
+			if (updatedBeanId != null) {
+				if (result == null) {
 					result = bean;
 				}
 				beanContext.addBean(updatedBeanId, result, source);
-			} else if(result != null && bean != result) {
+			} else if (result != null && bean != result) {
 				beanContext.changeBean(beanId, bean, source);
 			}
 		} finally {
-			if(dao != null) {
+			if (dao != null) {
 				emr.returnDao(dao);
 			}
 		}
 	}
-
-
 }

@@ -43,11 +43,8 @@
   -->
 
 <smooks-resource-list xmlns="https://www.smooks.org/xsd/smooks-2.0.xsd"
-                      xmlns:core="https://www.smooks.org/xsd/smooks/smooks-core-1.5.xsd"
                       xmlns:jb="https://www.smooks.org/xsd/smooks/javabean-1.6.xsd">
     
-    <core:filterSettings type="SAX"/>
-
     <!-- The javabean cartridge actions -->
     <jb:bean beanId="person" class="com.smies.smooks.persistence.test.model.Person" createOnElement="person">
         <jb:value property="id" data="person/@id"/>

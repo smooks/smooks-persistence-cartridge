@@ -49,26 +49,24 @@ import org.smooks.cartridges.javabean.BeanRuntimeInfo;
 import org.smooks.cartridges.persistence.observers.BeanCreateLifecycleObserver;
 import org.smooks.cartridges.persistence.parameter.*;
 import org.smooks.cdr.SmooksConfigurationException;
-import org.smooks.cdr.registry.lookup.converter.NameTypeConverterFactoryLookup;
-import org.smooks.cdr.registry.lookup.converter.SourceTargetTypeConverterFactoryLookup;
 import org.smooks.container.ApplicationContext;
 import org.smooks.container.ExecutionContext;
 import org.smooks.converter.TypeConverter;
 import org.smooks.converter.TypeConverterException;
 import org.smooks.converter.factory.TypeConverterFactory;
-import org.smooks.delivery.dom.DOMElementVisitor;
+import org.smooks.delivery.memento.NodeVisitable;
+import org.smooks.delivery.memento.TextAccumulatorMemento;
 import org.smooks.delivery.ordering.Consumer;
 import org.smooks.delivery.ordering.Producer;
-import org.smooks.delivery.sax.SAXElement;
-import org.smooks.delivery.sax.SAXUtil;
-import org.smooks.delivery.sax.SAXVisitAfter;
-import org.smooks.delivery.sax.SAXVisitBefore;
+import org.smooks.delivery.sax.ng.ElementVisitor;
 import org.smooks.event.report.annotation.VisitAfterReport;
 import org.smooks.event.report.annotation.VisitBeforeReport;
 import org.smooks.expression.ExpressionEvaluator;
 import org.smooks.javabean.context.BeanContext;
 import org.smooks.javabean.context.BeanIdStore;
 import org.smooks.javabean.repository.BeanId;
+import org.smooks.registry.lookup.converter.NameTypeConverterFactoryLookup;
+import org.smooks.registry.lookup.converter.SourceTargetTypeConverterFactoryLookup;
 import org.smooks.util.CollectionsUtil;
 import org.smooks.xml.DomUtils;
 import org.w3c.dom.Element;
@@ -76,7 +74,6 @@ import org.w3c.dom.Element;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -97,7 +94,7 @@ import java.util.Set;
 		summary = "<#if resource.parameters.wireBeanId??>Removing bean lifecycle observer for the bean under the beanId '${resource.parameters.wireBeanId}'." +
 		"<#else>Populating <#if resource.parameters.name??>the '${resource.parameters.name}'</#if> parameter " +
 		"from <#if resource.parameters.expression??>an expression<#else>this element.</#if></#if>.")
-public class EntityLocatorParameterVisitor implements DOMElementVisitor, SAXVisitBefore, SAXVisitAfter, Consumer, Producer  {
+public class EntityLocatorParameterVisitor implements ElementVisitor, Consumer, Producer  {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(EntityLocatorParameterVisitor.class);
 
@@ -154,7 +151,7 @@ public class EntityLocatorParameterVisitor implements DOMElementVisitor, SAXVisi
      * @throws SmooksConfigurationException Incorrectly configured resource.
      */
     @PostConstruct
-    public void initialize() throws SmooksConfigurationException {
+    public void postConstruct() throws SmooksConfigurationException {
 
     	if(LOGGER.isDebugEnabled()) {
     		LOGGER.debug("Initializing EntityLocatorParameterVisitor with name '"+ name +"'");
@@ -181,6 +178,7 @@ public class EntityLocatorParameterVisitor implements DOMElementVisitor, SAXVisi
     /* (non-Javadoc)
      * @see org.smooks.delivery.ordering.Consumer#consumes(java.lang.String)
      */
+    @Override
     public boolean consumes(Object object) {
         if (object.equals(wireBeanIdName)) {
             return true;
@@ -194,54 +192,38 @@ public class EntityLocatorParameterVisitor implements DOMElementVisitor, SAXVisi
      * @see org.smooks.delivery.ordering.Producer#getProducts()
      */
 	@SuppressWarnings("unchecked")
+    @Override
 	public Set<? extends Object> getProducts() {
     	return CollectionsUtil.toSet(parameter);
     }
 
+    @Override
     public void visitBefore(Element element, ExecutionContext executionContext) throws SmooksException {
-    	if(beanWiring) {
-        	bindBeanValue(executionContext);
-        } else if(isAttribute) {
-            bindDomDataValue(element, executionContext);
+
+        if (beanWiring) {
+            bindBeanValue(executionContext);
+        } else if (isAttribute) {
+            // Bind attribute (i.e. selectors with '@' prefix) values on the visitBefore...
+            bindDataValue(element, executionContext);
         }
     }
 
+    @Override
     public void visitAfter(Element element, ExecutionContext executionContext) throws SmooksException {
     	if(!beanWiring && !isAttribute) {
-            bindDomDataValue(element, executionContext);
+            bindDataValue(element, executionContext);
     	}
     }
-
-    public void visitBefore(SAXElement element, ExecutionContext executionContext) throws SmooksException, IOException {
-
-        if (!isAttribute) {
-            // It's not an attribute binding i.e. it's the element's text.
-            // Turn on Text Accumulation...
-            element.accumulateText();
-        }
-
-        if(beanWiring) {
-        	bindBeanValue(executionContext);
-        } else if(isAttribute) {
-            // Bind attribute (i.e. selectors with '@' prefix) values on the visitBefore...
-            bindSaxDataValue(element, executionContext);
-        }
-    }
-
-    public void visitAfter(SAXElement element, ExecutionContext executionContext) throws SmooksException, IOException {
-    	if(!beanWiring && !isAttribute) {
-            bindSaxDataValue(element, executionContext);
-    	}
-    }
-
-
-    private void bindDomDataValue(Element element, ExecutionContext executionContext) {
+    
+    private void bindDataValue(Element element, ExecutionContext executionContext) {
         String dataString;
 
         if (isAttribute) {
             dataString = DomUtils.getAttributeValue(element, valueAttributeName.orElse(null));
         } else {
-            dataString = DomUtils.getAllText(element, false);
+            TextAccumulatorMemento textAccumulatorMemento = new TextAccumulatorMemento(new NodeVisitable(element), this);
+            executionContext.getMementoCaretaker().restore(textAccumulatorMemento);
+            dataString = textAccumulatorMemento.getText();
         }
 
         if(expression.isPresent()) {
@@ -250,24 +232,7 @@ public class EntityLocatorParameterVisitor implements DOMElementVisitor, SAXVisi
             populateAndSetPropertyValue(dataString, executionContext);
         }
     }
-
-    private void bindSaxDataValue(SAXElement element, ExecutionContext executionContext) {
-        String dataString;
-
-        if (isAttribute) {
-            dataString = SAXUtil.getAttribute(valueAttributeName.orElse(null), element.getAttributes());
-        } else {
-            dataString = element.getTextContent();
-        }
-
-
-        if(expression.isPresent()) {
-            bindExpressionValue(executionContext);
-        } else {
-            populateAndSetPropertyValue(dataString, executionContext);
-        }
-    }
-
+    
     private void bindBeanValue(final ExecutionContext executionContext) {
     	final BeanContext beanContext = executionContext.getBeanContext();
 
@@ -362,4 +327,17 @@ public class EntityLocatorParameterVisitor implements DOMElementVisitor, SAXVisi
 		return EntityLocatorParameterVisitor.class.getName() + "#" + entityLocatorId + "#" + name;
 	}
 
+    @Override
+    public void visitChildText(Element element, ExecutionContext executionContext) {
+        if (!isAttribute) {
+            // It's not an attribute binding i.e. it's the element's text.
+            // Turn on Text Accumulation...
+            executionContext.getMementoCaretaker().stash(new TextAccumulatorMemento(new NodeVisitable(element), this), textAccumulatorMemento -> textAccumulatorMemento.accumulateText(element.getTextContent()));
+        }
+    }
+
+    @Override
+    public void visitChildElement(Element childElement, ExecutionContext executionContext) {
+
+    }
 }

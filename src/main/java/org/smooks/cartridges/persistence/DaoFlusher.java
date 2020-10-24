@@ -50,10 +50,8 @@ import org.smooks.container.ApplicationContext;
 import org.smooks.container.ExecutionContext;
 import org.smooks.delivery.annotation.VisitAfterIf;
 import org.smooks.delivery.annotation.VisitBeforeIf;
-import org.smooks.delivery.dom.DOMElementVisitor;
-import org.smooks.delivery.sax.SAXElement;
-import org.smooks.delivery.sax.SAXVisitAfter;
-import org.smooks.delivery.sax.SAXVisitBefore;
+import org.smooks.delivery.sax.ng.AfterVisitor;
+import org.smooks.delivery.sax.ng.BeforeVisitor;
 import org.smooks.event.report.annotation.VisitAfterReport;
 import org.smooks.event.report.annotation.VisitBeforeReport;
 import org.smooks.scribe.invoker.DaoInvoker;
@@ -64,7 +62,6 @@ import org.w3c.dom.Element;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
-import java.io.IOException;
 import java.util.Optional;
 
 /**
@@ -97,7 +94,7 @@ import java.util.Optional;
 @VisitAfterIf( condition = "!flushBefore")
 @VisitBeforeReport(summary = "Flushing <#if !resource.parameters.dao??>default </#if>DAO<#if resource.parameters.dao??> '${resource.parameters.dao}'</#if>.", detailTemplate="reporting/DaoFlusher.html")
 @VisitAfterReport(summary = "Flushing <#if !resource.parameters.dao??>default </#if>DAO<#if resource.parameters.dao??> '${resource.parameters.dao}'</#if>.", detailTemplate="reporting/DaoFlusher.html")
-public class DaoFlusher implements DOMElementVisitor, SAXVisitBefore, SAXVisitAfter {
+public class DaoFlusher implements BeforeVisitor, AfterVisitor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DaoFlusher.class);
 
@@ -114,23 +111,17 @@ public class DaoFlusher implements DOMElementVisitor, SAXVisitBefore, SAXVisitAf
     private ApplicationContextObjectStore objectStore;
 
     @PostConstruct
-    public void initialize() {
+    public void postConstruct() {
     	objectStore = new ApplicationContextObjectStore(appContext);
     }
-
+    
+    @Override
     public void visitBefore(final Element element, final ExecutionContext executionContext) throws SmooksException {
     	flush(executionContext);
     }
 
-    public void visitAfter(final Element element, final ExecutionContext executionContext) throws SmooksException {
-    	flush(executionContext);
-    }
-
-    public void visitBefore(final SAXElement element, final ExecutionContext executionContext) throws SmooksException, IOException {
-    	flush(executionContext);
-    }
-
-    public void visitAfter(final SAXElement element, final ExecutionContext executionContext) throws SmooksException, IOException {
+	@Override
+	public void visitAfter(final Element element, final ExecutionContext executionContext) throws SmooksException {
     	flush(executionContext);
     }
 

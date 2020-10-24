@@ -50,12 +50,10 @@ import org.smooks.cdr.SmooksConfigurationException;
 import org.smooks.container.ApplicationContext;
 import org.smooks.container.ExecutionContext;
 import org.smooks.delivery.Fragment;
-import org.smooks.delivery.dom.DOMElementVisitor;
 import org.smooks.delivery.ordering.Consumer;
 import org.smooks.delivery.ordering.Producer;
-import org.smooks.delivery.sax.SAXElement;
-import org.smooks.delivery.sax.SAXVisitAfter;
-import org.smooks.delivery.sax.SAXVisitBefore;
+import org.smooks.delivery.sax.ng.AfterVisitor;
+import org.smooks.delivery.sax.ng.BeforeVisitor;
 import org.smooks.event.report.annotation.VisitAfterReport;
 import org.smooks.event.report.annotation.VisitBeforeReport;
 import org.smooks.javabean.context.BeanContext;
@@ -70,7 +68,6 @@ import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.persistence.NonUniqueResultException;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
@@ -119,7 +116,7 @@ import java.util.Set;
  */
 @VisitBeforeReport(summary = "Initializing parameter container to hold the parameters needed for the lookup.", detailTemplate="reporting/EntityLocator_before.html")
 @VisitAfterReport(summary = "Looking up entity to put under beanId '${resource.parameters.beanId}'.", detailTemplate="reporting/EntityLocator_after.html")
-public class EntityLocator implements DOMElementVisitor, SAXVisitBefore, SAXVisitAfter, Producer, Consumer {
+public class EntityLocator implements BeforeVisitor, AfterVisitor, Producer, Consumer {
 
 	@Inject
 	private Integer id;
@@ -158,7 +155,7 @@ public class EntityLocator implements DOMElementVisitor, SAXVisitBefore, SAXVisi
     private BeanId beanId;
     
     @PostConstruct
-    public void initialize() throws SmooksConfigurationException {
+    public void postConstruct() throws SmooksConfigurationException {
 
     	if(StringUtils.isEmpty(lookupName.orElse(null)) && StringUtils.isEmpty(query.orElse(null))) {
     		throw new SmooksConfigurationException("A lookup name or  a query  needs to be set to be able to lookup anything");
@@ -178,6 +175,7 @@ public class EntityLocator implements DOMElementVisitor, SAXVisitBefore, SAXVisi
     /* (non-Javadoc)
 	 * @see org.smooks.delivery.ordering.Producer#getProducts()
 	 */
+	@Override
 	public Set<? extends Object> getProducts() {
 		return CollectionsUtil.toSet(beanIdName);
 	}
@@ -185,37 +183,25 @@ public class EntityLocator implements DOMElementVisitor, SAXVisitBefore, SAXVisi
 	/* (non-Javadoc)
 	 * @see org.smooks.delivery.ordering.Consumer#consumes(java.lang.String)
 	 */
+	@Override
 	public boolean consumes(Object object) {
 		return parameterIndex.containsParameter(object);
 	}
 
 	/* (non-Javadoc)
-	 * @see org.smooks.delivery.dom.DOMVisitBefore#visitBefore(org.w3c.dom.Element, org.smooks.container.ExecutionContext)
-	 */
-	public void visitBefore(Element element, ExecutionContext executionContext)	throws SmooksException {
-
-		initParameterContainer(executionContext);
-	}
-
-	/* (non-Javadoc)
 	 * @see org.smooks.delivery.sax.SAXVisitBefore#visitBefore(org.smooks.delivery.sax.SAXElement, org.smooks.container.ExecutionContext)
 	 */
-	public void visitBefore(SAXElement element,	ExecutionContext executionContext) throws SmooksException, IOException {
 
+	@Override
+	public void visitBefore(Element element, ExecutionContext executionContext) throws SmooksException {
 		initParameterContainer(executionContext);
 	}
-
-	/* (non-Javadoc)
-	 * @see org.smooks.delivery.dom.DOMVisitAfter#visitAfter(org.w3c.dom.Element, org.smooks.container.ExecutionContext)
-	 */
-	public void visitAfter(Element element, ExecutionContext executionContext) throws SmooksException {
-		lookup(executionContext, new Fragment(element));
-	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.smooks.delivery.sax.SAXVisitAfter#visitAfter(org.smooks.delivery.sax.SAXElement, org.smooks.container.ExecutionContext)
 	 */
-	public void visitAfter(SAXElement element, ExecutionContext executionContext) throws SmooksException, IOException {
+	@Override
+	public void visitAfter(Element element, ExecutionContext executionContext) throws SmooksException {
 		lookup(executionContext, new Fragment(element));
 	}
 
