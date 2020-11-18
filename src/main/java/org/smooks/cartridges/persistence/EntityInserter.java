@@ -52,12 +52,10 @@ import org.smooks.container.ExecutionContext;
 import org.smooks.delivery.Fragment;
 import org.smooks.delivery.annotation.VisitAfterIf;
 import org.smooks.delivery.annotation.VisitBeforeIf;
-import org.smooks.delivery.dom.DOMElementVisitor;
 import org.smooks.delivery.ordering.Consumer;
 import org.smooks.delivery.ordering.Producer;
-import org.smooks.delivery.sax.SAXElement;
-import org.smooks.delivery.sax.SAXVisitAfter;
-import org.smooks.delivery.sax.SAXVisitBefore;
+import org.smooks.delivery.sax.ng.AfterVisitor;
+import org.smooks.delivery.sax.ng.BeforeVisitor;
 import org.smooks.event.report.annotation.VisitAfterReport;
 import org.smooks.event.report.annotation.VisitBeforeReport;
 import org.smooks.javabean.context.BeanContext;
@@ -73,7 +71,6 @@ import org.w3c.dom.Element;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
-import java.io.IOException;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
@@ -119,7 +116,7 @@ import java.util.Set;
 @VisitAfterIf( condition = "!insertBefore")
 @VisitBeforeReport(summary = "Inserting bean under beanId '${resource.parameters.beanId}'.", detailTemplate="reporting/EntityInserter.html")
 @VisitAfterReport(summary = "Inserting bean under beanId '${resource.parameters.beanId}'.", detailTemplate="reporting/EntityInserter.html")
-public class EntityInserter implements DOMElementVisitor, SAXVisitBefore, SAXVisitAfter, Consumer, Producer {
+public class EntityInserter implements BeforeVisitor, AfterVisitor, Consumer, Producer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EntityInserter.class);
 
@@ -151,7 +148,7 @@ public class EntityInserter implements DOMElementVisitor, SAXVisitBefore, SAXVis
     private BeanId insertedBeanId;
 
     @PostConstruct
-    public void initialize() throws SmooksConfigurationException {
+    public void postConstruct() throws SmooksConfigurationException {
     	BeanIdStore beanIdStore = appContext.getBeanIdStore();
 
     	beanId = beanIdStore.register(beanIdName);
@@ -164,6 +161,7 @@ public class EntityInserter implements DOMElementVisitor, SAXVisitBefore, SAXVis
     /* (non-Javadoc)
 	 * @see org.smooks.delivery.ordering.Producer#getProducts()
 	 */
+	@Override
 	public Set<? extends Object> getProducts() {
 		if(!insertedBeanIdName.isPresent()) {
 			return Collections.emptySet();
@@ -175,23 +173,18 @@ public class EntityInserter implements DOMElementVisitor, SAXVisitBefore, SAXVis
 	/* (non-Javadoc)
 	 * @see org.smooks.delivery.ordering.Consumer#consumes(java.lang.String)
 	 */
+	@Override
 	public boolean consumes(Object object) {
 		return object.equals(beanIdName);
 	}
 
-    public void visitBefore(final Element element, final ExecutionContext executionContext) throws SmooksException {
+	@Override
+	public void visitBefore(final Element element, final ExecutionContext executionContext) throws SmooksException {
     	insert(executionContext, new Fragment(element));
     }
 
-    public void visitAfter(final Element element, final ExecutionContext executionContext) throws SmooksException {
-    	insert(executionContext, new Fragment(element));
-    }
-
-    public void visitBefore(final SAXElement element, final ExecutionContext executionContext) throws SmooksException, IOException {
-    	insert(executionContext, new Fragment(element));
-    }
-
-    public void visitAfter(final SAXElement element, final ExecutionContext executionContext) throws SmooksException, IOException {
+	@Override
+	public void visitAfter(final Element element, final ExecutionContext executionContext) throws SmooksException {
     	insert(executionContext, new Fragment(element));
     }
 

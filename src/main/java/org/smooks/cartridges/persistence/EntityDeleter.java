@@ -52,12 +52,10 @@ import org.smooks.container.ExecutionContext;
 import org.smooks.delivery.Fragment;
 import org.smooks.delivery.annotation.VisitAfterIf;
 import org.smooks.delivery.annotation.VisitBeforeIf;
-import org.smooks.delivery.dom.DOMElementVisitor;
 import org.smooks.delivery.ordering.Consumer;
 import org.smooks.delivery.ordering.Producer;
-import org.smooks.delivery.sax.SAXElement;
-import org.smooks.delivery.sax.SAXVisitAfter;
-import org.smooks.delivery.sax.SAXVisitBefore;
+import org.smooks.delivery.sax.ng.AfterVisitor;
+import org.smooks.delivery.sax.ng.BeforeVisitor;
 import org.smooks.event.report.annotation.VisitAfterReport;
 import org.smooks.event.report.annotation.VisitBeforeReport;
 import org.smooks.javabean.context.BeanContext;
@@ -72,7 +70,6 @@ import org.w3c.dom.Element;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
-import java.io.IOException;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
@@ -121,7 +118,7 @@ import java.util.Set;
 @VisitAfterIf( condition = "!deleteBefore")
 @VisitBeforeReport(summary = "Deleting bean under beanId '${resource.parameters.beanId}'.", detailTemplate="reporting/EntityDeleter.html")
 @VisitAfterReport(summary = "Deleting bean under beanId '${resource.parameters.beanId}'.", detailTemplate="reporting/EntityDeleter.html")
-public class EntityDeleter implements DOMElementVisitor, SAXVisitBefore, SAXVisitAfter, Consumer, Producer {
+public class EntityDeleter implements AfterVisitor, BeforeVisitor, Consumer, Producer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EntityDeleter.class);
 
@@ -153,7 +150,7 @@ public class EntityDeleter implements DOMElementVisitor, SAXVisitBefore, SAXVisi
     private BeanId deletedBeanId;
 
     @PostConstruct
-    public void initialize() throws SmooksConfigurationException {
+    public void postConstruct() throws SmooksConfigurationException {
 
     	BeanIdStore beanIdStore = appContext.getBeanIdStore();
 
@@ -167,6 +164,7 @@ public class EntityDeleter implements DOMElementVisitor, SAXVisitBefore, SAXVisi
 	/* (non-Javadoc)
 	 * @see org.smooks.delivery.ordering.Producer#getProducts()
 	 */
+	@Override
 	public Set<String> getProducts() {
 		return deletedBeanIdName.map(CollectionsUtil::toSet).orElse(Collections.emptySet());
 	}
@@ -178,20 +176,14 @@ public class EntityDeleter implements DOMElementVisitor, SAXVisitBefore, SAXVisi
 	public boolean consumes(Object object) {
 		return object.equals(beanIdName);
 	}
-
+	
+	@Override
     public void visitBefore(final Element element, final ExecutionContext executionContext) throws SmooksException {
     	delete(executionContext, new Fragment(element));
     }
 
-    public void visitAfter(final Element element, final ExecutionContext executionContext) throws SmooksException {
-    	delete(executionContext, new Fragment(element));
-    }
-
-    public void visitBefore(final SAXElement element, final ExecutionContext executionContext) throws SmooksException, IOException {
-    	delete(executionContext, new Fragment(element));
-    }
-
-    public void visitAfter(final SAXElement element, final ExecutionContext executionContext) throws SmooksException, IOException {
+	@Override
+	public void visitAfter(final Element element, final ExecutionContext executionContext) throws SmooksException {
     	delete(executionContext, new Fragment(element));
     }
 
