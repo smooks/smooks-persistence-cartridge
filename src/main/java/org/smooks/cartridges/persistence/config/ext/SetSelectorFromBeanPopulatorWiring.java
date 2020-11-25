@@ -46,8 +46,8 @@ import org.smooks.SmooksException;
 import org.smooks.cartridges.javabean.BeanInstancePopulator;
 import org.smooks.cdr.ConfigSearch;
 import org.smooks.cdr.Parameter;
+import org.smooks.cdr.ResourceConfig;
 import org.smooks.cdr.SmooksConfigurationException;
-import org.smooks.cdr.SmooksResourceConfiguration;
 import org.smooks.cdr.extension.ExtensionContext;
 import org.smooks.container.ExecutionContext;
 import org.smooks.delivery.dom.DOMVisitBefore;
@@ -75,33 +75,33 @@ public class SetSelectorFromBeanPopulatorWiring implements DOMVisitBefore {
 
     public void visitBefore(Element element, ExecutionContext executionContext) throws SmooksException {
         ExtensionContext extensionContext = ExtensionContext.getExtensionContext(executionContext);
-        SmooksResourceConfiguration config = extensionContext.getResourceStack().peek();
+        ResourceConfig resourceConfig = extensionContext.getResourceStack().peek();
 
-        if(config.getSelectorPath().getSelector() == null || config.getSelectorPath().getSelector().equals("none")) {
-            Parameter<String> beanIdParam = config.getParameter("beanId", String.class);
+        if(resourceConfig.getSelectorPath().getSelector() == null || resourceConfig.getSelectorPath().getSelector().equals("none")) {
+            Parameter<String> beanIdParam = resourceConfig.getParameter("beanId", String.class);
             String beanId = beanIdParam.getValue();
 
-            SmooksResourceConfiguration beanCreatorConfig = findBeanCreatorConfig(beanId, extensionContext);
+            ResourceConfig beanCreatorConfig = findBeanCreatorConfig(beanId, extensionContext);
 
             if(beanCreatorConfig == null) {
                 throw new SmooksConfigurationException("No <jb:wiring> configurations is found yet for beanId '" + beanId + "'. " +
                         "This can mean that no <jb:wiring> is present that wires the bean with the bean id or that it is configured after the <" + element.getNodeName() + ">. " +
                          "In this case you must set the selector in the '" + selectorAttrName + "' attribute.");
             } else {
-                config.setSelector(beanCreatorConfig.getSelectorPath().getSelector());
+                resourceConfig.setSelector(beanCreatorConfig.getSelectorPath().getSelector());
             }
         }
     }
 
-    public SmooksResourceConfiguration findBeanCreatorConfig(String beanId, ExtensionContext extensionContext) {
-        List<SmooksResourceConfiguration> creatorConfigs = extensionContext.lookupResource(new ConfigSearch().resource(BeanInstancePopulator.class.getName()).param("wireBeanId", beanId));
+    public ResourceConfig findBeanCreatorConfig(String beanId, ExtensionContext extensionContext) {
+        List<ResourceConfig> resourceConfigs = extensionContext.lookupResource(new ConfigSearch().resource(BeanInstancePopulator.class.getName()).param("wireBeanId", beanId));
 
-        if(creatorConfigs.size() > 1) {
+        if(resourceConfigs.size() > 1) {
             throw new SmooksConfigurationException("Multiple <jb:wiring> configurations exist for beanId '" + beanId + "'. " +
                         "In this case you must set the selector in the '" + selectorAttrName + "' attribute because Smooks can't select a sensible default.");
         }
-        if(creatorConfigs.size() == 1) {
-            return creatorConfigs.get(0);
+        if(resourceConfigs.size() == 1) {
+            return resourceConfigs.get(0);
         }
         return null;
     }

@@ -43,7 +43,7 @@
 package org.smooks.cartridges.persistence.config.ext;
 
 import org.smooks.SmooksException;
-import org.smooks.cdr.SmooksResourceConfiguration;
+import org.smooks.cdr.ResourceConfig;
 import org.smooks.cdr.extension.ExtensionContext;
 import org.smooks.cdr.extension.ResourceConfigUtil;
 import org.smooks.container.ExecutionContext;
@@ -61,11 +61,11 @@ public class ParameterIndexResolver implements DOMVisitBefore {
 	 */
 	public void visitBefore(Element element, ExecutionContext executionContext)	throws SmooksException {
 
-		SmooksResourceConfiguration config = ExtensionContext.getExtensionContext(executionContext).getResourceStack().peek();
+		ResourceConfig resourceConfig = ExtensionContext.getExtensionContext(executionContext).getResourceStack().peek();
 
-		Integer index = (Integer) executionContext.getAttribute(ParameterIndexInitializer.PARAMETER_INDEX);
+		Integer index = executionContext.getAttribute(ParameterIndexInitializer.PARAMETER_INDEX);
 
-		ResourceConfigUtil.setProperty(config, "index", Integer.toString(index), executionContext);
+		ResourceConfigUtil.setProperty(resourceConfig, "index", Integer.toString(index), executionContext);
 
 		executionContext.setAttribute(ParameterIndexInitializer.PARAMETER_INDEX, index + 1);
 	}

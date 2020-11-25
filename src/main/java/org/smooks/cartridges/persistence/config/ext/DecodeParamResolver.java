@@ -44,7 +44,7 @@ package org.smooks.cartridges.persistence.config.ext;
 
 import org.smooks.SmooksException;
 import org.smooks.cartridges.persistence.Constants;
-import org.smooks.cdr.SmooksResourceConfiguration;
+import org.smooks.cdr.ResourceConfig;
 import org.smooks.cdr.extension.ExtensionContext;
 import org.smooks.container.ApplicationContext;
 import org.smooks.container.ExecutionContext;
@@ -77,8 +77,8 @@ public class DecodeParamResolver implements DOMVisitBefore {
 
         if(decodeParams.getLength() > 0) {
             ExtensionContext extensionContext = ExtensionContext.getExtensionContext(executionContext);
-            SmooksResourceConfiguration populatorConfig = extensionContext.getResourceStack().peek();
-            SmooksResourceConfiguration decoderConfig = new SmooksResourceConfiguration();
+            ResourceConfig populatorConfig = extensionContext.getResourceStack().peek();
+            ResourceConfig decoderConfig = new ResourceConfig();
 
             extensionContext.addResource(decoderConfig);
             try {
