@@ -43,7 +43,7 @@
 package org.smooks.cartridges.persistence.config.ext;
 
 import org.smooks.SmooksException;
-import org.smooks.cdr.SmooksResourceConfiguration;
+import org.smooks.cdr.ResourceConfig;
 import org.smooks.cdr.extension.ExtensionContext;
 import org.smooks.cdr.extension.ResourceConfigUtil;
 import org.smooks.container.ApplicationContext;
@@ -67,11 +67,11 @@ public class EntityLocatorIdResolver implements DOMVisitBefore {
 	 */
 	public void visitBefore(Element element, ExecutionContext executionContext)
 			throws SmooksException {
-		SmooksResourceConfiguration config = ExtensionContext.getExtensionContext(executionContext).getResourceStack().peek();
+		ResourceConfig resourceConfig = ExtensionContext.getExtensionContext(executionContext).getResourceStack().peek();
 
 		int index = LocatorIndex.getLocatorIndex(applicationContext).increment();
 
-		ResourceConfigUtil.setProperty(config, "id", Integer.toString(index), executionContext);
+		ResourceConfigUtil.setProperty(resourceConfig, "id", Integer.toString(index), executionContext);
 	}
 
 }
