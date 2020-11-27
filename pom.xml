@@ -7,7 +7,7 @@
 
     <groupId>org.smooks.cartridges</groupId>
     <artifactId>smooks-persistence-cartridge</artifactId>
-    <version>2.0.0-M2-SNAPSHOT</version>
+    <version>2.0.0-M2</version>
     <packaging>bundle</packaging>
 
     <name>Smooks Persistence Cartridge</name>
@@ -159,6 +159,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.2.0</version>
                 <configuration>
                     <failOnError>false</failOnError>
                     <failOnWarnings>false</failOnWarnings>
@@ -191,7 +192,7 @@
         <dependency>
             <groupId>org.smooks</groupId>
             <artifactId>smooks-scribe-core</artifactId>
-            <version>2.0.0-M2-SNAPSHOT</version>
+            <version>2.0.0-M2</version>
         </dependency>
 
         <!-- Smooks Libs -->
@@ -199,7 +200,7 @@
         <dependency>
             <groupId>org.smooks.cartridges</groupId>
             <artifactId>smooks-javabean-cartridge</artifactId>
-            <version>2.0.0-M2-SNAPSHOT</version>
+            <version>2.0.0-M2</version>
         </dependency>
         <!-- ORM Libs -->
 
@@ -239,7 +240,7 @@
     <repositories>
         <repository>
             <id>oss.sonatype.org-snapshot</id>
-            <url>http://oss.sonatype.org/content/repositories/snapshots</url>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
             <releases>
                 <enabled>false</enabled>
             </releases>
@@ -252,7 +253,7 @@
     <distributionManagement>
         <repository>
             <id>ossrh</id>
-            <url>http://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
         </repository>
         <snapshotRepository>
             <id>ossrh</id>
