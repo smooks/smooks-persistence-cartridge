@@ -49,9 +49,9 @@ import org.smooks.cartridges.persistence.util.PersistenceUtil;
 import org.smooks.cdr.SmooksConfigurationException;
 import org.smooks.container.ApplicationContext;
 import org.smooks.container.ExecutionContext;
-import org.smooks.delivery.Fragment;
 import org.smooks.delivery.annotation.VisitAfterIf;
 import org.smooks.delivery.annotation.VisitBeforeIf;
+import org.smooks.delivery.fragment.NodeFragment;
 import org.smooks.delivery.ordering.Consumer;
 import org.smooks.delivery.ordering.Producer;
 import org.smooks.delivery.sax.ng.AfterVisitor;
@@ -183,12 +183,12 @@ public class EntityUpdater implements AfterVisitor, BeforeVisitor, Producer, Con
 
 	@Override
     public void visitBefore(final Element element, final ExecutionContext executionContext) throws SmooksException {
-    	update(executionContext, new Fragment(element));
+    	update(executionContext, new NodeFragment(element));
     }
 
     @Override
     public void visitAfter(final Element element, final ExecutionContext executionContext) throws SmooksException {
-    	update(executionContext, new Fragment(element));
+    	update(executionContext, new NodeFragment(element));
     }
 
 	/**
@@ -197,7 +197,7 @@ public class EntityUpdater implements AfterVisitor, BeforeVisitor, Producer, Con
      * @return
 	 */
 	@SuppressWarnings("unchecked")
-	private void update(final ExecutionContext executionContext, Fragment source) {
+	private void update(final ExecutionContext executionContext, NodeFragment source) {
 
 		if (LOGGER.isDebugEnabled()) {
 			LOGGER.debug("Updating bean under BeanId '" + beanIdName + "' with DAO '" + daoName + "'.");

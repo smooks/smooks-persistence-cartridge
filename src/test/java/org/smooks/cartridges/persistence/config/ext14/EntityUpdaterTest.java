@@ -42,16 +42,16 @@
  */
 package org.smooks.cartridges.persistence.config.ext14;
 
+import org.mockito.Mock;
 import org.smooks.Smooks;
+import org.smooks.cartridges.persistence.test.util.BaseTestCase;
 import org.smooks.cartridges.persistence.util.PersistenceUtil;
 import org.smooks.container.ExecutionContext;
 import org.smooks.event.report.HtmlReportGenerator;
 import org.smooks.payload.JavaResult;
 import org.smooks.payload.StringSource;
-import org.smooks.cartridges.persistence.test.util.BaseTestCase;
 import org.smooks.scribe.Dao;
 import org.smooks.scribe.register.SingleDaoRegister;
-import org.mockito.Mock;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
@@ -105,7 +105,7 @@ public class EntityUpdaterTest extends BaseTestCase {
 
 	private void enableReporting(ExecutionContext executionContext, String reportFilePath) throws IOException {
 		if(ENABLE_REPORTING) {
-			executionContext.setEventListener(new HtmlReportGenerator("target/" + reportFilePath));
+			executionContext.getContentDeliveryRuntime().getExecutionEventListeners().add(new HtmlReportGenerator("target/" + reportFilePath));
 		}
 	}
 

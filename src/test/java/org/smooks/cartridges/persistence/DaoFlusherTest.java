@@ -42,24 +42,25 @@
  */
 package org.smooks.cartridges.persistence;
 
+import org.mockito.Mock;
 import org.smooks.Smooks;
+import org.smooks.cartridges.persistence.test.dao.FullInterfaceDao;
+import org.smooks.cartridges.persistence.test.dao.FullInterfaceMappedDao;
+import org.smooks.cartridges.persistence.test.util.BaseTestCase;
 import org.smooks.cartridges.persistence.util.PersistenceUtil;
 import org.smooks.container.ExecutionContext;
 import org.smooks.event.report.HtmlReportGenerator;
 import org.smooks.payload.StringSource;
-import org.smooks.cartridges.persistence.test.dao.FullInterfaceDao;
-import org.smooks.cartridges.persistence.test.dao.FullInterfaceMappedDao;
-import org.smooks.cartridges.persistence.test.util.BaseTestCase;
 import org.smooks.scribe.register.MapDaoRegister;
 import org.smooks.scribe.register.SingleDaoRegister;
-import org.mockito.Mock;
-import static org.mockito.Mockito.verify;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
+
+import static org.mockito.Mockito.verify;
 
 /**
  * @author <a href="mailto:maurice.zeijen@smies.com">maurice.zeijen@smies.com</a>
@@ -154,7 +155,7 @@ public class DaoFlusherTest extends BaseTestCase {
 
     private void enableReporting(ExecutionContext executionContext, String reportFilePath) throws IOException {
         if (ENABLE_REPORTING) {
-            executionContext.setEventListener(new HtmlReportGenerator("target/" + reportFilePath));
+            executionContext.getContentDeliveryRuntime().getExecutionEventListeners().add(new HtmlReportGenerator("target/" + reportFilePath));
         }
     }
 }

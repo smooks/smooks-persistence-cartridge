@@ -42,9 +42,22 @@
  */
 package org.smooks.cartridges.persistence;
 
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import org.apache.commons.lang.exception.ExceptionUtils;
+import org.mockito.Mock;
+import org.smooks.Smooks;
+import org.smooks.SmooksException;
+import org.smooks.cartridges.persistence.test.dao.FullInterfaceDao;
+import org.smooks.cartridges.persistence.test.util.BaseTestCase;
+import org.smooks.cartridges.persistence.util.PersistenceUtil;
+import org.smooks.container.ExecutionContext;
+import org.smooks.event.report.HtmlReportGenerator;
+import org.smooks.scribe.register.MapDaoRegister;
+import org.smooks.scribe.register.SingleDaoRegister;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
+import javax.xml.transform.Source;
+import javax.xml.transform.stream.StreamSource;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
@@ -52,22 +65,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 
-import javax.xml.transform.Source;
-import javax.xml.transform.stream.StreamSource;
-
-import org.apache.commons.lang.exception.ExceptionUtils;
-import org.smooks.Smooks;
-import org.smooks.SmooksException;
-import org.smooks.cartridges.persistence.util.PersistenceUtil;
-import org.smooks.container.ExecutionContext;
-import org.smooks.event.report.HtmlReportGenerator;
-import org.smooks.cartridges.persistence.test.dao.FullInterfaceDao;
-import org.smooks.cartridges.persistence.test.util.BaseTestCase;
-import org.smooks.scribe.register.MapDaoRegister;
-import org.smooks.scribe.register.SingleDaoRegister;
-import org.mockito.Mock;
-import org.testng.Assert;
-import org.testng.annotations.Test;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 
 /**
@@ -240,7 +240,7 @@ public class EntityLocatorTest extends BaseTestCase {
 
 	private void enableReporting(ExecutionContext executionContext, String reportFilePath) throws IOException {
 		if (ENABLE_REPORTING) {
-			executionContext.setEventListener(new HtmlReportGenerator("target/" + reportFilePath));
+			executionContext.getContentDeliveryRuntime().getExecutionEventListeners().add(new HtmlReportGenerator("target/" + reportFilePath));
 		}
 	}
 }

@@ -74,7 +74,7 @@ public class SetSelectorFromBeanPopulatorWiring implements DOMVisitBefore {
     private String selectorAttrName;
 
     public void visitBefore(Element element, ExecutionContext executionContext) throws SmooksException {
-        ExtensionContext extensionContext = ExtensionContext.getExtensionContext(executionContext);
+        ExtensionContext extensionContext = executionContext.get(ExtensionContext.EXTENSION_CONTEXT_TYPED_KEY);
         ResourceConfig resourceConfig = extensionContext.getResourceStack().peek();
 
         if(resourceConfig.getSelectorPath().getSelector() == null || resourceConfig.getSelectorPath().getSelector().equals("none")) {

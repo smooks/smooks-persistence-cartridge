@@ -45,6 +45,7 @@ package org.smooks.cartridges.persistence.parameter;
 import org.smooks.cartridges.persistence.ParameterListType;
 import org.smooks.container.ApplicationContext;
 import org.smooks.container.ExecutionContext;
+import org.smooks.container.TypedKey;
 
 /**
  * @author <a href="mailto:maurice.zeijen@smies.com">maurice.zeijen@smies.com</a>
@@ -107,7 +108,7 @@ public class ParameterManager {
 				throw new IllegalStateException("Unknown ParameterListType '" + type + "'.");
 			}
 
-			executionContext.setAttribute(getParameterContainerName(id), container);
+			executionContext.put(new TypedKey<>(getParameterContainerName(id)), container);
 
 		} else {
 			container.clear();
@@ -117,7 +118,7 @@ public class ParameterManager {
 
 	@SuppressWarnings("unchecked")
 	public static ParameterContainer<Parameter<?>> getParameterContainer(int id, ExecutionContext executionContext) {
-		return (ParameterContainer<Parameter<?>>) executionContext.getAttribute(getParameterContainerName(id));
+		return executionContext.get(new TypedKey<>(getParameterContainerName(id)));
 	}
 
 

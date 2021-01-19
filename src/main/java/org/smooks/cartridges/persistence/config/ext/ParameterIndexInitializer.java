@@ -44,8 +44,8 @@ package org.smooks.cartridges.persistence.config.ext;
 
 import org.smooks.SmooksException;
 import org.smooks.container.ExecutionContext;
+import org.smooks.container.TypedKey;
 import org.smooks.delivery.dom.DOMVisitBefore;
-
 import org.w3c.dom.Element;
 
 /**
@@ -60,9 +60,7 @@ public class ParameterIndexInitializer implements DOMVisitBefore {
 	 * @see org.smooks.delivery.dom.DOMVisitBefore#visitBefore(org.w3c.dom.Element, org.smooks.container.ExecutionContext)
 	 */
 	public void visitBefore(Element element, ExecutionContext executionContext)	throws SmooksException {
-
-		executionContext.setAttribute(PARAMETER_INDEX, new Integer(0));
-
+		executionContext.put(new TypedKey<>(PARAMETER_INDEX), 0);
 	}
 
 }

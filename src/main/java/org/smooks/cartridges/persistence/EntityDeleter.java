@@ -49,9 +49,9 @@ import org.smooks.cartridges.persistence.util.PersistenceUtil;
 import org.smooks.cdr.SmooksConfigurationException;
 import org.smooks.container.ApplicationContext;
 import org.smooks.container.ExecutionContext;
-import org.smooks.delivery.Fragment;
 import org.smooks.delivery.annotation.VisitAfterIf;
 import org.smooks.delivery.annotation.VisitBeforeIf;
+import org.smooks.delivery.fragment.NodeFragment;
 import org.smooks.delivery.ordering.Consumer;
 import org.smooks.delivery.ordering.Producer;
 import org.smooks.delivery.sax.ng.AfterVisitor;
@@ -179,12 +179,12 @@ public class EntityDeleter implements AfterVisitor, BeforeVisitor, Consumer, Pro
 	
 	@Override
     public void visitBefore(final Element element, final ExecutionContext executionContext) throws SmooksException {
-    	delete(executionContext, new Fragment(element));
+    	delete(executionContext, new NodeFragment(element));
     }
 
 	@Override
 	public void visitAfter(final Element element, final ExecutionContext executionContext) throws SmooksException {
-    	delete(executionContext, new Fragment(element));
+    	delete(executionContext, new NodeFragment(element));
     }
 
 	/**
@@ -193,7 +193,7 @@ public class EntityDeleter implements AfterVisitor, BeforeVisitor, Consumer, Pro
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-	private void delete(final ExecutionContext executionContext, final Fragment source) {
+	private void delete(final ExecutionContext executionContext, final NodeFragment source) {
 
 		if(LOGGER.isDebugEnabled()) {
 			LOGGER.debug("Deleting bean under BeanId '" + beanIdName + "' with DAO '" + daoName + "'");

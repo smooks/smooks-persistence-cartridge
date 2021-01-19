@@ -42,16 +42,16 @@
  */
 package org.smooks.cartridges.persistence.config.ext14;
 
+import org.mockito.Mock;
 import org.smooks.Smooks;
+import org.smooks.cartridges.persistence.test.dao.FullInterfaceDao;
+import org.smooks.cartridges.persistence.test.util.BaseTestCase;
 import org.smooks.cartridges.persistence.util.PersistenceUtil;
 import org.smooks.container.ExecutionContext;
 import org.smooks.event.report.HtmlReportGenerator;
 import org.smooks.payload.JavaResult;
 import org.smooks.payload.StringSource;
-import org.smooks.cartridges.persistence.test.dao.FullInterfaceDao;
-import org.smooks.cartridges.persistence.test.util.BaseTestCase;
 import org.smooks.scribe.register.MapDaoRegister;
-import org.mockito.Mock;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -122,7 +122,7 @@ public class EntityLocatorTest extends BaseTestCase {
 
 	private void enableReporting(ExecutionContext executionContext, String reportFilePath) throws IOException {
 		if(ENABLE_REPORTING) {
-			executionContext.setEventListener(new HtmlReportGenerator("target/" + reportFilePath));
+			executionContext.getContentDeliveryRuntime().getExecutionEventListeners().add(new HtmlReportGenerator("target/" + reportFilePath));
 		}
 	}
 }

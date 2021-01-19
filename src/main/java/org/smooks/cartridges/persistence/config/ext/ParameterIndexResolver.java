@@ -47,6 +47,7 @@ import org.smooks.cdr.ResourceConfig;
 import org.smooks.cdr.extension.ExtensionContext;
 import org.smooks.cdr.extension.ResourceConfigUtil;
 import org.smooks.container.ExecutionContext;
+import org.smooks.container.TypedKey;
 import org.smooks.delivery.dom.DOMVisitBefore;
 import org.w3c.dom.Element;
 
@@ -61,13 +62,13 @@ public class ParameterIndexResolver implements DOMVisitBefore {
 	 */
 	public void visitBefore(Element element, ExecutionContext executionContext)	throws SmooksException {
 
-		ResourceConfig resourceConfig = ExtensionContext.getExtensionContext(executionContext).getResourceStack().peek();
+		ResourceConfig resourceConfig = executionContext.get(ExtensionContext.EXTENSION_CONTEXT_TYPED_KEY).getResourceStack().peek();
 
-		Integer index = executionContext.getAttribute(ParameterIndexInitializer.PARAMETER_INDEX);
+		Integer index = executionContext.get(new TypedKey<>(ParameterIndexInitializer.PARAMETER_INDEX));
 
 		ResourceConfigUtil.setProperty(resourceConfig, "index", Integer.toString(index), executionContext);
 
-		executionContext.setAttribute(ParameterIndexInitializer.PARAMETER_INDEX, index + 1);
+		executionContext.put(new TypedKey<>(ParameterIndexInitializer.PARAMETER_INDEX), index + 1);
 	}
 
 }
