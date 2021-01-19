@@ -49,9 +49,9 @@ import org.smooks.cartridges.persistence.util.PersistenceUtil;
 import org.smooks.cdr.SmooksConfigurationException;
 import org.smooks.container.ApplicationContext;
 import org.smooks.container.ExecutionContext;
-import org.smooks.delivery.Fragment;
 import org.smooks.delivery.annotation.VisitAfterIf;
 import org.smooks.delivery.annotation.VisitBeforeIf;
+import org.smooks.delivery.fragment.NodeFragment;
 import org.smooks.delivery.ordering.Consumer;
 import org.smooks.delivery.ordering.Producer;
 import org.smooks.delivery.sax.ng.AfterVisitor;
@@ -180,12 +180,12 @@ public class EntityInserter implements BeforeVisitor, AfterVisitor, Consumer, Pr
 
 	@Override
 	public void visitBefore(final Element element, final ExecutionContext executionContext) throws SmooksException {
-    	insert(executionContext, new Fragment(element));
+    	insert(executionContext, new NodeFragment(element));
     }
 
 	@Override
 	public void visitAfter(final Element element, final ExecutionContext executionContext) throws SmooksException {
-    	insert(executionContext, new Fragment(element));
+    	insert(executionContext, new NodeFragment(element));
     }
 
 	/**
@@ -194,7 +194,7 @@ public class EntityInserter implements BeforeVisitor, AfterVisitor, Consumer, Pr
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-	private void insert(final ExecutionContext executionContext, final Fragment source) {
+	private void insert(final ExecutionContext executionContext, final NodeFragment source) {
 
 		if(LOGGER.isDebugEnabled()) {
 			LOGGER.debug("Inserting bean under BeanId '" + beanIdName + "' with DAO '" + daoName + "'.");

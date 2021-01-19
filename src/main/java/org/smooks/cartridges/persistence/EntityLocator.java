@@ -49,7 +49,7 @@ import org.smooks.cartridges.persistence.util.PersistenceUtil;
 import org.smooks.cdr.SmooksConfigurationException;
 import org.smooks.container.ApplicationContext;
 import org.smooks.container.ExecutionContext;
-import org.smooks.delivery.Fragment;
+import org.smooks.delivery.fragment.NodeFragment;
 import org.smooks.delivery.ordering.Consumer;
 import org.smooks.delivery.ordering.Producer;
 import org.smooks.delivery.sax.ng.AfterVisitor;
@@ -202,7 +202,7 @@ public class EntityLocator implements BeforeVisitor, AfterVisitor, Producer, Con
 	 */
 	@Override
 	public void visitAfter(Element element, ExecutionContext executionContext) throws SmooksException {
-		lookup(executionContext, new Fragment(element));
+		lookup(executionContext, new NodeFragment(element));
 	}
 
 	public void initParameterContainer(ExecutionContext executionContext) {
@@ -210,7 +210,7 @@ public class EntityLocator implements BeforeVisitor, AfterVisitor, Producer, Con
 	}
 
 	@SuppressWarnings("unchecked")
-	public void lookup(ExecutionContext executionContext, Fragment source) {
+	public void lookup(ExecutionContext executionContext, NodeFragment source) {
 		final DaoRegister emr = PersistenceUtil.getDAORegister(executionContext);
 
 		Object dao = null;

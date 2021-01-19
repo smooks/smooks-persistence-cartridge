@@ -42,28 +42,30 @@
  */
 package org.smooks.cartridges.persistence;
 
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import org.mockito.Mock;
+import org.smooks.Smooks;
+import org.smooks.cartridges.persistence.test.util.BaseTestCase;
+import org.smooks.cartridges.persistence.util.PersistenceUtil;
+import org.smooks.container.ExecutionContext;
+import org.smooks.event.report.HtmlReportGenerator;
+import org.smooks.payload.JavaResult;
+import org.smooks.payload.StringSource;
+import org.smooks.scribe.Dao;
+import org.smooks.scribe.MappingDao;
+import org.smooks.scribe.register.MapDaoRegister;
+import org.smooks.scribe.register.SingleDaoRegister;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.smooks.Smooks;
-import org.smooks.cartridges.persistence.util.PersistenceUtil;
-import org.smooks.container.ExecutionContext;
-import org.smooks.event.report.HtmlReportGenerator;
-import org.smooks.payload.JavaResult;
-import org.smooks.payload.StringSource;
-import org.smooks.cartridges.persistence.test.util.BaseTestCase;
-import org.smooks.scribe.Dao;
-import org.smooks.scribe.MappingDao;
-import org.smooks.scribe.register.MapDaoRegister;
-import org.smooks.scribe.register.SingleDaoRegister;
-import org.mockito.Mock;
-import org.testng.Assert;
-import org.testng.annotations.Test;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.same;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * @author <a href="mailto:maurice.zeijen@smies.com">maurice.zeijen@smies.com</a>
@@ -241,7 +243,7 @@ public class EntityInserterTest extends BaseTestCase {
 
 	private void enableReporting(ExecutionContext executionContext, String reportFilePath) throws IOException {
 		if(ENABLE_REPORTING) {
-			executionContext.setEventListener(new HtmlReportGenerator("target/" + reportFilePath));
+			executionContext.getContentDeliveryRuntime().getExecutionEventListeners().add(new HtmlReportGenerator("target/" + reportFilePath));
 		}
 	}
 

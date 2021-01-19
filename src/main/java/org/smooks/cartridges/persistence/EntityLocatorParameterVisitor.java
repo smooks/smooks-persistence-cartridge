@@ -54,7 +54,7 @@ import org.smooks.container.ExecutionContext;
 import org.smooks.converter.TypeConverter;
 import org.smooks.converter.TypeConverterException;
 import org.smooks.converter.factory.TypeConverterFactory;
-import org.smooks.delivery.memento.NodeVisitable;
+import org.smooks.delivery.fragment.NodeFragment;
 import org.smooks.delivery.memento.TextAccumulatorMemento;
 import org.smooks.delivery.ordering.Consumer;
 import org.smooks.delivery.ordering.Producer;
@@ -69,6 +69,7 @@ import org.smooks.registry.lookup.converter.NameTypeConverterFactoryLookup;
 import org.smooks.registry.lookup.converter.SourceTargetTypeConverterFactoryLookup;
 import org.smooks.util.CollectionsUtil;
 import org.smooks.xml.DomUtils;
+import org.w3c.dom.CharacterData;
 import org.w3c.dom.Element;
 
 import javax.annotation.PostConstruct;
@@ -221,7 +222,7 @@ public class EntityLocatorParameterVisitor implements ElementVisitor, Consumer, 
         if (isAttribute) {
             dataString = DomUtils.getAttributeValue(element, valueAttributeName.orElse(null));
         } else {
-            TextAccumulatorMemento textAccumulatorMemento = new TextAccumulatorMemento(new NodeVisitable(element), this);
+            TextAccumulatorMemento textAccumulatorMemento = new TextAccumulatorMemento(new NodeFragment(element), this);
             executionContext.getMementoCaretaker().restore(textAccumulatorMemento);
             dataString = textAccumulatorMemento.getText();
         }
@@ -296,7 +297,7 @@ public class EntityLocatorParameterVisitor implements ElementVisitor, Consumer, 
 
     private TypeConverter<? super String, ?> getTypeConverter(ExecutionContext executionContext) throws TypeConverterException {
         @SuppressWarnings("unchecked")
-        List decoders = executionContext.getDeliveryConfig().getObjects("decoder:" + typeAlias.orElse(null));
+        List decoders = executionContext.getContentDeliveryRuntime().getContentDeliveryConfig().getObjects("decoder:" + typeAlias.orElse(null));
 
         if (decoders == null || decoders.isEmpty()) {
             final TypeConverterFactory<String, ?> typeConverterFactory = appContext.getRegistry().lookup(new NameTypeConverterFactoryLookup<>(typeAlias.orElse(null)));
@@ -328,11 +329,11 @@ public class EntityLocatorParameterVisitor implements ElementVisitor, Consumer, 
 	}
 
     @Override
-    public void visitChildText(Element element, ExecutionContext executionContext) {
+    public void visitChildText(CharacterData characterData, ExecutionContext executionContext) {
         if (!isAttribute) {
             // It's not an attribute binding i.e. it's the element's text.
             // Turn on Text Accumulation...
-            executionContext.getMementoCaretaker().stash(new TextAccumulatorMemento(new NodeVisitable(element), this), textAccumulatorMemento -> textAccumulatorMemento.accumulateText(element.getTextContent()));
+            executionContext.getMementoCaretaker().stash(new TextAccumulatorMemento(new NodeFragment(characterData.getParentNode()), this), textAccumulatorMemento -> textAccumulatorMemento.accumulateText(characterData.getTextContent()));
         }
     }
 
