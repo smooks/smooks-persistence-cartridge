@@ -42,13 +42,13 @@
  */
 package org.smooks.cartridges.persistence.observers;
 
-import org.smooks.container.ExecutionContext;
+import org.smooks.api.ExecutionContext;
+import org.smooks.api.bean.lifecycle.BeanContextLifecycleEvent;
+import org.smooks.api.bean.lifecycle.BeanContextLifecycleObserver;
+import org.smooks.api.bean.lifecycle.BeanLifecycle;
+import org.smooks.api.bean.repository.BeanId;
 import org.smooks.cartridges.javabean.BeanRuntimeInfo;
 import org.smooks.cartridges.javabean.BeanRuntimeInfo.Classification;
-import org.smooks.javabean.lifecycle.BeanContextLifecycleEvent;
-import org.smooks.javabean.lifecycle.BeanContextLifecycleObserver;
-import org.smooks.javabean.lifecycle.BeanLifecycle;
-import org.smooks.javabean.repository.BeanId;
 import org.smooks.cartridges.persistence.EntityLocatorParameterVisitor;
 
 /**

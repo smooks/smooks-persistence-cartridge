@@ -42,7 +42,7 @@
  */
 package org.smooks.cartridges.persistence;
 
-import org.smooks.container.ApplicationContext;
+import org.smooks.api.ApplicationContext;
 import org.smooks.scribe.ObjectStore;
 
 import java.util.Map;

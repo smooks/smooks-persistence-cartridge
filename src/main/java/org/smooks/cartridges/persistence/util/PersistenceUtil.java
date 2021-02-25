@@ -42,10 +42,10 @@
  */
 package org.smooks.cartridges.persistence.util;
 
-import org.smooks.cdr.ParameterAccessor;
-import org.smooks.container.ExecutionContext;
-import org.smooks.container.TypedKey;
-import org.smooks.delivery.ContentDeliveryConfig;
+import org.smooks.api.ExecutionContext;
+import org.smooks.api.TypedKey;
+import org.smooks.api.delivery.ContentDeliveryConfig;
+import org.smooks.engine.resource.config.ParameterAccessor;
 import org.smooks.scribe.register.DaoRegister;
 
 

@@ -43,25 +43,25 @@
 package org.smooks.cartridges.persistence;
 
 import org.apache.commons.lang.StringUtils;
-import org.smooks.SmooksException;
+import org.smooks.api.ApplicationContext;
+import org.smooks.api.ExecutionContext;
+import org.smooks.api.SmooksConfigException;
+import org.smooks.api.SmooksException;
+import org.smooks.api.bean.context.BeanContext;
+import org.smooks.api.bean.repository.BeanId;
+import org.smooks.api.delivery.ordering.Consumer;
+import org.smooks.api.delivery.ordering.Producer;
+import org.smooks.api.resource.visitor.VisitAfterReport;
+import org.smooks.api.resource.visitor.VisitBeforeReport;
+import org.smooks.api.resource.visitor.sax.ng.AfterVisitor;
+import org.smooks.api.resource.visitor.sax.ng.BeforeVisitor;
 import org.smooks.cartridges.persistence.parameter.*;
 import org.smooks.cartridges.persistence.util.PersistenceUtil;
-import org.smooks.cdr.SmooksConfigurationException;
-import org.smooks.container.ApplicationContext;
-import org.smooks.container.ExecutionContext;
-import org.smooks.delivery.fragment.NodeFragment;
-import org.smooks.delivery.ordering.Consumer;
-import org.smooks.delivery.ordering.Producer;
-import org.smooks.delivery.sax.ng.AfterVisitor;
-import org.smooks.delivery.sax.ng.BeforeVisitor;
-import org.smooks.event.report.annotation.VisitAfterReport;
-import org.smooks.event.report.annotation.VisitBeforeReport;
-import org.smooks.javabean.context.BeanContext;
-import org.smooks.javabean.repository.BeanId;
+import org.smooks.engine.delivery.fragment.NodeFragment;
 import org.smooks.scribe.invoker.DaoInvoker;
 import org.smooks.scribe.invoker.DaoInvokerFactory;
 import org.smooks.scribe.register.DaoRegister;
-import org.smooks.util.CollectionsUtil;
+import org.smooks.support.CollectionsUtil;
 import org.w3c.dom.Element;
 
 import javax.annotation.PostConstruct;
@@ -155,14 +155,14 @@ public class EntityLocator implements BeforeVisitor, AfterVisitor, Producer, Con
     private BeanId beanId;
     
     @PostConstruct
-    public void postConstruct() throws SmooksConfigurationException {
+    public void postConstruct() throws SmooksConfigException {
 
     	if(StringUtils.isEmpty(lookupName.orElse(null)) && StringUtils.isEmpty(query.orElse(null))) {
-    		throw new SmooksConfigurationException("A lookup name or  a query  needs to be set to be able to lookup anything");
+    		throw new SmooksConfigException("A lookup name or  a query  needs to be set to be able to lookup anything");
     	}
 
     	if(StringUtils.isNotEmpty(lookupName.orElse(null)) && StringUtils.isNotEmpty(query.orElse(null))) {
-    		throw new SmooksConfigurationException("Both the lookup name and the query can't be set at the same time");
+    		throw new SmooksConfigException("Both the lookup name and the query can't be set at the same time");
     	}
 
     	beanId = appContext.getBeanIdStore().register(beanIdName);
@@ -173,7 +173,7 @@ public class EntityLocator implements BeforeVisitor, AfterVisitor, Producer, Con
     }
 
     /* (non-Javadoc)
-	 * @see org.smooks.delivery.ordering.Producer#getProducts()
+	 * @see org.smooks.api.delivery.ordering.Producer#getProducts()
 	 */
 	@Override
 	public Set<? extends Object> getProducts() {
@@ -181,7 +181,7 @@ public class EntityLocator implements BeforeVisitor, AfterVisitor, Producer, Con
 	}
 
 	/* (non-Javadoc)
-	 * @see org.smooks.delivery.ordering.Consumer#consumes(java.lang.String)
+	 * @see org.smooks.api.delivery.ordering.Consumer#consumes(java.lang.String)
 	 */
 	@Override
 	public boolean consumes(Object object) {
@@ -189,7 +189,7 @@ public class EntityLocator implements BeforeVisitor, AfterVisitor, Producer, Con
 	}
 
 	/* (non-Javadoc)
-	 * @see org.smooks.delivery.sax.SAXVisitBefore#visitBefore(org.smooks.delivery.sax.SAXElement, org.smooks.container.ExecutionContext)
+	 * @see org.smooks.delivery.sax.SAXVisitBefore#visitBefore(org.smooks.delivery.sax.SAXElement, org.smooks.api.ExecutionContext)
 	 */
 
 	@Override
@@ -198,7 +198,7 @@ public class EntityLocator implements BeforeVisitor, AfterVisitor, Producer, Con
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.smooks.delivery.sax.SAXVisitAfter#visitAfter(org.smooks.delivery.sax.SAXElement, org.smooks.container.ExecutionContext)
+	 * @see org.smooks.delivery.sax.SAXVisitAfter#visitAfter(org.smooks.delivery.sax.SAXElement, org.smooks.api.ExecutionContext)
 	 */
 	@Override
 	public void visitAfter(Element element, ExecutionContext executionContext) throws SmooksException {
@@ -254,7 +254,7 @@ public class EntityLocator implements BeforeVisitor, AfterVisitor, Producer, Con
 					}
 
 				} else {
-					throw new SmooksConfigurationException("The returned result doesn't implement the '" + Collection.class.getName() + "' interface " +
+					throw new SmooksConfigException("The returned result doesn't implement the '" + Collection.class.getName() + "' interface " +
 							"and there for the unique result check can't be done.");
 				}
 			}

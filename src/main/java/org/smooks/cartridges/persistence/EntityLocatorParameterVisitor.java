@@ -44,31 +44,31 @@ package org.smooks.cartridges.persistence;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.smooks.SmooksException;
+import org.smooks.api.ApplicationContext;
+import org.smooks.api.ExecutionContext;
+import org.smooks.api.SmooksConfigException;
+import org.smooks.api.SmooksException;
+import org.smooks.api.bean.context.BeanContext;
+import org.smooks.api.bean.context.BeanIdStore;
+import org.smooks.api.bean.repository.BeanId;
+import org.smooks.api.converter.TypeConverter;
+import org.smooks.api.converter.TypeConverterException;
+import org.smooks.api.converter.TypeConverterFactory;
+import org.smooks.api.delivery.ordering.Consumer;
+import org.smooks.api.delivery.ordering.Producer;
+import org.smooks.api.expression.ExpressionEvaluator;
+import org.smooks.api.resource.visitor.VisitAfterReport;
+import org.smooks.api.resource.visitor.VisitBeforeReport;
+import org.smooks.api.resource.visitor.sax.ng.ElementVisitor;
 import org.smooks.cartridges.javabean.BeanRuntimeInfo;
 import org.smooks.cartridges.persistence.observers.BeanCreateLifecycleObserver;
 import org.smooks.cartridges.persistence.parameter.*;
-import org.smooks.cdr.SmooksConfigurationException;
-import org.smooks.container.ApplicationContext;
-import org.smooks.container.ExecutionContext;
-import org.smooks.converter.TypeConverter;
-import org.smooks.converter.TypeConverterException;
-import org.smooks.converter.factory.TypeConverterFactory;
-import org.smooks.delivery.fragment.NodeFragment;
-import org.smooks.delivery.memento.TextAccumulatorMemento;
-import org.smooks.delivery.ordering.Consumer;
-import org.smooks.delivery.ordering.Producer;
-import org.smooks.delivery.sax.ng.ElementVisitor;
-import org.smooks.event.report.annotation.VisitAfterReport;
-import org.smooks.event.report.annotation.VisitBeforeReport;
-import org.smooks.expression.ExpressionEvaluator;
-import org.smooks.javabean.context.BeanContext;
-import org.smooks.javabean.context.BeanIdStore;
-import org.smooks.javabean.repository.BeanId;
-import org.smooks.registry.lookup.converter.NameTypeConverterFactoryLookup;
-import org.smooks.registry.lookup.converter.SourceTargetTypeConverterFactoryLookup;
-import org.smooks.util.CollectionsUtil;
-import org.smooks.xml.DomUtils;
+import org.smooks.engine.delivery.fragment.NodeFragment;
+import org.smooks.engine.lookup.converter.NameTypeConverterFactoryLookup;
+import org.smooks.engine.lookup.converter.SourceTargetTypeConverterFactoryLookup;
+import org.smooks.engine.memento.TextAccumulatorMemento;
+import org.smooks.support.CollectionsUtil;
+import org.smooks.support.DomUtils;
 import org.w3c.dom.CharacterData;
 import org.w3c.dom.Element;
 
@@ -149,10 +149,10 @@ public class EntityLocatorParameterVisitor implements ElementVisitor, Consumer, 
 
     /**
      * Set the resource configuration on the bean populator.
-     * @throws SmooksConfigurationException Incorrectly configured resource.
+     * @throws SmooksConfigException Incorrectly configured resource.
      */
     @PostConstruct
-    public void postConstruct() throws SmooksConfigurationException {
+    public void postConstruct() throws SmooksConfigException {
 
     	if(LOGGER.isDebugEnabled()) {
     		LOGGER.debug("Initializing EntityLocatorParameterVisitor with name '"+ name +"'");
@@ -177,7 +177,7 @@ public class EntityLocatorParameterVisitor implements ElementVisitor, Consumer, 
     }
 
     /* (non-Javadoc)
-     * @see org.smooks.delivery.ordering.Consumer#consumes(java.lang.String)
+     * @see org.smooks.api.delivery.ordering.Consumer#consumes(java.lang.String)
      */
     @Override
     public boolean consumes(Object object) {
@@ -190,7 +190,7 @@ public class EntityLocatorParameterVisitor implements ElementVisitor, Consumer, 
     }
 
     /* (non-Javadoc)
-     * @see org.smooks.delivery.ordering.Producer#getProducts()
+     * @see org.smooks.api.delivery.ordering.Producer#getProducts()
      */
 	@SuppressWarnings("unchecked")
     @Override

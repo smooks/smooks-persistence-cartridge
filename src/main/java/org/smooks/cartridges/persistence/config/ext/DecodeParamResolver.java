@@ -42,16 +42,17 @@
  */
 package org.smooks.cartridges.persistence.config.ext;
 
-import org.smooks.SmooksException;
+import org.smooks.api.ApplicationContext;
+import org.smooks.api.ExecutionContext;
+import org.smooks.api.SmooksException;
+import org.smooks.api.converter.TypeConverter;
+import org.smooks.api.resource.config.ResourceConfig;
+import org.smooks.api.resource.visitor.dom.DOMVisitBefore;
 import org.smooks.cartridges.persistence.Constants;
-import org.smooks.cdr.ResourceConfig;
-import org.smooks.cdr.extension.ExtensionContext;
-import org.smooks.container.ApplicationContext;
-import org.smooks.container.ExecutionContext;
-import org.smooks.converter.TypeConverter;
-import org.smooks.delivery.dom.DOMVisitBefore;
-import org.smooks.registry.lookup.converter.NameTypeConverterFactoryLookup;
-import org.smooks.xml.DomUtils;
+import org.smooks.engine.lookup.converter.NameTypeConverterFactoryLookup;
+import org.smooks.engine.resource.config.DefaultResourceConfig;
+import org.smooks.engine.resource.extension.ExtensionContext;
+import org.smooks.support.DomUtils;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
@@ -78,7 +79,7 @@ public class DecodeParamResolver implements DOMVisitBefore {
         if(decodeParams.getLength() > 0) {
             ExtensionContext extensionContext = executionContext.get(ExtensionContext.EXTENSION_CONTEXT_TYPED_KEY);
             ResourceConfig populatorConfig = extensionContext.getResourceStack().peek();
-            ResourceConfig decoderConfig = new ResourceConfig();
+            ResourceConfig decoderConfig = new DefaultResourceConfig();
 
             extensionContext.addResource(decoderConfig);
             try {

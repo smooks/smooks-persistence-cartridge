@@ -42,7 +42,7 @@
  */
 package org.smooks.cartridges.persistence;
 
-import org.smooks.SmooksException;
+import org.smooks.api.SmooksException;
 
 /**
  * @author maurice
