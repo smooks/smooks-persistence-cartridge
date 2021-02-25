@@ -42,15 +42,15 @@
  */
 package org.smooks.cartridges.persistence.config.ext;
 
-import org.smooks.SmooksException;
+import org.smooks.api.ExecutionContext;
+import org.smooks.api.SmooksConfigException;
+import org.smooks.api.SmooksException;
+import org.smooks.api.resource.config.Parameter;
+import org.smooks.api.resource.config.ResourceConfig;
+import org.smooks.api.resource.visitor.dom.DOMVisitBefore;
 import org.smooks.cartridges.javabean.BeanInstanceCreator;
-import org.smooks.cdr.ConfigSearch;
-import org.smooks.cdr.Parameter;
-import org.smooks.cdr.ResourceConfig;
-import org.smooks.cdr.SmooksConfigurationException;
-import org.smooks.cdr.extension.ExtensionContext;
-import org.smooks.container.ExecutionContext;
-import org.smooks.delivery.dom.DOMVisitBefore;
+import org.smooks.engine.resource.config.DefaultConfigSearch;
+import org.smooks.engine.resource.extension.ExtensionContext;
 import org.w3c.dom.Element;
 
 import javax.inject.Inject;
@@ -84,7 +84,7 @@ public class SetSelectorFromBeanCreator implements DOMVisitBefore {
             ResourceConfig beanCreatorConfig = findBeanCreatorConfig(beanId, extensionContext);
 
             if(beanCreatorConfig == null) {
-                throw new SmooksConfigurationException("No <jb:bean> configurations is found yet for beanId '" + beanId + "'. " +
+                throw new SmooksConfigException("No <jb:bean> configurations is found yet for beanId '" + beanId + "'. " +
                         "This can mean that no <jb:bean> is present that creates the bean with the bean id or that it is configured after the <" + element.getNodeName() + ">. " +
                          "In this case you must set the selector in the '" + selectorAttrName + "' attribute.");
             } else {
@@ -94,10 +94,10 @@ public class SetSelectorFromBeanCreator implements DOMVisitBefore {
     }
 
     public ResourceConfig findBeanCreatorConfig(String beanId, ExtensionContext extensionContext) {
-        List<ResourceConfig> resourceConfigs = extensionContext.lookupResource(new ConfigSearch().resource(BeanInstanceCreator.class.getName()).param("beanId", beanId));
+        List<ResourceConfig> resourceConfigs = extensionContext.lookupResource(new DefaultConfigSearch().resource(BeanInstanceCreator.class.getName()).param("beanId", beanId));
 
         if(resourceConfigs.size() > 1) {
-            throw new SmooksConfigurationException("Multiple <jb:bean> configurations exist for beanId '" + beanId + "'. " +
+            throw new SmooksConfigException("Multiple <jb:bean> configurations exist for beanId '" + beanId + "'. " +
                         "In this case you must set the selector in the '" + selectorAttrName + "' attribute because Smooks can't select a sensible default.");
         }
         if(resourceConfigs.size() == 1) {

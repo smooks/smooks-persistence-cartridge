@@ -42,13 +42,13 @@
  */
 package org.smooks.cartridges.persistence.config.ext;
 
-import org.smooks.SmooksException;
-import org.smooks.cdr.ResourceConfig;
-import org.smooks.cdr.extension.ExtensionContext;
-import org.smooks.cdr.extension.ResourceConfigUtil;
-import org.smooks.container.ApplicationContext;
-import org.smooks.container.ExecutionContext;
-import org.smooks.delivery.dom.DOMVisitBefore;
+import org.smooks.api.ApplicationContext;
+import org.smooks.api.ExecutionContext;
+import org.smooks.api.SmooksException;
+import org.smooks.api.resource.config.ResourceConfig;
+import org.smooks.api.resource.visitor.dom.DOMVisitBefore;
+import org.smooks.engine.resource.extension.ExtensionContext;
+import org.smooks.engine.resource.extension.ResourceConfigUtil;
 import org.w3c.dom.Element;
 
 import javax.inject.Inject;
@@ -63,7 +63,7 @@ public class EntityLocatorIdResolver implements DOMVisitBefore {
 	private ApplicationContext applicationContext;
 
 	/* (non-Javadoc)
-	 * @see org.smooks.delivery.dom.DOMVisitBefore#visitBefore(org.w3c.dom.Element, org.smooks.container.ExecutionContext)
+	 * @see org.smooks.delivery.dom.DOMVisitBefore#visitBefore(org.w3c.dom.Element, org.smooks.api.ExecutionContext)
 	 */
 	public void visitBefore(Element element, ExecutionContext executionContext)
 			throws SmooksException {

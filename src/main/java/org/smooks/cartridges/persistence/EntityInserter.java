@@ -44,28 +44,28 @@ package org.smooks.cartridges.persistence;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.smooks.SmooksException;
+import org.smooks.api.ApplicationContext;
+import org.smooks.api.ExecutionContext;
+import org.smooks.api.SmooksConfigException;
+import org.smooks.api.SmooksException;
+import org.smooks.api.bean.context.BeanContext;
+import org.smooks.api.bean.context.BeanIdStore;
+import org.smooks.api.bean.repository.BeanId;
+import org.smooks.api.delivery.ordering.Consumer;
+import org.smooks.api.delivery.ordering.Producer;
+import org.smooks.api.resource.visitor.VisitAfterIf;
+import org.smooks.api.resource.visitor.VisitAfterReport;
+import org.smooks.api.resource.visitor.VisitBeforeIf;
+import org.smooks.api.resource.visitor.VisitBeforeReport;
+import org.smooks.api.resource.visitor.sax.ng.AfterVisitor;
+import org.smooks.api.resource.visitor.sax.ng.BeforeVisitor;
 import org.smooks.cartridges.persistence.util.PersistenceUtil;
-import org.smooks.cdr.SmooksConfigurationException;
-import org.smooks.container.ApplicationContext;
-import org.smooks.container.ExecutionContext;
-import org.smooks.delivery.annotation.VisitAfterIf;
-import org.smooks.delivery.annotation.VisitBeforeIf;
-import org.smooks.delivery.fragment.NodeFragment;
-import org.smooks.delivery.ordering.Consumer;
-import org.smooks.delivery.ordering.Producer;
-import org.smooks.delivery.sax.ng.AfterVisitor;
-import org.smooks.delivery.sax.ng.BeforeVisitor;
-import org.smooks.event.report.annotation.VisitAfterReport;
-import org.smooks.event.report.annotation.VisitBeforeReport;
-import org.smooks.javabean.context.BeanContext;
-import org.smooks.javabean.context.BeanIdStore;
-import org.smooks.javabean.repository.BeanId;
+import org.smooks.engine.delivery.fragment.NodeFragment;
 import org.smooks.scribe.ObjectStore;
 import org.smooks.scribe.invoker.DaoInvoker;
 import org.smooks.scribe.invoker.DaoInvokerFactory;
 import org.smooks.scribe.register.DaoRegister;
-import org.smooks.util.CollectionsUtil;
+import org.smooks.support.CollectionsUtil;
 import org.w3c.dom.Element;
 
 import javax.annotation.PostConstruct;
@@ -148,7 +148,7 @@ public class EntityInserter implements BeforeVisitor, AfterVisitor, Consumer, Pr
     private BeanId insertedBeanId;
 
     @PostConstruct
-    public void postConstruct() throws SmooksConfigurationException {
+    public void postConstruct() throws SmooksConfigException {
     	BeanIdStore beanIdStore = appContext.getBeanIdStore();
 
     	beanId = beanIdStore.register(beanIdName);
@@ -159,7 +159,7 @@ public class EntityInserter implements BeforeVisitor, AfterVisitor, Consumer, Pr
     }
 
     /* (non-Javadoc)
-	 * @see org.smooks.delivery.ordering.Producer#getProducts()
+	 * @see org.smooks.api.delivery.ordering.Producer#getProducts()
 	 */
 	@Override
 	public Set<? extends Object> getProducts() {
@@ -171,7 +171,7 @@ public class EntityInserter implements BeforeVisitor, AfterVisitor, Consumer, Pr
 	}
 
 	/* (non-Javadoc)
-	 * @see org.smooks.delivery.ordering.Consumer#consumes(java.lang.String)
+	 * @see org.smooks.api.delivery.ordering.Consumer#consumes(java.lang.String)
 	 */
 	@Override
 	public boolean consumes(Object object) {

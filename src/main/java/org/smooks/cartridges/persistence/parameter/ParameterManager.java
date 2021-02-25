@@ -42,10 +42,10 @@
  */
 package org.smooks.cartridges.persistence.parameter;
 
+import org.smooks.api.ApplicationContext;
+import org.smooks.api.ExecutionContext;
+import org.smooks.api.TypedKey;
 import org.smooks.cartridges.persistence.ParameterListType;
-import org.smooks.container.ApplicationContext;
-import org.smooks.container.ExecutionContext;
-import org.smooks.container.TypedKey;
 
 /**
  * @author <a href="mailto:maurice.zeijen@smies.com">maurice.zeijen@smies.com</a>
@@ -65,31 +65,28 @@ public class ParameterManager {
 	public static String getParameterContainerName(int id) {
 		return PARAMETER_CONTAINER_CONTEXT_KEY + "#" + id;
 	}
-
-
+	
 	public static ParameterIndex<?, ?> initializeParameterIndex(int id, ParameterListType type, ApplicationContext applicationContext) {
-
-		ParameterIndex<?, ?> index;
-
-		switch (type) {
-		case NAMED:
-			index = new NamedParameterIndex();
-			break;
-		case POSITIONAL:
-			index = new PositionalParameterIndex();
-			break;
-		default:
-			throw new IllegalStateException("Unknown ParameterListType '" + type + "'.");
+		ParameterIndex<?, ?> index = applicationContext.getRegistry().lookup(getParameterIndexName(id));
+		if (index == null) {
+			switch (type) {
+				case NAMED:
+					index = new NamedParameterIndex();
+					break;
+				case POSITIONAL:
+					index = new PositionalParameterIndex();
+					break;
+				default:
+					throw new IllegalStateException("Unknown ParameterListType '" + type + "'.");
+			}
+			applicationContext.getRegistry().registerObject(getParameterIndexName(id), index);
 		}
-
-		applicationContext.getRegistry().registerObject(getParameterIndexName(id), index);
 
 		return index;
 	}
 
-	@SuppressWarnings("unchecked")
 	public static ParameterIndex<?, ? extends Parameter<?>> getParameterIndex(int id, ApplicationContext applicationContext) {
-		return (ParameterIndex<?, ? extends Parameter<?>>) applicationContext.getRegistry().lookup(getParameterIndexName(id));
+		return applicationContext.getRegistry().lookup(getParameterIndexName(id));
 	}
 
 	public static void initializeParameterContainer(int id, ParameterListType type, ExecutionContext executionContext) {

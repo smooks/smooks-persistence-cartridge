@@ -42,7 +42,7 @@
  */
 package org.smooks.cartridges.persistence.config.ext;
 
-import org.smooks.container.ApplicationContext;
+import org.smooks.api.ApplicationContext;
 
 /**
  * @author <a href="mailto:maurice.zeijen@smies.com">maurice.zeijen@smies.com</a>

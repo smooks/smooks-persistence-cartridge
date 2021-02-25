@@ -44,13 +44,13 @@ package org.smooks.cartridges.persistence;
 
 import org.mockito.Mock;
 import org.smooks.Smooks;
+import org.smooks.api.ExecutionContext;
 import org.smooks.cartridges.persistence.test.dao.FullInterfaceDao;
 import org.smooks.cartridges.persistence.test.dao.FullInterfaceMappedDao;
 import org.smooks.cartridges.persistence.test.util.BaseTestCase;
 import org.smooks.cartridges.persistence.util.PersistenceUtil;
-import org.smooks.container.ExecutionContext;
-import org.smooks.event.report.HtmlReportGenerator;
-import org.smooks.payload.StringSource;
+import org.smooks.engine.report.HtmlReportGenerator;
+import org.smooks.io.payload.StringSource;
 import org.smooks.scribe.register.MapDaoRegister;
 import org.smooks.scribe.register.SingleDaoRegister;
 import org.testng.annotations.Test;
