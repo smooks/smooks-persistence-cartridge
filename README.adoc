@@ -1,0 +1,316 @@
+= Smooks Persistence Cartridge
+
+image:https://img.shields.io/maven-central/v/org.smooks.cartridges/smooks-persistence-cartridge[Maven Central]
+image:https://img.shields.io/nexus/s/org.smooks.cartridges/smooks-persistence-cartridge?server=https%3A%2F%2Foss.sonatype.org[Sonatype Nexus (Snapshots)]
+image:https://github.com/smooks/smooks-persistence-cartridge/workflows/CI/badge.svg[Build Status]
+
+// tag::smooks-persistence-cartridge[]
+With the Smooks Persistence Cartridge, you can directly use several entity persistence frameworks from within Smooks (Hibernate, JPA, etc...).
+
+Let us take a look at a Hibernate example. The same principals follow for any JPA compliant framework.
+
+The data we are going to process is an XML order message. It should be noted however, that the input data could also be CSV, JSON, EDI, Java or any other structured data format. The same principals apply, no matter what the data format is!
+
+[source,xml]
+----
+<order>
+    <ordernumber>1</ordernumber>
+    <customer>123456</customer>
+    <order-items>
+        <order-item>
+            <product>11</product>
+            <quantity>2</quantity>
+        </order-item>
+        <order-item>
+            <product>22</product>
+            <quantity>7</quantity>
+        </order-item>
+    </order-items>
+</order>
+----
+
+The Hibernate entities are:
+
+[source,java]
+----
+@Entity
+@Table(name="orders")
+public class Order {
+
+    @Id
+    private Integer ordernumber;
+
+    @Basic
+    private String customerId;
+
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+    private List orderItems = new ArrayList();
+
+    public void addOrderLine(OrderLine orderLine) {
+        orderItems.add(orderLine);
+    }
+
+    // Getters and Setters....
+}
+
+@Entity
+@Table(name="orderlines")
+public class OrderLine {
+
+    @Id
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
+    private Integer id;
+
+    @ManyToOne
+    @JoinColumn(name="orderid")
+    private Order order;
+
+    @Basic
+    private Integer quantity;
+
+    @ManyToOne
+    @JoinColumn(name="productid")
+    private Product product;
+
+    // Getters and Setters....
+}
+
+@Entity
+@Table(name = "products")
+@NamedQuery(name="product.byId", query="from Product p where p.id = :id")
+public class Product {
+
+    @Id
+    private Integer id;
+
+    @Basic
+    private String name;
+
+    // Getters and Setters....
+}
+----
+
+What we want to do here is to process and persist the `+Order+`. First thing we need to do is to bind the order data into the `+Order+` entities (`+Order+`, `+OrderLine+` and `+Product+`). To do this we need to:
+
+. *Create* and populate the Order and OrderLine entities using the link:#java-binding[Java Binding] framework.
+. *Wire* each OrderLine instance into the Order instance.
+. Into each OrderLine instance, we need to *lookup and wire* in the associated order line Product entity.
+. And finally, we need to *insert* (persist) the Order instance.
+
+To do this, we need the following Smooks configuration:
+
+[source,xml]
+----
+<smooks-resource-list xmlns="https://www.smooks.org/xsd/smooks-2.0.xsd"
+ xmlns:jb="https://www.smooks.org/xsd/smooks/javabean-1.6.xsd"
+ xmlns:dao="https://www.smooks.org/xsd/smooks/persistence-2.0.xsd">
+
+    <jb:bean beanId="order" class="example.entity.Order" createOnElement="order">
+        <jb:value property="ordernumber" data="ordernumber" />
+        <jb:value property="customerId" data="customer" />
+        <jb:wiring setterMethod="addOrderLine" beanIdRef="orderLine" />
+    </jb:bean>
+
+    <jb:bean beanId="orderLine" class="example.entity.OrderLine" createOnElement="order-item">
+        <jb:value property="quantity" data="quantity" />
+        <jb:wiring property="order" beanIdRef="order" />
+        <jb:wiring property="product" beanIdRef="product" />
+    </jb:bean>
+
+    <dao:locator beanId="product" lookupOnElement="order-item" onNoResult="EXCEPTION" uniqueResult="true">
+        <dao:query>from Product p where p.id = :id</dao:query>
+        <dao:params>
+            <dao:value name="id" data="product" decoder="Integer" />
+        </dao:params>
+    </dao:locator>
+
+    <dao:inserter beanId="order" insertOnElement="order" />
+
+</smooks-resource-list>
+----
+
+If we want to use the named query `+productById+` instead of the query string then the DAO locator configuration will look like this:
+
+[source,xml]
+----
+<dao:locator beanId="product" lookupOnElement="order-item" lookup="product.byId" onNoResult="EXCEPTION" uniqueResult="true">
+    <dao:params>
+        <dao:value name="id" data="product" decoder="Integer"/>
+    </dao:params>
+</dao:locator>
+----
+
+The following code executes Smooks. Note that we use a `+SessionRegister+` object so that we can access the Hibernate Session from within Smooks.
+
+[source,java]
+----
+Smooks smooks = new Smooks("smooks-config.xml");
+
+ExecutionContext executionContext = smooks.createExecutionContext();
+
+// The SessionRegister provides the bridge between Hibernate and the
+// Persistence Cartridge. We provide it with the Hibernate session.
+// The Hibernate Session is set as default Session.
+DaoRegister register = new SessionRegister(session);
+
+// This sets the DAO Register in the executionContext for Smooks
+// to access it.
+PersistenceUtil.setDAORegister(executionContext, register);
+
+Transaction transaction = session.beginTransaction();
+
+smooks.filterSource(executionContext, source);
+
+transaction.commit();
+----
+
+== Data Access Object Support
+
+Now let’s take a look at a DAO based example. The example will read an XML file containing order information (note that this works just the same for EDI, CSV, etc...). Using the javabean cartridge, it will bind the XML data into a set of entity beans. Using the id of the products within the order items (the element) it will locate the product entities and bind them to the order entity bean. Finally, the order bean will be persisted.
+
+The order XML message looks like this:
+
+[source,xml]
+----
+<order>
+    <ordernumber>1</ordernumber>
+    <customer>123456</customer>
+    <order-items>
+        <order-item>
+            <product>11</product>
+            <quantity>2</quantity>
+        </order-item>
+        <order-item>
+            <product>22</product>
+            <quantity>7</quantity>
+        </order-item>
+    </order-items>
+</order>
+----
+
+The following custom DAO will be used to persist the Order entity:
+
+[source,java]
+----
+@Dao
+public class OrderDao {
+
+    private final EntityManager em;
+
+    public OrderDao(EntityManager em) {
+        this.em = em;
+    }
+
+    @Insert
+    public void insertOrder(Order order) {
+        em.persist(order);
+    }
+}
+----
+
+When looking at this class you should notice the `+@Dao+` and `+@Insert+` annotations. The `+@Dao+` annotation declares that the `+OrderDao+` is a DAO object. The `+@Insert+` annotation declares that the `+insertOrder+` method should be used to insert `+Order+` entities.
+
+The following custom DAO will be used to lookup the `+Product+` entities:
+
+[source,java]
+----
+@Dao
+public class ProductDao {
+
+    private final EntityManager em;
+
+    public ProductDao(EntityManager em) {
+        this.em = em;
+    }
+
+    @Lookup(name = "id")
+    public Product findProductById(@Param("id")int id) {
+        return em.find(Product.class, id);
+    }
+}
+----
+
+When looking at this class, you should notice the `+@Lookup+` and `+@Param+` annotations. The `+@Lookup+` annotation declares that the `+ProductDao#findByProductId+` method is used to lookup `+Product+` entities. The name parameter in the `+@Lookup+` annotation sets the lookup name reference for that method. When the name isn’t declared, the method name will be used. The optional `+@Param+` annotation lets you name the  parameters. This creates a better abstraction between Smooks and the DAO. If you don’t declare the `+@Param+` annotation the parameters are resolved by there position.
+
+The Smooks configuration look likes this:
+
+[source,xml]
+----
+<smooks-resource-list xmlns="https://www.smooks.org/xsd/smooks-2.0.xsd"
+                      xmlns:jb="https://www.smooks.org/xsd/smooks/javabean-1.6.xsd"
+                      xmlns:dao="https://www.smooks.org/xsd/smooks/persistence-2.0.xsd">
+
+    <jb:bean beanId="order" class="example.entity.Order" createOnElement="order">
+        <jb:value property="ordernumber" data="ordernumber"/>
+        <jb:value property="customerId" data="customer"/>
+        <jb:wiring setterMethod="addOrderLine" beanIdRef="orderLine"/>
+    </jb:bean>
+
+    <jb:bean beanId="orderLine" class="example.entity.OrderLine" createOnElement="order-item">
+        <jb:value property="quantity" data="quantity"/>
+        <jb:wiring property="order" beanIdRef="order"/>
+        <jb:wiring property="product" beanIdRef="product"/>
+    </jb:bean>
+
+    <dao:locator beanId="product" dao="product" lookup="id" lookupOnElement="order-item" onNoResult="EXCEPTION">
+        <dao:params>
+            <dao:value name="id" data="product" decoder="Integer"/>
+        </dao:params>
+    </dao:locator>
+
+    <dao:inserter beanId="order" dao="order" insertOnElement="order"/>
+
+</smooks-resource-list>
+----
+
+The following code executes Smooks:
+
+[source,java]
+----
+Smooks smooks=new Smooks("./smooks-configs/smooks-dao-config.xml");
+ExecutionContext executionContext=smooks.createExecutionContext();
+
+// The register is used to map the DAO's to a DAO name. The DAO name isbe used in
+// the configuration.
+// The MapRegister is a simple Map like implementation of the DaoRegister.
+DaoRegister<object>register = MapRegister.builder()
+        .put("product",new ProductDao(em))
+        .put("order",new OrderDao(em))
+        .build();
+
+PersistenceUtil.setDAORegister(executionContext,mapRegister);
+
+// Transaction management from within Smooks isn't supported yet,
+// so we need to do it outside the filter execution
+EntityTransaction tx=em.getTransaction();
+tx.begin();
+
+smooks.filter(new StreamSource(messageIn),null,executionContext);
+
+tx.commit();
+----
+
+== Maven Coordinates
+
+.pom.xml
+[source,xml]
+----
+<dependency>
+    <groupId>org.smooks.cartridges</groupId>
+    <artifactId>smooks-persistence-cartridge</artifactId>
+    <version>2.0.0-M3</version>
+</dependency>
+----
+
+== XML Namespace
+
+....
+xmlns:dao="https://www.smooks.org/xsd/smooks/persistence-2.0.xsd"
+....
+// end::smooks-persistence-cartridge[]
+
+== License
+
+Smooks Persistence Cartridge is open source and licensed under the terms of the Apache License Version 2.0, or the GNU Lesser General Public License version 3.0 or later. You may use Smooks Persistence Cartridge according to either of these licenses as is most appropriate for your project.
+
+`+SPDX-License-Identifier: Apache-2.0 OR LGPL-3.0-or-later+`
