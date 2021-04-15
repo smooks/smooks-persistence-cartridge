@@ -5,6 +5,7 @@ image:https://img.shields.io/nexus/s/org.smooks.cartridges/smooks-persistence-ca
 image:https://github.com/smooks/smooks-persistence-cartridge/workflows/CI/badge.svg[Build Status]
 
 // tag::smooks-persistence-cartridge[]
+== Entity Persistence Frameworks
 With the Smooks Persistence Cartridge, you can directly use several entity persistence frameworks from within Smooks (Hibernate, JPA, etc...).
 
 Let us take a look at a Hibernate example. The same principals follow for any JPA compliant framework.
