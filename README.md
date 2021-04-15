@@ -1,1 +1,0 @@
-# smooks-persistence-cartridge
