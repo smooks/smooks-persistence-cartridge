@@ -40,51 +40,24 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  * =========================LICENSE_END==================================
  */
-package org.smooks.cartridges.persistence.db;
+package org.smooks.cartridges.persistence.datasource;
 
-import org.smooks.assertion.AssertArgument;
+import org.smooks.api.ExecutionContext;
+import org.smooks.api.SmooksException;
+import org.smooks.api.delivery.sax.SAXElement;
+import org.smooks.api.resource.visitor.sax.SAXVisitAfter;
 
-import java.sql.Connection;
-import java.sql.SQLException;
+import java.io.IOException;
 
-public class ExternalTransactionManager implements TransactionManager {
+/**
+ * @author <a href="mailto:tom.fennelly@gmail.com">tom.fennelly@gmail.com</a>
+ */
+public class ExceptionVisitor implements SAXVisitAfter {
+    public static boolean exceptionThrown;
 
-    private final Connection connection;
-
-    private final boolean isSetAutoCommitAllowed;
-
-	private final boolean autoCommit;
-
-    /**
-     * @param connection
-     */
-    public ExternalTransactionManager(Connection connection, boolean autoCommit, boolean isSetAutoCommitAllowed) {
-    	AssertArgument.isNotNull(connection, "connection");
-
-        this.connection = connection;
-        this.autoCommit = autoCommit;
-        this.isSetAutoCommitAllowed = isSetAutoCommitAllowed;
+    @Override
+    public void visitAfter(SAXElement element, ExecutionContext executionContext) throws SmooksException, IOException {
+        exceptionThrown = true;
+        throw new RuntimeException("Blah");
     }
-
-	@Override
-	public void begin() {
-    	if(isSetAutoCommitAllowed) {
-	    	try {
-				if(connection.getAutoCommit() != autoCommit) {
-					connection.setAutoCommit(autoCommit);
-				}
-			} catch (SQLException e) {
-				throw new TransactionException("Exception while setting the autoCommit flag of the connection", e);
-			}
-    	}
-    }
-
-	@Override
-	public void commit() {
-	}
-
-	@Override
-	public void rollback() {
-	}
-
 }

@@ -15,9 +15,30 @@
 
     <dependencies>
         <dependency>
+            <groupId>javax.persistence</groupId>
+            <artifactId>persistence-api</artifactId>
+            <version>${persistence-api.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.transaction</groupId>
+            <artifactId>jta</artifactId>
+            <version>1.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.smooks.cartridges</groupId>
+            <artifactId>smooks-javabean-cartridge</artifactId>
+            <version>2.0.0-RC1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
             <groupId>org.smooks.cartridges</groupId>
             <artifactId>smooks-scribe-core</artifactId>
             <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.smooks</groupId>
+            <artifactId>smooks-tck</artifactId>
+            <version>2.0.0-RC1-SNAPSHOT</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mockejb</groupId>

@@ -40,63 +40,29 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  * =========================LICENSE_END==================================
  */
-package org.smooks.cartridges.persistence.db;
+package org.smooks.cartridges.persistence.jdbc;
 
+import org.smooks.Smooks;
+import org.smooks.api.ApplicationContext;
 import org.smooks.api.ExecutionContext;
 
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Proxy;
-import java.sql.Connection;
-import java.sql.SQLException;
-
 /**
- * @author <a href="mailto:tom.fennelly@gmail.com">tom.fennelly@gmail.com</a>
+ * Database Resultset lifecycle scope for Resultsets created by the
+ * {@link SQLExecutor} class.
+ *
+ * @author <a href="mailto:tom.fennelly@jboss.com">tom.fennelly@jboss.com</a>
  */
-public class MockDatasource extends AbstractDataSource {
-
-    public static boolean committed;
-    public static boolean rolledBack;
-    public static int cleanupCallCount;
-    public static final String MOCK_DS_NAME = "mockDS";
-
-    @Override
-    public String getName() {
-        return MOCK_DS_NAME;
-    }
-
-    @Override
-    public Connection getConnection() throws SQLException {
-        InvocationHandler handler = (proxy, method, args) -> {
-            if(method.getName().equals("commit")) {
-                committed = true;
-                return null;
-            } else if(method.getName().equals("rollback")) {
-                rolledBack = true;
-                return null;
-            } else if(method.getName().equals("setAutoCommit")) {
-                return null;
-            } else if(method.getName().equals("close")) {
-                return null;
-            }  else if(method.getName().equals("getAutoCommit")) {
-                return true;
-            }
-
-            throw new RuntimeException("Unexpected call to method: " + method);
-        };
-
-        return (Connection) Proxy.newProxyInstance(Connection.class.getClassLoader(),
-                new Class[]{Connection.class},
-                handler);
-    }
-
-    @Override
-    public boolean isAutoCommit() {
-        return false;
-    }
-
-    @Override
-    protected void unbind(ExecutionContext executionContext) {
-        cleanupCallCount++;
-        super.unbind(executionContext);
-    }
+public enum ResultSetScope {
+    /**
+     * The Resultset is scoped around the Smooks {@link ExecutionContext}, and so only
+     * lives for the duration of the {@link Smooks#filter(org.smooks.container.ExecutionContext,javax.xml.transform.Source,javax.xml.transform.Result)}
+     * call.
+     */
+    EXECUTION,
+    /**
+     * The Resultset is scoped around the Smooks {@link ApplicationContext}. In this case,
+     * the ResultSet can outlive the lifetime of the {@link Smooks#filter(org.smooks.container.ExecutionContext,javax.xml.transform.Source,javax.xml.transform.Result)}
+     * that created it.  It's expiry is governed by the .
+     */
+    APPLICATION;
 }

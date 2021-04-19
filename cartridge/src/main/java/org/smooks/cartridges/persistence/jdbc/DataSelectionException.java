@@ -40,57 +40,22 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  * =========================LICENSE_END==================================
  */
-package org.smooks.cartridges.persistence.db;
+package org.smooks.cartridges.persistence.jdbc;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.smooks.Smooks;
 import org.smooks.api.SmooksException;
-import org.smooks.io.payload.StringSource;
-import org.xml.sax.SAXException;
-
-import java.io.IOException;
-
-import static org.junit.Assert.*;
 
 /**
+ * Data selection exception.
+ * 
  * @author <a href="mailto:tom.fennelly@gmail.com">tom.fennelly@gmail.com</a>
  */
-public class DatasourceCleanupTestCase {
+public class DataSelectionException extends SmooksException {
 
-    @Before
-    public void setUp() throws Exception {
-        MockDatasource.cleanupCallCount = 0;
+    public DataSelectionException(String message) {
+        super(message);
     }
 
-    @Test
-    public void test_normal() throws IOException, SAXException {
-        Smooks smooks = new Smooks(getClass().getResourceAsStream("normal-ds-lifecycle.xml"));
-
-        // Cleanup should get called twice.  Once for the visitAfter event and once for the
-        // executeExecutionLifecycleCleanup event...
-        smooks.filterSource(new StringSource("<a></a>"));
-        assertEquals(2, MockDatasource.cleanupCallCount);
-        assertTrue(MockDatasource.committed);
-    }
-
-    @Test
-    public void test_exception() throws IOException, SAXException {
-        Smooks smooks = new Smooks(getClass().getResourceAsStream("exception-ds-lifecycle.xml"));
-
-        try {
-            smooks.filterSource(new StringSource("<a><b/><c/></a>"));
-            fail("Expected exception...");
-        } catch(SmooksException e) {
-            // Expected
-        }
-
-        // Test that even after an exception is thrown, the DataSource cleanup takes place...
-        // Cleanup should only get called once for the executeExecutionLifecycleCleanup event.
-        // The visitAfter event doesn't call it because of the exception thrown by a nested
-        // visitor...
-        assertTrue(ExceptionVisitor.exceptionThrown);
-        assertEquals(1, MockDatasource.cleanupCallCount);
-        assertTrue(MockDatasource.rolledBack);
+    public DataSelectionException(String message, Throwable cause) {
+        super(message, cause);
     }
 }

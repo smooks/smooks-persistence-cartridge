@@ -40,60 +40,57 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  * =========================LICENSE_END==================================
  */
-package org.smooks.cartridges.persistence.db;
+package org.smooks.cartridges.persistence.datasource;
 
-import org.smooks.assertion.AssertArgument;
+import org.junit.Before;
+import org.junit.Test;
+import org.smooks.Smooks;
+import org.smooks.api.SmooksException;
+import org.smooks.io.payload.StringSource;
+import org.xml.sax.SAXException;
 
-import java.sql.Connection;
-import java.sql.SQLException;
+import java.io.IOException;
 
-class JdbcTransactionManager implements TransactionManager {
+import static org.junit.Assert.*;
 
-	private final Connection connection;
+/**
+ * @author <a href="mailto:tom.fennelly@gmail.com">tom.fennelly@gmail.com</a>
+ */
+public class DatasourceCleanupTestCase {
 
-	private final boolean autoCommit;
+    @Before
+    public void setUp() throws Exception {
+        MockDatasource.cleanupCallCount = 0;
+    }
 
-	public JdbcTransactionManager(Connection connection, boolean autoCommit) {
-		AssertArgument.isNotNull(connection, "connection");
+    @Test
+    public void test_normal() throws IOException, SAXException {
+        Smooks smooks = new Smooks(getClass().getResourceAsStream("normal-ds-lifecycle.xml"));
 
-		this.connection = connection;
-		this.autoCommit = autoCommit;
-	}
+        // Cleanup should get called twice.  Once for the visitAfter event and once for the
+        // executeExecutionLifecycleCleanup event...
+        smooks.filterSource(new StringSource("<a></a>"));
+        assertEquals(2, MockDatasource.cleanupCallCount);
+        assertTrue(MockDatasource.committed);
+    }
 
-	@Override
-	public void begin() {
-		try {
-			if(connection.getAutoCommit() != autoCommit) {
-				connection.setAutoCommit(autoCommit);
-			}
-		} catch (SQLException e) {
-			throw new TransactionException("Exception while setting the autoCommit flag of the connection", e);
-		}
-	}
+    @Test
+    public void test_exception() throws IOException, SAXException {
+        Smooks smooks = new Smooks(getClass().getResourceAsStream("exception-ds-lifecycle.xml"));
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.smooks.engine.db.TransactionManager#commit()
-	 */
-	@Override
-	public void commit() {
-		try {
-			connection.commit();
-		} catch (SQLException e) {
-			throw new TransactionException("Exception while committing the connection", e);
-		}
-	}
+        try {
+            smooks.filterSource(new StringSource("<a><b/><c/></a>"));
+            fail("Expected exception...");
+        } catch(SmooksException e) {
+            // Expected
+        }
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.smooks.engine.db.TransactionManager#rollback()
-	 */
-	@Override
-	public void rollback() {
-		try {
-			connection.rollback();
-		} catch (SQLException e) {
-			throw new TransactionException("Exception while rolling back the connection", e);
-		}
-	}
+        // Test that even after an exception is thrown, the DataSource cleanup takes place...
+        // Cleanup should only get called once for the executeExecutionLifecycleCleanup event.
+        // The visitAfter event doesn't call it because of the exception thrown by a nested
+        // visitor...
+        assertTrue(ExceptionVisitor.exceptionThrown);
+        assertEquals(1, MockDatasource.cleanupCallCount);
+        assertTrue(MockDatasource.rolledBack);
+    }
 }

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
   ========================LICENSE_START=================================
-  Core
+  smooks-persistence-cartridge
   %%
   Copyright (C) 2020 Smooks
   %%
@@ -42,18 +42,45 @@
   =========================LICENSE_END==================================
   -->
 
-<smooks-resource-list xmlns="https://www.smooks.org/xsd/smooks-2.0.xsd">
+<smooks-resource-list xmlns="https://www.smooks.org/xsd/smooks-2.0.xsd"
+	xmlns:ds="https://www.smooks.org/xsd/smooks/datasource-1.4.xsd"
+	xmlns:jdbc="https://www.smooks.org/xsd/smooks/jdbc-2.0.xsd">
 
-    <resource-config selector="a">
-        <resource>org.smooks.cartridges.persistence.db.MockDatasource</resource>
-    </resource-config>
+	<ds:direct
+		bindOnElement="#document"
+		datasource="OrdersDS"
+		driver="org.hsqldb.jdbcDriver"
+		url="jdbc:hsqldb:hsql://localhost:9992/milyn-hsql-9992"
+		username="sa"
+		password=""
+		autoCommit="true" />
 
-    <resource-config selector="b">
-        <resource>org.smooks.cartridges.persistence.db.DSConnectionUser</resource>
-    </resource-config>
+	<jdbc:executor
+		executeOnElement="#document"
+		datasource="OrdersDS"
+		executeBefore="true">
 
-    <resource-config selector="c">
-        <resource>org.smooks.cartridges.persistence.db.ExceptionVisitor</resource>
-    </resource-config>
+		<jdbc:statement>select * from ORDERS</jdbc:statement>
+		<jdbc:resultSet name="orders1" />
+	</jdbc:executor>
+
+	<jdbc:resultSetRowSelector
+		selectRowOnElement="#document"
+		resultSetName="orders1"
+		beanId="myOrder"
+		executeBefore="true">
+
+		<jdbc:where>row.ORDERNUMBER == 2</jdbc:where>
+		<jdbc:failedSelectError>Order with ORDERNUMBER=2 not found in Database</jdbc:failedSelectError>
+	</jdbc:resultSetRowSelector>
+
+	<jdbc:executor
+		executeOnElement="#document"
+		datasource="OrdersDS"
+		executeBefore="true">
+
+		<jdbc:statement>select * from ORDERS</jdbc:statement>
+		<jdbc:resultSet name="orders2" scope="APPLICATION" timeToLive="2000" />
+	</jdbc:executor>
 
 </smooks-resource-list>

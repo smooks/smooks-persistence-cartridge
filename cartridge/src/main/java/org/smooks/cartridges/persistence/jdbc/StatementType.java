@@ -40,24 +40,14 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  * =========================LICENSE_END==================================
  */
-package org.smooks.cartridges.persistence.db;
-
-import org.smooks.api.ExecutionContext;
-import org.smooks.api.SmooksException;
-import org.smooks.api.delivery.sax.SAXElement;
-import org.smooks.api.resource.visitor.sax.SAXVisitAfter;
-
-import java.io.IOException;
+package org.smooks.cartridges.persistence.jdbc;
 
 /**
+ * SQL Statement type.
+ *
  * @author <a href="mailto:tom.fennelly@gmail.com">tom.fennelly@gmail.com</a>
  */
-public class ExceptionVisitor implements SAXVisitAfter {
-    public static boolean exceptionThrown;
-
-    @Override
-    public void visitAfter(SAXElement element, ExecutionContext executionContext) throws SmooksException, IOException {
-        exceptionThrown = true;
-        throw new RuntimeException("Blah");
-    }
+public enum StatementType {
+    QUERY, // "select" statement
+    UPDATE  // "insert", "update", "delete" etc statement
 }

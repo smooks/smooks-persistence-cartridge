@@ -43,6 +43,7 @@
 package org.smooks.cartridges.persistence;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
+import org.junit.Test;
 import org.mockito.Mock;
 import org.smooks.Smooks;
 import org.smooks.api.ExecutionContext;
@@ -53,8 +54,6 @@ import org.smooks.cartridges.persistence.util.PersistenceUtil;
 import org.smooks.engine.report.HtmlReportGenerator;
 import org.smooks.scribe.register.MapDaoRegister;
 import org.smooks.scribe.register.SingleDaoRegister;
-import org.testng.Assert;
-import org.testng.annotations.Test;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
@@ -65,6 +64,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -73,7 +73,6 @@ import static org.mockito.Mockito.when;
 /**
  * @author <a href="mailto:maurice.zeijen@smies.com">maurice.zeijen@smies.com</a>
  */
-@Test(groups = "unit")
 public class EntityLocatorTest extends BaseTestCase {
 	private static final boolean ENABLE_REPORTING = false;
 
@@ -110,7 +109,7 @@ public class EntityLocatorTest extends BaseTestCase {
 			Source source = new StreamSource(getClass().getResourceAsStream("input-message-01.xml"));
 			smooks.filterSource(executionContext, source);
 
-			Assert.assertSame(result, executionContext.getBeanContext().getBean("entity"));
+			assertSame(result, executionContext.getBeanContext().getBean("entity"));
 		} finally {
 			smooks.close();
 		}
@@ -141,7 +140,7 @@ public class EntityLocatorTest extends BaseTestCase {
 			Source source = new StreamSource(getClass().getResourceAsStream("input-message-01.xml"));
 			smooks.filterSource(executionContext, source);
 
-			Assert.assertNull(executionContext.getBeanContext().getBean("entity"));
+			assertNull(executionContext.getBeanContext().getBean("entity"));
 		} finally {
 			smooks.close();
 		}
@@ -168,14 +167,14 @@ public class EntityLocatorTest extends BaseTestCase {
 			smooks.filterSource(executionContext, source);
 
 		} catch (SmooksException e) {
-			Assert.assertSame(ExceptionUtils.getCause(e).getClass(), NoLookupResultException.class);
+			assertSame(ExceptionUtils.getCause(e).getClass(), NoLookupResultException.class);
 
 			return;
 		} finally {
 			smooks.close();
 		}
 
-		Assert.fail("NoLookupResultException was not thrown.");
+		fail("NoLookupResultException was not thrown.");
 	}
 
 	@Test

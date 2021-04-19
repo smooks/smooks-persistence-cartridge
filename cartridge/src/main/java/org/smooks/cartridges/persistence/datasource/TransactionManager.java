@@ -40,20 +40,39 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  * =========================LICENSE_END==================================
  */
-package org.smooks.cartridges.persistence.test.util;
-
-import org.junit.Before;
-import org.mockito.MockitoAnnotations;
+package org.smooks.cartridges.persistence.datasource;
 
 /**
+ * The transaction manager manages the transaction
+ * of a data source
+ * <p />
+ *
+ * This transaction manager does nothing and has a default level
+ * because it can change in future versions of Smooks.
+ *
  * @author <a href="mailto:maurice.zeijen@smies.com">maurice.zeijen@smies.com</a>
  *
  */
-public abstract class BaseTestCase {
+public interface TransactionManager {
 
-	@Before
-	public void beforeMethod() {
-		MockitoAnnotations.initMocks(this);
-	}
+	/**
+	 * Begin the transaction
+	 *
+	 * @throws TransactionException If an exception got thrown while beginning the exception
+	 */
+    void begin();
+    /**
+	 * Commit the transaction
+	 *
+	 * @throws TransactionException If an exception got thrown while committing the exception
+	 */
+    void commit();
+
+    /**
+	 * Rollback the transaction
+	 *
+	 * @throws TransactionException If an exception got thrown while rollingback the exception
+	 */
+    void rollback();
 
 }

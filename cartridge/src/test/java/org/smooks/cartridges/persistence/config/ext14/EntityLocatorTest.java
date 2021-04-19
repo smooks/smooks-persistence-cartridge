@@ -42,6 +42,7 @@
  */
 package org.smooks.cartridges.persistence.config.ext14;
 
+import org.junit.Test;
 import org.mockito.Mock;
 import org.smooks.Smooks;
 import org.smooks.api.ExecutionContext;
@@ -52,14 +53,14 @@ import org.smooks.engine.report.HtmlReportGenerator;
 import org.smooks.io.payload.JavaResult;
 import org.smooks.io.payload.StringSource;
 import org.smooks.scribe.register.MapDaoRegister;
-import org.testng.Assert;
-import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
@@ -71,7 +72,6 @@ import static org.mockito.Mockito.when;
  *
  */
 @SuppressWarnings("unchecked")
-@Test(groups="unit")
 public class EntityLocatorTest extends BaseTestCase {
 	private static final boolean ENABLE_REPORTING = false;
 
@@ -106,8 +106,8 @@ public class EntityLocatorTest extends BaseTestCase {
 
             List<String> resultList = (List<String>) result.getBean("theList");
 
-            Assert.assertNotNull(resultList);
-            Assert.assertSame(searchResult, resultList.get(0));
+            assertNotNull(resultList);
+            assertSame(searchResult, resultList.get(0));
 
         }finally {
             smooks.close();
