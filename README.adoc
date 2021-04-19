@@ -219,8 +219,8 @@ To do this, we need the following Smooks configuration:
 [source,xml]
 ----
 <smooks-resource-list xmlns="https://www.smooks.org/xsd/smooks-2.0.xsd"
- xmlns:jb="https://www.smooks.org/xsd/smooks/javabean-1.6.xsd"
- xmlns:dao="https://www.smooks.org/xsd/smooks/persistence-2.0.xsd">
+                      xmlns:jb="https://www.smooks.org/xsd/smooks/javabean-1.6.xsd"
+                      xmlns:persistence="https://www.smooks.org/xsd/smooks/persistence-2.0.xsd">
 
     <jb:bean beanId="order" class="example.entity.Order" createOnElement="order">
         <jb:value property="ordernumber" data="ordernumber" />
@@ -234,14 +234,14 @@ To do this, we need the following Smooks configuration:
         <jb:wiring property="product" beanIdRef="product" />
     </jb:bean>
 
-    <dao:locator beanId="product" lookupOnElement="order-item" onNoResult="EXCEPTION" uniqueResult="true">
-        <dao:query>from Product p where p.id = :id</dao:query>
-        <dao:params>
-            <dao:value name="id" data="product" decoder="Integer" />
-        </dao:params>
-    </dao:locator>
+    <persistence:locator beanId="product" lookupOnElement="order-item" onNoResult="EXCEPTION" uniqueResult="true">
+        <persistence:query>from Product p where p.id = :id</persistence:query>
+        <persistence:params>
+            <persistence:value name="id" data="product" decoder="Integer" />
+        </persistence:params>
+    </persistence:locator>
 
-    <dao:inserter beanId="order" insertOnElement="order" />
+    <persistence:inserter beanId="order" insertOnElement="order" />
 
 </smooks-resource-list>
 ----
@@ -250,11 +250,11 @@ If we want to use the named query `+productById+` instead of the query string th
 
 [source,xml]
 ----
-<dao:locator beanId="product" lookupOnElement="order-item" lookup="product.byId" onNoResult="EXCEPTION" uniqueResult="true">
-    <dao:params>
-        <dao:value name="id" data="product" decoder="Integer"/>
-    </dao:params>
-</dao:locator>
+<persistence:locator beanId="product" lookupOnElement="order-item" lookup="product.byId" onNoResult="EXCEPTION" uniqueResult="true">
+    <persistence:params>
+        <persistence:value name="id" data="product" decoder="Integer"/>
+    </persistence:params>
+</persistence:locator>
 ----
 
 The following code executes Smooks. Note that we use a `+SessionRegister+` object so that we can access the Hibernate Session from within Smooks.
@@ -355,7 +355,7 @@ The Smooks configuration look likes this:
 ----
 <smooks-resource-list xmlns="https://www.smooks.org/xsd/smooks-2.0.xsd"
                       xmlns:jb="https://www.smooks.org/xsd/smooks/javabean-1.6.xsd"
-                      xmlns:dao="https://www.smooks.org/xsd/smooks/persistence-2.0.xsd">
+                      xmlns:persistence="https://www.smooks.org/xsd/smooks/persistence-2.0.xsd">
 
     <jb:bean beanId="order" class="example.entity.Order" createOnElement="order">
         <jb:value property="ordernumber" data="ordernumber"/>
@@ -369,13 +369,13 @@ The Smooks configuration look likes this:
         <jb:wiring property="product" beanIdRef="product"/>
     </jb:bean>
 
-    <dao:locator beanId="product" dao="product" lookup="id" lookupOnElement="order-item" onNoResult="EXCEPTION">
-        <dao:params>
-            <dao:value name="id" data="product" decoder="Integer"/>
-        </dao:params>
-    </dao:locator>
+    <persistence:locator beanId="product" dao="product" lookup="id" lookupOnElement="order-item" onNoResult="EXCEPTION">
+        <persistence:params>
+            <persistence:value name="id" data="product" decoder="Integer"/>
+        </persistence:params>
+    </persistence:locator>
 
-    <dao:inserter beanId="order" dao="order" insertOnElement="order"/>
+    <persistence:inserter beanId="order" dao="order" insertOnElement="order"/>
 
 </smooks-resource-list>
 ----
@@ -419,10 +419,18 @@ tx.commit();
 </dependency>
 ----
 
-== XML Namespace
+== XML Namespaces
 
 ....
-xmlns:dao="https://www.smooks.org/xsd/smooks/persistence-2.0.xsd"
+xmlns:ds="https://www.smooks.org/xsd/smooks/datasource-1.4.xsd"
+....
+
+....
+xmlns:jdbc="https://www.smooks.org/xsd/smooks/jdbc-2.0.xsd"
+....
+
+....
+xmlns:persistence="https://www.smooks.org/xsd/smooks/persistence-2.0.xsd"
 ....
 // end::smooks-persistence-cartridge[]
 
