@@ -42,6 +42,7 @@
  */
 package org.smooks.cartridges.persistence.config.ext14;
 
+import org.junit.Test;
 import org.mockito.Mock;
 import org.smooks.Smooks;
 import org.smooks.api.ExecutionContext;
@@ -52,7 +53,6 @@ import org.smooks.io.payload.JavaResult;
 import org.smooks.io.payload.StringSource;
 import org.smooks.scribe.Dao;
 import org.smooks.scribe.register.SingleDaoRegister;
-import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -64,7 +64,6 @@ import static org.mockito.Mockito.verify;
  * @author <a href="mailto:maurice.zeijen@smies.com">maurice.zeijen@smies.com</a>
  *
  */
-@Test(groups="unit")
 public class EntityInserterTest extends BaseTestCase {
 
 	private static final boolean ENABLE_REPORTING = false;

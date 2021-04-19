@@ -40,32 +40,60 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  * =========================LICENSE_END==================================
  */
-package org.smooks.cartridges.persistence.db;
+package org.smooks.cartridges.persistence.datasource;
 
-import org.smooks.api.ExecutionContext;
-import org.smooks.api.SmooksException;
-import org.smooks.api.delivery.ordering.Consumer;
-import org.smooks.api.delivery.sax.SAXElement;
-import org.smooks.api.resource.visitor.sax.SAXVisitAfter;
+import org.smooks.assertion.AssertArgument;
 
-import javax.inject.Inject;
-import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
 
-/**
- * @author <a href="mailto:tom.fennelly@gmail.com">tom.fennelly@gmail.com</a>
- */
-public class DSConnectionUser implements SAXVisitAfter, Consumer {
+class JdbcTransactionManager implements TransactionManager {
 
-	@Inject
-	private String datasource = MockDatasource.MOCK_DS_NAME;
+	private final Connection connection;
 
-    @Override
-	public void visitAfter(SAXElement element, ExecutionContext executionContext) throws SmooksException, IOException {
-        AbstractDataSource.getConnection(datasource, executionContext);
-    }
+	private final boolean autoCommit;
 
-    @Override
-    public boolean consumes(Object object) {
-        return object.equals(datasource);
-    }
+	public JdbcTransactionManager(Connection connection, boolean autoCommit) {
+		AssertArgument.isNotNull(connection, "connection");
+
+		this.connection = connection;
+		this.autoCommit = autoCommit;
+	}
+
+	@Override
+	public void begin() {
+		try {
+			if(connection.getAutoCommit() != autoCommit) {
+				connection.setAutoCommit(autoCommit);
+			}
+		} catch (SQLException e) {
+			throw new TransactionException("Exception while setting the autoCommit flag of the connection", e);
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.smooks.engine.db.TransactionManager#commit()
+	 */
+	@Override
+	public void commit() {
+		try {
+			connection.commit();
+		} catch (SQLException e) {
+			throw new TransactionException("Exception while committing the connection", e);
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.smooks.engine.db.TransactionManager#rollback()
+	 */
+	@Override
+	public void rollback() {
+		try {
+			connection.rollback();
+		} catch (SQLException e) {
+			throw new TransactionException("Exception while rolling back the connection", e);
+		}
+	}
 }

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
   ========================LICENSE_START=================================
-  Core
+  smooks-persistence-cartridge
   %%
   Copyright (C) 2020 Smooks
   %%
@@ -42,103 +42,94 @@
   =========================LICENSE_END==================================
   -->
 
-<smooks-resource-list xmlns="https://www.smooks.org/xsd/smooks-2.0.xsd"
-                      xmlns:ds="https://www.smooks.org/xsd/smooks/datasource-1.4.xsd">
+<smooks-resource-list xmlns="https://www.smooks.org/xsd/smooks-2.0.xsd" 
+                      xmlns:jdbc="https://www.smooks.org/xsd/smooks/jdbc-2.0.xsd">
 
     <!--
-        DirectDatasource Resource
+        SQLExecutor Resource
     -->
 
-    <resource-config selector="ds:direct">
+    <resource-config selector="jdbc:executor">
         <resource>org.smooks.engine.resource.extension.NewResourceConfig</resource>
-        <param name="resource">org.smooks.cartridges.persistence.datasource.DirectDataSource</param>
+        <param name="resource">org.smooks.cartridges.persistence.jdbc.SQLExecutor</param>
     </resource-config>
 
-    <resource-config selector="ds:direct">
+    <resource-config selector="jdbc:executor">
         <resource>org.smooks.engine.resource.extension.MapToResourceConfigFromAttribute</resource>
-        <param name="attribute">bindOnElement</param>
+        <param name="attribute">executeOnElement</param>
         <param name="mapTo">selector</param>
     </resource-config>
 
-    <resource-config selector="ds:direct">
-        <resource>org.smooks.engine.resource.extension.MapToResourceConfigFromAttribute</resource>
-        <param name="attribute">bindOnElementNS</param>
-        <param name="mapTo">selector-namespace</param>
-    </resource-config>
-
-    <resource-config selector="ds:direct">
+    <resource-config selector="jdbc:executor">
         <resource>org.smooks.engine.resource.extension.MapToResourceConfigFromAttribute</resource>
         <param name="attribute">datasource</param>
     </resource-config>
 
-    <resource-config selector="ds:direct">
+	<resource-config selector="jdbc:executor">
         <resource>org.smooks.engine.resource.extension.MapToResourceConfigFromAttribute</resource>
-        <param name="attribute">autoCommit</param>
+        <param name="attribute">executeBefore</param>
     </resource-config>
 
-    <resource-config selector="ds:direct">
-        <resource>org.smooks.engine.resource.extension.MapToResourceConfigFromAttribute</resource>
-        <param name="attribute">driver</param>
+    <resource-config selector="jdbc:executor/statement">
+        <resource>org.smooks.engine.resource.extension.MapToResourceConfigFromText</resource>
+        <param name="mapTo">statement</param>
     </resource-config>
 
-    <resource-config selector="ds:direct">
+    <resource-config selector="jdbc:executor/resultSet">
         <resource>org.smooks.engine.resource.extension.MapToResourceConfigFromAttribute</resource>
-        <param name="attribute">url</param>
+        <param name="attribute">name</param>
+        <param name="mapTo">resultSetName</param>
     </resource-config>
 
-    <resource-config selector="ds:direct">
+    <resource-config selector="jdbc:executor/resultSet">
         <resource>org.smooks.engine.resource.extension.MapToResourceConfigFromAttribute</resource>
-        <param name="attribute">username</param>
+        <param name="attribute">scope</param>
+        <param name="mapTo">resultSetScope</param>
     </resource-config>
 
-    <resource-config selector="ds:direct">
+    <resource-config selector="jdbc:executor/resultSet">
         <resource>org.smooks.engine.resource.extension.MapToResourceConfigFromAttribute</resource>
-        <param name="attribute">password</param>
+        <param name="attribute">timeToLive</param>
+        <param name="mapTo">resultSetTTL</param>
     </resource-config>
 
     <!--
-        JndiDatasource Resource
+        ResultsetRowSelector Resource
     -->
-
-    <resource-config selector="ds:JNDI">
+	<resource-config selector="jdbc:resultSetRowSelector">
         <resource>org.smooks.engine.resource.extension.NewResourceConfig</resource>
-        <param name="resource">org.smooks.cartridges.persistence.datasource.JndiDataSource</param>
+        <param name="resource">org.smooks.cartridges.persistence.jdbc.ResultSetRowSelector</param>
     </resource-config>
 
-    <resource-config selector="ds:JNDI">
+    <resource-config selector="jdbc:resultSetRowSelector">
         <resource>org.smooks.engine.resource.extension.MapToResourceConfigFromAttribute</resource>
-        <param name="attribute">bindOnElement</param>
+        <param name="attribute">selectRowOnElement</param>
         <param name="mapTo">selector</param>
     </resource-config>
 
-    <resource-config selector="ds:JNDI">
+    <resource-config selector="jdbc:resultSetRowSelector">
         <resource>org.smooks.engine.resource.extension.MapToResourceConfigFromAttribute</resource>
-        <param name="attribute">datasource</param>
+        <param name="attribute">resultSetName</param>
     </resource-config>
 
-    <resource-config selector="ds:JNDI">
+	<resource-config selector="jdbc:resultSetRowSelector">
         <resource>org.smooks.engine.resource.extension.MapToResourceConfigFromAttribute</resource>
-        <param name="attribute">datasourceJndi</param>
+        <param name="attribute">beanId</param>
     </resource-config>
 
-    <resource-config selector="ds:JNDI">
+	<resource-config selector="jdbc:resultSetRowSelector">
         <resource>org.smooks.engine.resource.extension.MapToResourceConfigFromAttribute</resource>
-        <param name="attribute">transactionJndi</param>
+        <param name="attribute">executeBefore</param>
     </resource-config>
 
-    <resource-config selector="ds:JNDI">
-        <resource>org.smooks.engine.resource.extension.MapToResourceConfigFromAttribute</resource>
-        <param name="attribute">transactionManager</param>
+    <resource-config selector="jdbc:resultSetRowSelector/where">
+        <resource>org.smooks.engine.resource.extension.MapToResourceConfigFromText</resource>
+        <param name="mapTo">where</param>
     </resource-config>
 
-    <resource-config selector="ds:JNDI">
-        <resource>org.smooks.engine.resource.extension.MapToResourceConfigFromAttribute</resource>
-        <param name="attribute">autoCommit</param>
-    </resource-config>
-
-    <resource-config selector="ds:JNDI">
-        <resource>org.smooks.engine.resource.extension.MapToResourceConfigFromAttribute</resource>
-        <param name="attribute">setAutoCommitAllowed</param>
+    <resource-config selector="jdbc:resultSetRowSelector/failedSelectError">
+        <resource>org.smooks.engine.resource.extension.MapToResourceConfigFromText</resource>
+        <param name="mapTo">failedSelectError</param>
     </resource-config>
 
 </smooks-resource-list>

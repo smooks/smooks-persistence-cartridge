@@ -15,6 +15,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>javax.persistence</groupId>
+            <artifactId>persistence-api</artifactId>
+            <version>${persistence-api.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.smooks</groupId>
             <artifactId>smooks-scribe-core</artifactId>
             <version>${project.version}</version>

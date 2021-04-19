@@ -42,6 +42,7 @@
  */
 package org.smooks.cartridges.persistence;
 
+import org.junit.Test;
 import org.mockito.Mock;
 import org.smooks.Smooks;
 import org.smooks.api.ExecutionContext;
@@ -54,14 +55,13 @@ import org.smooks.scribe.Dao;
 import org.smooks.scribe.MappingDao;
 import org.smooks.scribe.register.MapDaoRegister;
 import org.smooks.scribe.register.SingleDaoRegister;
-import org.testng.Assert;
-import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.junit.Assert.assertSame;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.same;
 import static org.mockito.Mockito.verify;
@@ -71,7 +71,6 @@ import static org.mockito.Mockito.when;
  * @author <a href="mailto:maurice.zeijen@smies.com">maurice.zeijen@smies.com</a>
  *
  */
-@Test(groups="unit")
 public class EntityUpdaterTest extends BaseTestCase {
 
 	private static final boolean ENABLE_REPORTING = false;
@@ -157,7 +156,7 @@ public class EntityUpdaterTest extends BaseTestCase {
 
             smooks.filterSource(executionContext, new StringSource(SIMPLE_XML), result);
 
-            Assert.assertSame(updated1, result.getBean("updated1"));
+            assertSame(updated1, result.getBean("updated1"));
         } finally {
             smooks.close();
         }

@@ -40,20 +40,51 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  * =========================LICENSE_END==================================
  */
-package org.smooks.cartridges.persistence.test.util;
+package org.smooks.cartridges.persistence.datasource;
 
-import org.junit.Before;
-import org.mockito.MockitoAnnotations;
+import org.smooks.assertion.AssertArgument;
 
-/**
- * @author <a href="mailto:maurice.zeijen@smies.com">maurice.zeijen@smies.com</a>
- *
- */
-public abstract class BaseTestCase {
+import java.sql.Connection;
+import java.sql.SQLException;
 
-	@Before
-	public void beforeMethod() {
-		MockitoAnnotations.initMocks(this);
+public class ExternalTransactionManager implements TransactionManager {
+
+    private final Connection connection;
+
+    private final boolean isSetAutoCommitAllowed;
+
+	private final boolean autoCommit;
+
+    /**
+     * @param connection
+     */
+    public ExternalTransactionManager(Connection connection, boolean autoCommit, boolean isSetAutoCommitAllowed) {
+    	AssertArgument.isNotNull(connection, "connection");
+
+        this.connection = connection;
+        this.autoCommit = autoCommit;
+        this.isSetAutoCommitAllowed = isSetAutoCommitAllowed;
+    }
+
+	@Override
+	public void begin() {
+    	if(isSetAutoCommitAllowed) {
+	    	try {
+				if(connection.getAutoCommit() != autoCommit) {
+					connection.setAutoCommit(autoCommit);
+				}
+			} catch (SQLException e) {
+				throw new TransactionException("Exception while setting the autoCommit flag of the connection", e);
+			}
+    	}
+    }
+
+	@Override
+	public void commit() {
+	}
+
+	@Override
+	public void rollback() {
 	}
 
 }

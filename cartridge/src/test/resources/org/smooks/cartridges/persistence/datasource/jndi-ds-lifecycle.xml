@@ -128,11 +128,11 @@
 		targetProfile="external_set_autocommit_not_allowed"/>
 
     <resource-config selector="a" target-profile="mock">
-        <resource>org.smooks.cartridges.persistence.db.DSConnectionUser</resource>
+        <resource>org.smooks.cartridges.persistence.datasource.DSConnectionUser</resource>
     </resource-config>
 
     <resource-config selector="b" target-profile="exception">
-        <resource>org.smooks.cartridges.persistence.db.ExceptionVisitor</resource>
+        <resource>org.smooks.cartridges.persistence.datasource.ExceptionVisitor</resource>
     </resource-config>
 
 </smooks-resource-list>

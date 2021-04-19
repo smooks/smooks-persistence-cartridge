@@ -40,20 +40,34 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  * =========================LICENSE_END==================================
  */
-package org.smooks.cartridges.persistence.test.util;
+package org.smooks.cartridges.persistence.jdbc.JIRAs.MILYN_345;
 
-import org.junit.Before;
-import org.mockito.MockitoAnnotations;
+import org.junit.Test;
+import org.smooks.cartridges.persistence.jdbc.ResultSetRowSelector;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
- * @author <a href="mailto:maurice.zeijen@smies.com">maurice.zeijen@smies.com</a>
- *
+ * @author <a href="mailto:tom.fennelly@jboss.com">tom.fennelly@jboss.com</a>
  */
-public abstract class BaseTestCase {
+public class MILYN_345_Test {
 
-	@Before
-	public void beforeMethod() {
-		MockitoAnnotations.initMocks(this);
-	}
+    @Test
+    public void test_where() {
+        ResultSetRowSelector selector = new ResultSetRowSelector();
 
+        selector.setWhereClause("a == b");
+        assertFalse(selector.consumes("x"));
+        assertTrue(selector.consumes("b"));
+    }
+
+    @Test
+    public void test_failError() {
+        ResultSetRowSelector selector = new ResultSetRowSelector();
+
+        selector.setFailedSelectError("this is an error on ${productId}");
+        assertFalse(selector.consumes("zzzzzzzzzz"));
+        assertTrue(selector.consumes("productId"));
+    }
 }

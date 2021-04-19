@@ -42,6 +42,7 @@
  */
 package org.smooks.cartridges.persistence;
 
+import org.junit.Test;
 import org.mockito.Mock;
 import org.smooks.Smooks;
 import org.smooks.api.ExecutionContext;
@@ -53,7 +54,6 @@ import org.smooks.engine.report.HtmlReportGenerator;
 import org.smooks.io.payload.StringSource;
 import org.smooks.scribe.register.MapDaoRegister;
 import org.smooks.scribe.register.SingleDaoRegister;
-import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -65,7 +65,6 @@ import static org.mockito.Mockito.verify;
 /**
  * @author <a href="mailto:maurice.zeijen@smies.com">maurice.zeijen@smies.com</a>
  */
-@Test(groups = "unit")
 public class DaoFlusherTest extends BaseTestCase {
 
     private static final boolean ENABLE_REPORTING = false;

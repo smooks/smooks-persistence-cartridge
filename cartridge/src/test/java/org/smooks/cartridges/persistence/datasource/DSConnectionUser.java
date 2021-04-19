@@ -40,39 +40,32 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  * =========================LICENSE_END==================================
  */
-package org.smooks.cartridges.persistence.db;
+package org.smooks.cartridges.persistence.datasource;
+
+import org.smooks.api.ExecutionContext;
+import org.smooks.api.SmooksException;
+import org.smooks.api.delivery.ordering.Consumer;
+import org.smooks.api.delivery.sax.SAXElement;
+import org.smooks.api.resource.visitor.sax.SAXVisitAfter;
+
+import javax.inject.Inject;
+import java.io.IOException;
 
 /**
- * The transaction manager manages the transaction
- * of a data source
- * <p />
- *
- * This transaction manager does nothing and has a default level
- * because it can change in future versions of Smooks.
- *
- * @author <a href="mailto:maurice.zeijen@smies.com">maurice.zeijen@smies.com</a>
- *
+ * @author <a href="mailto:tom.fennelly@gmail.com">tom.fennelly@gmail.com</a>
  */
-public interface TransactionManager {
+public class DSConnectionUser implements SAXVisitAfter, Consumer {
 
-	/**
-	 * Begin the transaction
-	 *
-	 * @throws TransactionException If an exception got thrown while beginning the exception
-	 */
-    void begin();
-    /**
-	 * Commit the transaction
-	 *
-	 * @throws TransactionException If an exception got thrown while committing the exception
-	 */
-    void commit();
+	@Inject
+	private String datasource = MockDatasource.MOCK_DS_NAME;
 
-    /**
-	 * Rollback the transaction
-	 *
-	 * @throws TransactionException If an exception got thrown while rollingback the exception
-	 */
-    void rollback();
+    @Override
+	public void visitAfter(SAXElement element, ExecutionContext executionContext) throws SmooksException, IOException {
+        AbstractDataSource.getConnection(datasource, executionContext);
+    }
 
+    @Override
+    public boolean consumes(Object object) {
+        return object.equals(datasource);
+    }
 }
