@@ -5,8 +5,124 @@ image:https://img.shields.io/nexus/s/org.smooks.cartridges/smooks-persistence-ca
 image:https://github.com/smooks/smooks-persistence-cartridge/workflows/CI/badge.svg[Build Status]
 
 // tag::smooks-persistence-cartridge[]
-== Entity Persistence Frameworks
-With the Smooks Persistence Cartridge, you can directly use several entity persistence frameworks from within Smooks (Hibernate, JPA, etc...).
+Smooks support for databases include:
+
+* link:#jdbc[JDBC resources] to read from and write to the database using SQL.
+
+* link:#persistence[Entity persistence resources] to leverage persistence frameworks such as MyBatis, Hibernate, or any JPA compatible framework.
+
+* link:#data-access-objects[Data Access Object (DAO) resources] where CRUD methods are invoked to issue database reads and writes.
+
+== JDBC
+
+Consider an ETL scenario where order and order items needs to be saved to the database:
+
+image:docs/images/Db-split-required.png[Image:db-split-required.png]
+
+To route an order and order item data to a database, you should define a set of Java bindings that extract the _order_ and _order-item_ data from the input source stream:
+
+[source,xml]
+----
+<?xml version="1.0"?>
+<smooks-resource-list xmlns="https://www.smooks.org/xsd/smooks-2.0.xsd"
+                      xmlns:jb="https://www.smooks.org/xsd/smooks/javabean-1.6.xsd">
+
+    <!-- Extract the order data... -->
+    <jb:bean beanId="order" class="java.util.Hashtable" createOnElement="order">
+        <jb:value property="orderId" decoder="Integer" data="order/@id"/>
+        <jb:value property="customerNumber" decoder="Long" data="header/customer/@number"/>
+        <jb:value property="customerName" data="header/customer"/>
+    </jb:bean>
+
+    <!-- Extract the order-item data... -->
+    <jb:bean beanId="orderItem" class="java.util.Hashtable" createOnElement="order-item">
+        <jb:value property="itemId" decoder="Integer" data="order-item/@id"/>
+        <jb:value property="productId" decoder="Long" data="order-item/product"/>
+        <jb:value property="quantity" decoder="Integer" data="order-item/quantity"/>
+        <jb:value property="price" decoder="Double" data="order-item/price"/>
+    </jb:bean>
+
+</smooks-resource-list>
+----
+
+Next you need to define datasource configuration, and a number of `+jdbc:executor+` configurations that will reference the datasource to insert the POJO fields into the database. This is the datasource configuration (namespace `+https://www.smooks.org/xsd/smooks/datasource-1.4.xsd+`) for retrieving a direct database connection:
+
+[source,xml]
+----
+<?xml version="1.0"?>
+<smooks-resource-list xmlns="https://www.smooks.org/xsd/smooks-2.0.xsd"
+                      xmlns:ds="https://www.smooks.org/xsd/smooks/datasource-1.4.xsd">
+
+    <ds:direct bindOnElement="#document"
+              datasource="DBExtractTransformLoadDS"
+              driver="org.hsqldb.jdbcDriver"
+              url="jdbc:hsqldb:hsql://localhost:9201/smooks-hsql-9201"
+              username="sa"
+              password=""
+              autoCommit="false"/>
+
+</smooks-resource-list>
+----
+
+It is also possible to use a JNDI datasource for retrieving a database connection:
+
+[source,xml]
+----
+<?xml version="1.0"?>
+<smooks-resource-list xmlns="https://www.smooks.org/xsd/smooks-2.0.xsd"
+                      xmlns:ds="https://www.smooks.org/xsd/smooks/datasource-1.4.xsd">
+
+    <!-- This JNDI datasource can handle JDBC and JTA transactions or
+         it can leave the transaction managment to an other external component.
+         An external component could be an other Smooks visitor, the EJB transaction manager
+         or you can do it your self. -->
+    <ds:JNDI
+         bindOnElement="#document"
+         datasource="DBExtractTransformLoadDS"
+         datasourceJndi="java:/someDS"
+         transactionManager="JTA"
+         transactionJndi="java:/mockTransaction"
+         targetProfile="jta"/>
+
+</smooks-resource-list>
+----
+
+The datasource schema describes and documents how you can configure the datasource. This is the `+jdbc:executor+` configuration (namespace `+https://www.smooks.org/xsd/smooks/jdbc-2.0.xsd+`):
+
+[source,xml]
+----
+<?xml version="1.0"?>
+<smooks-resource-list xmlns="https://www.smooks.org/xsd/smooks-2.0.xsd"
+                      xmlns:jdbc="https://www.smooks.org/xsd/smooks/jdbc-2.0.xsd">
+
+    <!-- Assert whether it's an insert or update. Need to do this just before we do the insert/update... -->
+    <jdbc:executor executeOnElement="order-items" datasource="DBExtractTransformLoadDS" executeBefore="true">
+        <jdbc:statement>select OrderId from ORDERS where OrderId = ${order.orderId}</jdbc:statement>
+        <jdbc:resultSet name="orderExistsRS"/>
+    </jdbc:executor>
+
+    <!-- If it's an insert (orderExistsRS.isEmpty()), insert the order before we process the order items... -->
+    <jdbc:executor executeOnElement="order-items" datasource="DBExtractTransformLoadDS" executeBefore="true">
+        <condition>orderExistsRS.isEmpty()</condition>
+        <jdbc:statement>INSERT INTO ORDERS VALUES(${order.orderId}, ${order.customerNumber}, ${order.customerName})</jdbc:statement>
+    </jdbc:executor>
+
+    <!-- And insert each orderItem... -->
+    <jdbc:executor executeOnElement="order-item" datasource="DBExtractTransformLoadDS" executeBefore="false">
+        <condition>orderExistsRS.isEmpty()</condition>
+        <jdbc:statement>INSERT INTO ORDERITEMS VALUES (${orderItem.itemId}, ${order.orderId}, ${orderItem.productId}, ${orderItem.quantity}, ${orderItem.price})</jdbc:statement>
+    </jdbc:executor>
+
+    <!-- Ignoring updates for now!! -->
+
+</smooks-resource-list>
+----
+
+A functional version of this example is available https://github.com/smooks/smooks-examples/tree/v1.0.2/db-extract-transform-load[online].
+
+== Persistence
+
+You can directly use several persistence frameworks from within Smooks (Hibernate, JPA, etc...).
 
 Let us take a look at a Hibernate example. The same principals follow for any JPA compliant framework.
 
@@ -165,7 +281,7 @@ smooks.filterSource(executionContext, source);
 transaction.commit();
 ----
 
-== Data Access Object Support
+== Data Access Objects
 
 Now let’s take a look at a DAO based example. The example will read an XML file containing order information (note that this works just the same for EDI, CSV, etc...). Using the javabean cartridge, it will bind the XML data into a set of entity beans. Using the id of the products within the order items (the element) it will locate the product entities and bind them to the order entity bean. Finally, the order bean will be persisted.
 
