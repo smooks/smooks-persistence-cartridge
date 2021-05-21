@@ -1,6 +1,6 @@
 = Smooks Persistence Cartridge
 
-image:https://img.shields.io/maven-central/v/org.smooks.cartridges/smooks-persistence-cartridge[Maven Central]
+image:https://img.shields.io/maven-central/v/org.smooks.cartridges.persistence/smooks-persistence-cartridge[Maven Central]
 image:https://img.shields.io/nexus/s/org.smooks.cartridges/smooks-persistence-cartridge?server=https%3A%2F%2Foss.sonatype.org[Sonatype Nexus (Snapshots)]
 image:https://github.com/smooks/smooks-persistence-cartridge/workflows/CI/badge.svg[Build Status]
 
@@ -413,7 +413,7 @@ tx.commit();
 [source,xml]
 ----
 <dependency>
-    <groupId>org.smooks.cartridges</groupId>
+    <groupId>org.smooks.cartridges.persistence</groupId>
     <artifactId>smooks-persistence-cartridge</artifactId>
     <version>2.0.0-M3</version>
 </dependency>
