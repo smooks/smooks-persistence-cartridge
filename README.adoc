@@ -1,7 +1,7 @@
 = Smooks Persistence Cartridge
 
 image:https://img.shields.io/maven-central/v/org.smooks.cartridges.persistence/smooks-persistence-cartridge[Maven Central]
-image:https://img.shields.io/nexus/s/org.smooks.cartridges/smooks-persistence-cartridge?server=https%3A%2F%2Foss.sonatype.org[Sonatype Nexus (Snapshots)]
+image:https://img.shields.io/nexus/s/org.smooks.cartridges.persistence/smooks-persistence-cartridge?server=https%3A%2F%2Foss.sonatype.org[Sonatype Nexus (Snapshots)]
 image:https://github.com/smooks/smooks-persistence-cartridge/workflows/CI/badge.svg[Build Status]
 
 // tag::smooks-persistence-cartridge[]
