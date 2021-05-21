@@ -47,16 +47,13 @@ import org.smooks.api.SmooksException;
 import org.smooks.api.TypedKey;
 import org.smooks.api.delivery.fragment.Fragment;
 import org.smooks.api.delivery.ordering.Producer;
-import org.smooks.api.delivery.sax.SAXElement;
 import org.smooks.api.lifecycle.ExecutionLifecycleCleanable;
 import org.smooks.api.lifecycle.VisitLifecycleCleanable;
 import org.smooks.api.resource.visitor.dom.DOMVisitBefore;
-import org.smooks.api.resource.visitor.sax.SAXVisitBefore;
 import org.smooks.api.resource.visitor.sax.ng.BeforeVisitor;
 import org.smooks.support.CollectionsUtil;
 import org.w3c.dom.Element;
 
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Set;
@@ -66,16 +63,11 @@ import java.util.Set;
  *
  * @author <a href="mailto:tom.fennelly@gmail.com">tom.fennelly@gmail.com</a>
  */
-public abstract class AbstractDataSource implements SAXVisitBefore, DOMVisitBefore, BeforeVisitor, Producer, VisitLifecycleCleanable, ExecutionLifecycleCleanable {
+public abstract class AbstractDataSource implements DOMVisitBefore, BeforeVisitor, Producer, VisitLifecycleCleanable, ExecutionLifecycleCleanable {
 
     private static final String DS_CONTEXT_KEY_PREFIX = AbstractDataSource.class.getName() + "#datasource:";
     private static final String CONNECTION_CONTEXT_KEY_PREFIX = AbstractDataSource.class.getName() + "#connection:";
     private static final String TRANSACTION_MANAGER_CONTEXT_KEY_PREFIX = AbstractDataSource.class.getName() + "#transactionManager:";
-
-    @Override
-    public final void visitBefore(SAXElement element, ExecutionContext executionContext) throws SmooksException, IOException {
-        bind(executionContext);
-    }
 
     @Override
     public final void visitBefore(Element element, ExecutionContext executionContext) throws SmooksException {

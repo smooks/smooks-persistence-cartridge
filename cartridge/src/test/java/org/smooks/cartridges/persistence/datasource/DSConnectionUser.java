@@ -45,22 +45,21 @@ package org.smooks.cartridges.persistence.datasource;
 import org.smooks.api.ExecutionContext;
 import org.smooks.api.SmooksException;
 import org.smooks.api.delivery.ordering.Consumer;
-import org.smooks.api.delivery.sax.SAXElement;
-import org.smooks.api.resource.visitor.sax.SAXVisitAfter;
+import org.smooks.api.resource.visitor.sax.ng.AfterVisitor;
+import org.w3c.dom.Element;
 
 import javax.inject.Inject;
-import java.io.IOException;
 
 /**
  * @author <a href="mailto:tom.fennelly@gmail.com">tom.fennelly@gmail.com</a>
  */
-public class DSConnectionUser implements SAXVisitAfter, Consumer {
+public class DSConnectionUser implements AfterVisitor, Consumer {
 
 	@Inject
 	private String datasource = MockDatasource.MOCK_DS_NAME;
 
     @Override
-	public void visitAfter(SAXElement element, ExecutionContext executionContext) throws SmooksException, IOException {
+	public void visitAfter(Element element, ExecutionContext executionContext) throws SmooksException {
         AbstractDataSource.getConnection(datasource, executionContext);
     }
 

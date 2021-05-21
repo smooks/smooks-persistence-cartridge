@@ -44,19 +44,17 @@ package org.smooks.cartridges.persistence.datasource;
 
 import org.smooks.api.ExecutionContext;
 import org.smooks.api.SmooksException;
-import org.smooks.api.delivery.sax.SAXElement;
-import org.smooks.api.resource.visitor.sax.SAXVisitAfter;
-
-import java.io.IOException;
+import org.smooks.api.resource.visitor.sax.ng.AfterVisitor;
+import org.w3c.dom.Element;
 
 /**
  * @author <a href="mailto:tom.fennelly@gmail.com">tom.fennelly@gmail.com</a>
  */
-public class ExceptionVisitor implements SAXVisitAfter {
+public class ExceptionVisitor implements AfterVisitor {
     public static boolean exceptionThrown;
 
     @Override
-    public void visitAfter(SAXElement element, ExecutionContext executionContext) throws SmooksException, IOException {
+    public void visitAfter(Element element, ExecutionContext executionContext) throws SmooksException {
         exceptionThrown = true;
         throw new RuntimeException("Blah");
     }
