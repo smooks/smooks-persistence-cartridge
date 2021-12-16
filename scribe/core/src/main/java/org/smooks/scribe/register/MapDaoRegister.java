@@ -42,7 +42,7 @@
  */
 package org.smooks.scribe.register;
 
-import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.smooks.assertion.AssertArgument;
 
 import java.util.HashMap;

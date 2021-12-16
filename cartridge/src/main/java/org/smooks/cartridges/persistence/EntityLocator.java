@@ -42,7 +42,7 @@
  */
 package org.smooks.cartridges.persistence;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.smooks.api.ApplicationContext;
 import org.smooks.api.ExecutionContext;
 import org.smooks.api.SmooksConfigException;

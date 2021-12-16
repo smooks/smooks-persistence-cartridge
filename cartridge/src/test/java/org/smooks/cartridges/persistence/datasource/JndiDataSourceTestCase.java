@@ -42,7 +42,7 @@
  */
 package org.smooks.cartridges.persistence.datasource;
 
-import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
