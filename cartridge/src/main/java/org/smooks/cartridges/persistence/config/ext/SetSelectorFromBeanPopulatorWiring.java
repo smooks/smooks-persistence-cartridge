@@ -55,6 +55,7 @@ import org.w3c.dom.Element;
 
 import javax.inject.Inject;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * This resource tries to find a sensible default selector if no selector
@@ -88,7 +89,7 @@ public class SetSelectorFromBeanPopulatorWiring implements DOMVisitBefore {
                         "This can mean that no <jb:wiring> is present that wires the bean with the bean id or that it is configured after the <" + element.getNodeName() + ">. " +
                          "In this case you must set the selector in the '" + selectorAttrName + "' attribute.");
             } else {
-                resourceConfig.setSelector(beanCreatorConfig.getSelectorPath().getSelector());
+                resourceConfig.setSelector(beanCreatorConfig.getSelectorPath().getSelector(), new Properties());
             }
         }
     }

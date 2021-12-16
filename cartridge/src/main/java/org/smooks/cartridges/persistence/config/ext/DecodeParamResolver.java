@@ -57,6 +57,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import javax.inject.Inject;
+import java.util.Properties;
 import java.util.UUID;
 
 /**
@@ -85,7 +86,7 @@ public class DecodeParamResolver implements DOMVisitBefore {
             try {
                 String type = populatorConfig.getParameterValue("type", String.class);
                 TypeConverter<?, ?> typeConverter = applicationContext.getRegistry().lookup(new NameTypeConverterFactoryLookup<>(type)).createTypeConverter();
-                String reType = UUID.randomUUID().toString();
+                String reType = "_" + UUID.randomUUID();
 
                 // Need to retype the populator configuration so as to get the
                 // value binding BeanInstancePopulator to lookup the new decoder
@@ -94,7 +95,7 @@ public class DecodeParamResolver implements DOMVisitBefore {
                 populatorConfig.setParameter("type", reType);
 
                 // Configure the new decoder config...
-                decoderConfig.setSelector("decoder:" + reType);
+                decoderConfig.setSelector("decoder:" + reType, new Properties());
                 decoderConfig.setTargetProfile(extensionContext.getDefaultProfile());
                 decoderConfig.setResource(typeConverter.getClass().getName());
                 for(int i = 0; i < decodeParams.getLength(); i++) {

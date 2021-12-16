@@ -42,7 +42,7 @@
  */
 package org.smooks.cartridges.persistence;
 
-import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.smooks.Smooks;
@@ -64,8 +64,12 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.fail;
+import static org.mockito.Matchers.anyMap;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
