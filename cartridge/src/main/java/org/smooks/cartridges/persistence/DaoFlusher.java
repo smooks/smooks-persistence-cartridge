@@ -59,7 +59,7 @@ import org.smooks.scribe.invoker.DaoInvokerFactory;
 import org.smooks.scribe.register.DaoRegister;
 import org.w3c.dom.Element;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.Optional;
