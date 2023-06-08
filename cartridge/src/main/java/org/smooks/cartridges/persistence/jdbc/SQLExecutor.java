@@ -62,7 +62,7 @@ import org.smooks.engine.delivery.fragment.NodeFragment;
 import org.smooks.support.CollectionsUtil;
 import org.w3c.dom.Element;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import javax.inject.Inject;
 import java.sql.Connection;
 import java.sql.SQLException;

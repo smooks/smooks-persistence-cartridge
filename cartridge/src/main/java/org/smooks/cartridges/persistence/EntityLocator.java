@@ -64,7 +64,7 @@ import org.smooks.scribe.register.DaoRegister;
 import org.smooks.support.CollectionsUtil;
 import org.w3c.dom.Element;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.persistence.NonUniqueResultException;

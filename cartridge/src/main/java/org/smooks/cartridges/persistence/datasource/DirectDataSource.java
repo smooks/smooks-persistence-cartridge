@@ -46,7 +46,7 @@ import org.smooks.api.resource.visitor.VisitAfterReport;
 import org.smooks.api.resource.visitor.VisitBeforeReport;
 import org.smooks.assertion.AssertArgument;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.sql.Connection;
