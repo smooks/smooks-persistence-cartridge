@@ -65,7 +65,6 @@ import org.smooks.scribe.ObjectStore;
 import org.smooks.scribe.invoker.DaoInvoker;
 import org.smooks.scribe.invoker.DaoInvokerFactory;
 import org.smooks.scribe.register.DaoRegister;
-import org.smooks.support.CollectionsUtil;
 import org.w3c.dom.Element;
 
 import jakarta.annotation.PostConstruct;
@@ -74,6 +73,8 @@ import javax.inject.Named;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * DAO Inserter
@@ -166,7 +167,7 @@ public class EntityInserter implements BeforeVisitor, AfterVisitor, Consumer, Pr
 		if(!insertedBeanIdName.isPresent()) {
 			return Collections.emptySet();
 		} else {
-			return CollectionsUtil.toSet(insertedBeanIdName.get());
+			return Stream.of(insertedBeanIdName).collect(Collectors.toSet());
 		}
 	}
 

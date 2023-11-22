@@ -68,7 +68,7 @@ import org.smooks.engine.lookup.converter.NameTypeConverterFactoryLookup;
 import org.smooks.engine.lookup.converter.SourceTargetTypeConverterFactoryLookup;
 import org.smooks.engine.memento.TextAccumulatorMemento;
 import org.smooks.engine.memento.TextAccumulatorVisitorMemento;
-import org.smooks.support.CollectionsUtil;
+
 import org.smooks.support.DomUtils;
 import org.w3c.dom.CharacterData;
 import org.w3c.dom.Element;
@@ -80,6 +80,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author <a href="mailto:maurice.zeijen@smies.com">maurice.zeijen@smies.com</a>
@@ -196,7 +198,7 @@ public class EntityLocatorParameterVisitor implements ElementVisitor, Consumer, 
 	@SuppressWarnings("unchecked")
     @Override
 	public Set<? extends Object> getProducts() {
-    	return CollectionsUtil.toSet(parameter);
+        return Stream.of(parameter).collect(Collectors.toSet());
     }
 
     @Override

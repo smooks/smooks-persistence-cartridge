@@ -61,7 +61,6 @@ import org.smooks.api.resource.visitor.sax.ng.BeforeVisitor;
 import org.smooks.assertion.AssertArgument;
 import org.smooks.engine.delivery.fragment.NodeFragment;
 import org.smooks.engine.expression.MVELExpressionEvaluator;
-import org.smooks.support.CollectionsUtil;
 import org.smooks.support.FreeMarkerTemplate;
 import org.w3c.dom.Element;
 
@@ -69,6 +68,8 @@ import jakarta.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author <a href="mailto:tom.fennelly@jboss.com">tom.fennelly@jboss.com</a>
@@ -161,7 +162,7 @@ public class ResultSetRowSelector implements BeforeVisitor, AfterVisitor, Produc
     }
 
     public Set<? extends Object> getProducts() {
-        return CollectionsUtil.toSet(beanId);
+        return Stream.of(beanId).collect(Collectors.toSet());
     }
 
     public boolean consumes(Object object) {

@@ -51,12 +51,13 @@ import org.smooks.api.lifecycle.ExecutionLifecycleCleanable;
 import org.smooks.api.lifecycle.VisitLifecycleCleanable;
 import org.smooks.api.resource.visitor.dom.DOMVisitBefore;
 import org.smooks.api.resource.visitor.sax.ng.BeforeVisitor;
-import org.smooks.support.CollectionsUtil;
 import org.w3c.dom.Element;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * DataSource management resource.
@@ -150,7 +151,7 @@ public abstract class AbstractDataSource implements DOMVisitBefore, BeforeVisito
 
     @Override
     public Set<String> getProducts() {
-        return CollectionsUtil.toSet(getName());
+        return Stream.of(getName()).collect(Collectors.toSet());
     }
 
     public abstract String getName();
