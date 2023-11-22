@@ -61,7 +61,6 @@ import org.smooks.engine.delivery.fragment.NodeFragment;
 import org.smooks.scribe.invoker.DaoInvoker;
 import org.smooks.scribe.invoker.DaoInvokerFactory;
 import org.smooks.scribe.register.DaoRegister;
-import org.smooks.support.CollectionsUtil;
 import org.w3c.dom.Element;
 
 import jakarta.annotation.PostConstruct;
@@ -71,6 +70,8 @@ import javax.persistence.NonUniqueResultException;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * DAO Locator
@@ -177,7 +178,7 @@ public class EntityLocator implements BeforeVisitor, AfterVisitor, Producer, Con
 	 */
 	@Override
 	public Set<? extends Object> getProducts() {
-		return CollectionsUtil.toSet(beanIdName);
+		return Stream.of(beanIdName).collect(Collectors.toSet());
 	}
 
 	/* (non-Javadoc)
