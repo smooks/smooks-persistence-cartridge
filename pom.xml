@@ -44,7 +44,8 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <gpg.skip>true</gpg.skip>
-        <persistence-api.version>1.0.2</persistence-api.version>
+        <persistence-api.version>3.1.0</persistence-api.version>
+        <maven.compiler.release>11</maven.compiler.release>
     </properties>
 
     <modules>
@@ -53,6 +54,17 @@
     </modules>
 
     <build>
+        <resources>
+            <resource>
+                <directory>src/main/java</directory>
+                <excludes>
+                    <exclude>**/*.java</exclude>
+                </excludes>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+        </resources>
         <testResources>
             <testResource>
                 <directory>src/test/java</directory>
@@ -131,10 +143,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.11.0</version>
-                <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -204,7 +212,7 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
-            <version>1.10.19</version>
+            <version>4.11.0</version>
             <scope>test</scope>
             <exclusions>
                 <exclusion>
@@ -252,22 +260,4 @@
             <url>https://oss.sonatype.org/content/repositories/snapshots</url>
         </snapshotRepository>
     </distributionManagement>
-
-    <profiles>
-        <profile>
-            <id>test-unit</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <properties>
-                <testGroups>unit</testGroups>
-            </properties>
-        </profile>
-        <profile>
-            <id>test-integration</id>
-            <properties>
-                <testGroups>unit,integration</testGroups>
-            </properties>
-        </profile>
-    </profiles>
 </project>

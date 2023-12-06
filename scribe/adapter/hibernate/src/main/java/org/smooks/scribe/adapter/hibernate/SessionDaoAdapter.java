@@ -45,8 +45,8 @@ package org.smooks.scribe.adapter.hibernate;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.hibernate.Query;
 import org.hibernate.Session;
+import org.hibernate.query.Query;
 import org.smooks.assertion.AssertArgument;
 import org.smooks.scribe.Dao;
 import org.smooks.scribe.Flushable;

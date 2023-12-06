@@ -42,9 +42,12 @@
  */
 package org.smooks.scribe.adapter.jpa;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertSame;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.same;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -52,9 +55,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.persistence.EntityManager;
-import javax.persistence.Query;
-
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.Query;
 import org.junit.Before;
 import org.junit.Test;
 import org.smooks.scribe.adapter.jpa.test.util.BaseTestCase;
@@ -124,8 +126,8 @@ public class EntityManagerDaoAdapterTestCase extends BaseTestCase {
 
 		List<?> listResult = Collections.emptyList();
 
-		stub(entityManager.createQuery(anyString())).toReturn(query);
-		stub(query.getResultList()).toReturn(listResult);
+		when(entityManager.createQuery(anyString())).thenReturn(query);
+		when(query.getResultList()).thenReturn(listResult);
 
 		// EXECUTE
 
@@ -154,8 +156,8 @@ public class EntityManagerDaoAdapterTestCase extends BaseTestCase {
 
 		List<?> listResult = Collections.emptyList();
 
-		stub(entityManager.createQuery(anyString())).toReturn(query);
-		stub(query.getResultList()).toReturn(listResult);
+		when(entityManager.createQuery(anyString())).thenReturn(query);
+		when(query.getResultList()).thenReturn(listResult);
 
 		// EXECUTE
 
@@ -184,8 +186,8 @@ public class EntityManagerDaoAdapterTestCase extends BaseTestCase {
 
 		List<?> listResult = Collections.emptyList();
 
-		stub(entityManager.createNamedQuery(anyString())).toReturn(query);
-		stub(query.getResultList()).toReturn(listResult);
+		when(entityManager.createNamedQuery(anyString())).thenReturn(query);
+		when(query.getResultList()).thenReturn(listResult);
 
 		// EXECUTE
 
@@ -214,8 +216,8 @@ public class EntityManagerDaoAdapterTestCase extends BaseTestCase {
 
 		List<?> listResult = Collections.emptyList();
 
-		stub(entityManager.createNamedQuery(anyString())).toReturn(query);
-		stub(query.getResultList()).toReturn(listResult);
+		when(entityManager.createNamedQuery(anyString())).thenReturn(query);
+		when(query.getResultList()).thenReturn(listResult);
 
 		// EXECUTE
 

@@ -45,9 +45,8 @@ package org.smooks.scribe.adapter.jpa;
 import java.util.Collection;
 import java.util.Map;
 
-import javax.persistence.EntityManager;
-import javax.persistence.Query;
-
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.Query;
 import org.smooks.assertion.AssertArgument;
 import org.smooks.scribe.Dao;
 import org.smooks.scribe.Flushable;

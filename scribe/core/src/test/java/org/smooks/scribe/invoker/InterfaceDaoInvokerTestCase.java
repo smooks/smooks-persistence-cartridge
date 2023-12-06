@@ -42,8 +42,9 @@
  */
 package org.smooks.scribe.invoker;
 
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.same;
+import static org.mockito.Mockito.verify;
 
 import java.util.HashMap;
 import java.util.Map;

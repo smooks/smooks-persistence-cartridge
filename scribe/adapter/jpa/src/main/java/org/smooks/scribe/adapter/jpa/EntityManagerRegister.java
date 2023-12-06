@@ -44,8 +44,7 @@ package org.smooks.scribe.adapter.jpa;
 
 import java.util.Map;
 
-import javax.persistence.EntityManager;
-
+import jakarta.persistence.EntityManager;
 import org.smooks.scribe.register.AbstractDaoAdapterRegister;
 
 

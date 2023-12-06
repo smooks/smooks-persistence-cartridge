@@ -49,13 +49,14 @@ import static org.junit.Assert.assertSame;
 import org.junit.Before;
 import org.junit.Test;
 import org.smooks.scribe.adapter.ibatis.test.util.BaseTestCase;
-import static org.mockito.Matchers.anyObject;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.same;
 import org.mockito.Mock;
-import static org.mockito.Mockito.stub;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.sql.SQLException;
 import java.util.Collection;
@@ -114,7 +115,7 @@ public class SqlMapClientDaoAdapterTestCase extends BaseTestCase {
 
         List<?> listResult = Collections.emptyList();
 
-        stub(sqlMapClient.queryForList(anyString(), anyObject())).toReturn(listResult);
+        when(sqlMapClient.queryForList(anyString(), any())).thenReturn(listResult);
 
         // EXECUTE
 
@@ -140,7 +141,7 @@ public class SqlMapClientDaoAdapterTestCase extends BaseTestCase {
 
         List<?> listResult = Collections.emptyList();
 
-        stub(sqlMapClient.queryForList(anyString(), anyObject())).toReturn(listResult);
+        when(sqlMapClient.queryForList(anyString(), any())).thenReturn(listResult);
 
         // EXECUTE
 

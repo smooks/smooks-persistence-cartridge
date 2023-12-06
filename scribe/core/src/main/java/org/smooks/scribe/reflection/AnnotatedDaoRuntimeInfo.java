@@ -48,7 +48,14 @@ import org.smooks.annotation.AnnotationManager;
 import org.smooks.assertion.AssertArgument;
 import org.smooks.scribe.AnnotationNotFoundException;
 import org.smooks.scribe.IllegalAnnotationUsageException;
-import org.smooks.scribe.annotation.*;
+import org.smooks.scribe.annotation.Dao;
+import org.smooks.scribe.annotation.Delete;
+import org.smooks.scribe.annotation.Flush;
+import org.smooks.scribe.annotation.Insert;
+import org.smooks.scribe.annotation.Lookup;
+import org.smooks.scribe.annotation.LookupByQuery;
+import org.smooks.scribe.annotation.ReturnsNoEntity;
+import org.smooks.scribe.annotation.Update;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;

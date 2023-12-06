@@ -42,10 +42,10 @@
  */
 package org.smooks.cartridges.persistence.datasource;
 
+import jakarta.transaction.Status;
+import jakarta.transaction.UserTransaction;
 import org.smooks.assertion.AssertArgument;
 
-import javax.transaction.Status;
-import javax.transaction.UserTransaction;
 import java.sql.Connection;
 import java.sql.SQLException;
 
