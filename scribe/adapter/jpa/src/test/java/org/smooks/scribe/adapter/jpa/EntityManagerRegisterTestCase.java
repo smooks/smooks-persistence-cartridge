@@ -45,11 +45,10 @@ package org.smooks.scribe.adapter.jpa;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 
+import jakarta.persistence.EntityManager;
 import org.junit.Test;
 import org.smooks.scribe.adapter.jpa.test.util.BaseTestCase;
 import org.mockito.Mock;
-
-import javax.persistence.EntityManager;
 
 /**
  * @author <a href="mailto:maurice.zeijen@smies.com">maurice.zeijen@smies.com</a>

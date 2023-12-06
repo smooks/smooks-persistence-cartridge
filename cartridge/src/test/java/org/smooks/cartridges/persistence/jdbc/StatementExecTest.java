@@ -65,13 +65,13 @@ public class StatementExecTest {
     private HsqlServer hsqlServer;
 
     @Before
-    public void setUp() throws Exception {
+    public void before() throws Exception {
         hsqlServer = new HsqlServer(9995);
         hsqlServer.execScript(getClass().getResourceAsStream("test.script"));
     }
 
     @After
-    public void tearDown() throws Exception {
+    public void after() throws Exception {
         hsqlServer.stop();
     }
 

@@ -45,7 +45,11 @@ package org.smooks.cartridges.persistence.scribe.annotation;
 import org.smooks.scribe.annotation.Insert;
 import org.smooks.scribe.annotation.Update;
 
-import java.lang.annotation.*;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  * DAO {@link Insert} and {@link Update} annotated methods with this annotation

@@ -42,6 +42,7 @@
  */
 package org.smooks.cartridges.persistence;
 
+import jakarta.persistence.NonUniqueResultException;
 import org.apache.commons.lang3.StringUtils;
 import org.smooks.api.ApplicationContext;
 import org.smooks.api.ExecutionContext;
@@ -55,7 +56,11 @@ import org.smooks.api.resource.visitor.VisitAfterReport;
 import org.smooks.api.resource.visitor.VisitBeforeReport;
 import org.smooks.api.resource.visitor.sax.ng.AfterVisitor;
 import org.smooks.api.resource.visitor.sax.ng.BeforeVisitor;
-import org.smooks.cartridges.persistence.parameter.*;
+import org.smooks.cartridges.persistence.parameter.NamedParameterContainer;
+import org.smooks.cartridges.persistence.parameter.ParameterContainer;
+import org.smooks.cartridges.persistence.parameter.ParameterIndex;
+import org.smooks.cartridges.persistence.parameter.ParameterManager;
+import org.smooks.cartridges.persistence.parameter.PositionalParameterContainer;
 import org.smooks.cartridges.persistence.util.PersistenceUtil;
 import org.smooks.engine.delivery.fragment.NodeFragment;
 import org.smooks.scribe.invoker.DaoInvoker;
@@ -66,7 +71,6 @@ import org.w3c.dom.Element;
 import jakarta.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.persistence.NonUniqueResultException;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;

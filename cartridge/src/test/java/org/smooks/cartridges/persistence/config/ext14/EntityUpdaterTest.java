@@ -57,7 +57,7 @@ import org.smooks.scribe.register.SingleDaoRegister;
 import java.io.IOException;
 import java.io.InputStream;
 
-import static org.mockito.Matchers.same;
+import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.verify;
 
 /**

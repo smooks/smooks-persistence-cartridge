@@ -42,6 +42,7 @@
  */
 package org.smooks.cartridges.persistence.datasource;
 
+import jakarta.transaction.UserTransaction;
 import org.smooks.api.SmooksConfigException;
 import org.smooks.api.SmooksException;
 import org.smooks.api.resource.visitor.VisitAfterReport;
@@ -55,7 +56,6 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
-import javax.transaction.UserTransaction;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Optional;

@@ -42,7 +42,11 @@
  */
 package org.smooks.cartridges.persistence.scribe.invoker;
 
-import org.smooks.scribe.*;
+import org.smooks.scribe.Dao;
+import org.smooks.scribe.Flushable;
+import org.smooks.scribe.Locator;
+import org.smooks.scribe.MappingDao;
+import org.smooks.scribe.Queryable;
 import org.smooks.scribe.invoker.DaoInvoker;
 
 import java.util.Map;

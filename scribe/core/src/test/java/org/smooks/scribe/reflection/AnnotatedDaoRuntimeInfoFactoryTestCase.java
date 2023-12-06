@@ -42,7 +42,9 @@
  */
 package org.smooks.scribe.reflection;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertSame;
 
 import org.junit.Test;
 import org.smooks.scribe.test.dao.FullAnnotatedDao;

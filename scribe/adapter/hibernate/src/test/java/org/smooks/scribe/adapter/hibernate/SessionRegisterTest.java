@@ -42,7 +42,8 @@
  */
 package org.smooks.scribe.adapter.hibernate;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
 
 import org.hibernate.Session;
 import org.junit.Test;

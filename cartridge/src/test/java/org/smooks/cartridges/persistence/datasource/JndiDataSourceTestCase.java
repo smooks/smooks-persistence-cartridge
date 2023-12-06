@@ -42,11 +42,12 @@
  */
 package org.smooks.cartridges.persistence.datasource;
 
+import jakarta.transaction.Status;
+import jakarta.transaction.UserTransaction;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockejb.jndi.MockContextFactory;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.smooks.Smooks;
@@ -54,16 +55,18 @@ import org.smooks.api.ExecutionContext;
 import org.smooks.engine.report.HtmlReportGenerator;
 import org.smooks.io.payload.StringSource;
 
+import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.sql.DataSource;
-import javax.transaction.Status;
-import javax.transaction.UserTransaction;
 import javax.xml.transform.Source;
 import java.sql.Connection;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit test for {@link JndiDataSource}.
@@ -84,7 +87,6 @@ public class JndiDataSourceTestCase {
     private Connection connection;
 
     private static final boolean REPORT = false;
-
 
     @Test
     public void test_jndi_autoCommit() throws Exception {
@@ -302,7 +304,6 @@ public class JndiDataSourceTestCase {
     private void executeSmooks(String profile, String testName, boolean report) throws Exception {
 
         Smooks smooks = new Smooks(getClass().getResourceAsStream("jndi-ds-lifecycle.xml"));
-
         ExecutionContext ec = smooks.createExecutionContext(profile);
 
         if (report) {
@@ -319,23 +320,23 @@ public class JndiDataSourceTestCase {
         }
     }
 
+
     @Before
-    public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
-        MockContextFactory.setAsInitial();
+    public void before() throws Exception {
+        MockitoAnnotations.openMocks(this);
 
-        source = new StringSource("<root><a /><b /></root>");
-
-        InitialContext context = new InitialContext();
-        context.bind("java:/mockDS", dataSource);
-        context.bind("java:/mockTransaction", transaction);
+        InitialContext initialContext = new InitialContext();
+        Context subcontext = initialContext.createSubcontext("java:");
+        subcontext.bind("mockDS", dataSource);
+        subcontext.bind("mockTransaction", transaction);
 
         when(dataSource.getConnection()).thenReturn(connection);
+        source = new StringSource("<root><a /><b /></root>");
 
     }
 
     @After
-    public void tearDown() throws Exception {
-        MockContextFactory.revertSetAsInitial();
+    public void after() throws Exception {
+        new InitialContext().destroySubcontext("java:");
     }
 }

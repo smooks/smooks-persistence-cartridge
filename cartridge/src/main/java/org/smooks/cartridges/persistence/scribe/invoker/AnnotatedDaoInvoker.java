@@ -44,9 +44,19 @@ package org.smooks.cartridges.persistence.scribe.invoker;
 
 import org.smooks.assertion.AssertArgument;
 import org.smooks.scribe.NoMethodWithAnnotationFoundException;
-import org.smooks.scribe.annotation.*;
+import org.smooks.scribe.annotation.Delete;
+import org.smooks.scribe.annotation.Flush;
+import org.smooks.scribe.annotation.Insert;
+import org.smooks.scribe.annotation.Lookup;
+import org.smooks.scribe.annotation.LookupByQuery;
+import org.smooks.scribe.annotation.Update;
 import org.smooks.scribe.invoker.DaoInvoker;
-import org.smooks.scribe.reflection.*;
+import org.smooks.scribe.reflection.AnnotatedDaoRuntimeInfo;
+import org.smooks.scribe.reflection.EntityMethod;
+import org.smooks.scribe.reflection.FlushMethod;
+import org.smooks.scribe.reflection.LookupMethod;
+import org.smooks.scribe.reflection.LookupWithNamedQueryMethod;
+import org.smooks.scribe.reflection.LookupWithPositionalQueryMethod;
 
 import java.util.Map;
 

@@ -49,8 +49,16 @@ import org.smooks.support.DollarBraceDecoder;
 import org.smooks.support.MVELTemplate;
 import org.smooks.support.XmlUtil;
 
-import java.sql.*;
-import java.util.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * SQL Statement Executor.

@@ -20,22 +20,4 @@
         <module>adapter/hibernate</module>
         <module>adapter/ibatis</module>
     </modules>
-
-    <profiles>
-        <profile>
-            <id>test-unit</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <properties>
-                <testGroups>unit</testGroups>
-            </properties>
-        </profile>
-        <profile>
-            <id>test-integration</id>
-            <properties>
-                <testGroups>unit,integration</testGroups>
-            </properties>
-        </profile>
-    </profiles>
 </project>
