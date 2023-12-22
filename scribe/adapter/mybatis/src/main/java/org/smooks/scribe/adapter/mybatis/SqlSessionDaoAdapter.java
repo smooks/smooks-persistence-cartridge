@@ -1,8 +1,8 @@
 /*-
  * ========================LICENSE_START=================================
- * Scribe :: Ibatis adapter
+ * Scribe :: MyBatis adapter
  * %%
- * Copyright (C) 2020 Smooks
+ * Copyright (C) 2020 - 2023 Smooks
  * %%
  * Licensed under the terms of the Apache License Version 2.0, or
  * the GNU Lesser General Public License version 3.0 or later.
@@ -40,31 +40,29 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  * =========================LICENSE_END==================================
  */
-package org.smooks.scribe.adapter.ibatis;
+package org.smooks.scribe.adapter.mybatis;
 
-import java.sql.SQLException;
-import java.util.Collection;
-import java.util.Map;
-
+import org.apache.ibatis.session.SqlSession;
 import org.smooks.scribe.DaoException;
 import org.smooks.scribe.Locator;
 import org.smooks.scribe.MappingDao;
 
-import com.ibatis.sqlmap.client.SqlMapClient;
+import java.util.Collection;
+import java.util.Map;
 
 /**
  * @author <a href="mailto:maurice.zeijen@smies.com">maurice.zeijen@smies.com</a>
  *
  */
-class SqlMapClientDaoAdapter implements MappingDao<Object>, Locator  {
+class SqlSessionDaoAdapter implements MappingDao<Object>, Locator  {
 
-	private final SqlMapClient sqlMapClient;
+	private final SqlSession sqlSession;
 
 	/**
-	 * @param sqlMapClient
+	 * @param sqlSession
 	 */
-	public SqlMapClientDaoAdapter(SqlMapClient sqlMapClient) {
-		this.sqlMapClient = sqlMapClient;
+	public SqlSessionDaoAdapter(SqlSession sqlSession) {
+		this.sqlSession = sqlSession;
 	}
 
 	/* (non-Javadoc)
@@ -73,8 +71,8 @@ class SqlMapClientDaoAdapter implements MappingDao<Object>, Locator  {
 	@Override
 	public Object update(String id, Object entity) {
 		try {
-			sqlMapClient.update(id, entity);
-		} catch (SQLException e) {
+			sqlSession.update(id, entity);
+		} catch (Exception e) {
 			throw new DaoException("Exception throw while executing update with statement id '" + id + "' and entity '" + entity + "'", e);
 		}
 		return null;
@@ -86,8 +84,8 @@ class SqlMapClientDaoAdapter implements MappingDao<Object>, Locator  {
 	@Override
 	public Object insert(String id, Object entity) {
 		try {
-			sqlMapClient.insert(id, entity);
-		} catch (SQLException e) {
+			sqlSession.insert(id, entity);
+		} catch (Exception e) {
 			throw new DaoException("Exception throw while executing insert with statement id '" + id + "' and entity '" + entity + "'", e);
 		}
 
@@ -101,8 +99,8 @@ class SqlMapClientDaoAdapter implements MappingDao<Object>, Locator  {
 	@Override
 	public Object delete(String id, Object entity) {
 		try {
-			sqlMapClient.delete(id, entity);
-		} catch (SQLException e) {
+			sqlSession.delete(id, entity);
+		} catch (Exception e) {
 			throw new DaoException("Exception throw while executing delete with statement id '" + id + "' and entity '" + entity + "'", e);
 		}
 
@@ -116,8 +114,8 @@ class SqlMapClientDaoAdapter implements MappingDao<Object>, Locator  {
 	@SuppressWarnings("unchecked")
 	public Collection<Object> lookup(String id, Map<String, ?> parameters) {
 		try {
-			return sqlMapClient.queryForList(id, parameters);
-		} catch (SQLException e) {
+			return sqlSession.selectList(id, parameters);
+		} catch (Exception e) {
 			throw new DaoException("Exception throw while executing query with statement id '" + id + "' and parameters '" + parameters + "'", e);
 		}
 	}
@@ -129,8 +127,8 @@ class SqlMapClientDaoAdapter implements MappingDao<Object>, Locator  {
 	@SuppressWarnings("unchecked")
 	public Collection<Object> lookup(String id, Object ... parameters) {
 		try {
-			return sqlMapClient.queryForList(id, parameters);
-		} catch (SQLException e) {
+			return sqlSession.selectList(id, parameters);
+		} catch (Exception e) {
 			throw new DaoException("Exception throw while executing query with statement id '" + id + "' and parameters '" + parameters + "'", e);
 		}
 	}
@@ -138,8 +136,8 @@ class SqlMapClientDaoAdapter implements MappingDao<Object>, Locator  {
 	/**
 	 * @return the sqlMapClient
 	 */
-	public SqlMapClient getSqlMapClient() {
-		return sqlMapClient;
+	public SqlSession getSqlSession() {
+		return sqlSession;
 	}
 
 

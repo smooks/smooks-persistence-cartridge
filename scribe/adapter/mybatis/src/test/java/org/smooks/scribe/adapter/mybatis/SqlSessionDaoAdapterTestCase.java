@@ -1,8 +1,8 @@
 /*-
  * ========================LICENSE_START=================================
- * Scribe :: Ibatis adapter
+ * Scribe :: MyBatis adapter
  * %%
- * Copyright (C) 2020 Smooks
+ * Copyright (C) 2020 - 2023 Smooks
  * %%
  * Licensed under the terms of the Apache License Version 2.0, or
  * the GNU Lesser General Public License version 3.0 or later.
@@ -40,15 +40,15 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  * =========================LICENSE_END==================================
  */
-package org.smooks.scribe.adapter.ibatis;
+package org.smooks.scribe.adapter.mybatis;
 
-import com.ibatis.sqlmap.client.SqlMapClient;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 
+import org.apache.ibatis.session.SqlSession;
 import org.junit.Before;
 import org.junit.Test;
-import org.smooks.scribe.adapter.ibatis.test.util.BaseTestCase;
+import org.smooks.scribe.adapter.mybatis.test.util.BaseTestCase;
 import org.mockito.Mock;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -68,12 +68,12 @@ import java.util.Map;
 /**
  * @author <a href="mailto:maurice.zeijen@smies.com">maurice.zeijen@smies.com</a>
  */
-public class SqlMapClientDaoAdapterTestCase extends BaseTestCase {
+public class SqlSessionDaoAdapterTestCase extends BaseTestCase {
 
     @Mock
-    private SqlMapClient sqlMapClient;
+    private SqlSession sqlSession;
 
-    private SqlMapClientDaoAdapter adapter;
+    private SqlSessionDaoAdapter adapter;
 
     @Test
     public void test_persist() throws SQLException {
@@ -86,7 +86,7 @@ public class SqlMapClientDaoAdapterTestCase extends BaseTestCase {
 
         adapter.insert("id", toPersist);
 
-        verify(sqlMapClient).insert(eq("id"), same(toPersist));
+        verify(sqlSession).insert(eq("id"), same(toPersist));
 
     }
 
@@ -101,7 +101,7 @@ public class SqlMapClientDaoAdapterTestCase extends BaseTestCase {
 
         // VERIFY
 
-        verify(sqlMapClient).update(eq("id"), same(toMerge));
+        verify(sqlSession).update(eq("id"), same(toMerge));
 
         assertNull(merged);
 
@@ -113,9 +113,9 @@ public class SqlMapClientDaoAdapterTestCase extends BaseTestCase {
 
         // STUB
 
-        List<?> listResult = Collections.emptyList();
+        List listResult = Collections.emptyList();
 
-        when(sqlMapClient.queryForList(anyString(), any())).thenReturn(listResult);
+        when(sqlSession.selectList(anyString(), any())).thenReturn(listResult);
 
         // EXECUTE
 
@@ -129,7 +129,7 @@ public class SqlMapClientDaoAdapterTestCase extends BaseTestCase {
 
         assertSame(listResult, result);
 
-        verify(sqlMapClient).queryForList(eq("name"), same(params));
+        verify(sqlSession).selectList(eq("name"), same(params));
 
 
     }
@@ -139,9 +139,9 @@ public class SqlMapClientDaoAdapterTestCase extends BaseTestCase {
 
         // STUB
 
-        List<?> listResult = Collections.emptyList();
+        List listResult = Collections.emptyList();
 
-        when(sqlMapClient.queryForList(anyString(), any())).thenReturn(listResult);
+        when(sqlSession.selectList(anyString(), any())).thenReturn(listResult);
 
         // EXECUTE
 
@@ -155,7 +155,7 @@ public class SqlMapClientDaoAdapterTestCase extends BaseTestCase {
 
         assertSame(listResult, result);
 
-        verify(sqlMapClient).queryForList(eq("name"), same(params));
+        verify(sqlSession).selectList(eq("name"), same(params));
 
     }
 
@@ -168,7 +168,7 @@ public class SqlMapClientDaoAdapterTestCase extends BaseTestCase {
     public void beforeMethod() {
         super.beforeMethod();
 
-        adapter = new SqlMapClientDaoAdapter(sqlMapClient);
+        adapter = new SqlSessionDaoAdapter(sqlSession);
     }
 
 }

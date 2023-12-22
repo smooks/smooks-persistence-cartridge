@@ -73,11 +73,11 @@ public class DecodeParamResolver implements DOMVisitBefore {
 
     @Inject
     private ApplicationContext applicationContext;
-    
+
     public void visitBefore(Element element, ExecutionContext executionContext) throws SmooksException {
         NodeList decodeParams = element.getElementsByTagNameNS(Constants.PERSISTENCE_NAMESPACE, "decodeParam");
 
-        if(decodeParams.getLength() > 0) {
+        if (decodeParams.getLength() > 0) {
             ExtensionContext extensionContext = executionContext.get(ExtensionContext.EXTENSION_CONTEXT_TYPED_KEY);
             ResourceConfig populatorConfig = extensionContext.getResourceStack().peek();
             ResourceConfig decoderConfig = new DefaultResourceConfig();
@@ -98,7 +98,7 @@ public class DecodeParamResolver implements DOMVisitBefore {
                 decoderConfig.setSelector("decoder:" + reType, new Properties());
                 decoderConfig.setTargetProfile(extensionContext.getDefaultProfile());
                 decoderConfig.setResource(typeConverter.getClass().getName());
-                for(int i = 0; i < decodeParams.getLength(); i++) {
+                for (int i = 0; i < decodeParams.getLength(); i++) {
                     Element decoderParam = (Element) decodeParams.item(i);
                     decoderConfig.setParameter(decoderParam.getAttribute("name"), DomUtils.getAllText(decoderParam, true));
                 }

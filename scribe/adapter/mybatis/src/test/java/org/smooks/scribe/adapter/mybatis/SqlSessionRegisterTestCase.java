@@ -1,8 +1,8 @@
 /*-
  * ========================LICENSE_START=================================
- * Scribe :: Ibatis adapter
+ * Scribe :: MyBatis adapter
  * %%
- * Copyright (C) 2020 Smooks
+ * Copyright (C) 2020 - 2023 Smooks
  * %%
  * Licensed under the terms of the Apache License Version 2.0, or
  * the GNU Lesser General Public License version 3.0 or later.
@@ -40,35 +40,33 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  * =========================LICENSE_END==================================
  */
-package org.smooks.scribe.adapter.ibatis;
+package org.smooks.scribe.adapter.mybatis;
 
-import com.ibatis.sqlmap.client.SqlMapClient;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 
+import org.apache.ibatis.session.SqlSession;
 import org.junit.Test;
-import org.smooks.scribe.adapter.ibatis.test.util.BaseTestCase;
+import org.smooks.scribe.adapter.mybatis.test.util.BaseTestCase;
 import org.mockito.Mock;
 
 /**
  * @author <a href="mailto:maurice.zeijen@smies.com">maurice.zeijen@smies.com</a>
  */
-public class SqlMapClientRegisterTestCase extends BaseTestCase {
+public class SqlSessionRegisterTestCase extends BaseTestCase {
 
     @Mock
-    SqlMapClient sqlMapClient;
+    SqlSession sqlSession;
 
     @Test
     public void test_getDao() {
 
-        SqlMapClientRegister register = new SqlMapClientRegister(sqlMapClient);
+        SqlSessionRegister register = new SqlSessionRegister(sqlSession);
 
-        SqlMapClientDaoAdapter entityManagerDaoAdapter = register.getDefaultDao();
+        SqlSessionDaoAdapter entityManagerDaoAdapter = register.getDefaultDao();
 
         assertNotNull(entityManagerDaoAdapter);
 
-        assertSame(sqlMapClient, entityManagerDaoAdapter.getSqlMapClient());
-
+        assertSame(sqlSession, entityManagerDaoAdapter.getSqlSession());
     }
-
 }
