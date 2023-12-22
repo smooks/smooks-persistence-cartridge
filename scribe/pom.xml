@@ -18,6 +18,6 @@
         <module>core</module>
         <module>adapter/jpa</module>
         <module>adapter/hibernate</module>
-        <module>adapter/ibatis</module>
+        <module>adapter/mybatis</module>
     </modules>
 </project>

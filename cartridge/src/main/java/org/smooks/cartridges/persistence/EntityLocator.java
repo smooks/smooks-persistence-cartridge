@@ -128,56 +128,56 @@ public class EntityLocator implements BeforeVisitor, AfterVisitor, Producer, Con
 
 	@Inject
 	@Named("beanId")
-    private String beanIdName;
+	private String beanIdName;
 
-    @Inject
+	@Inject
 	@Named("dao")
-    private Optional<String> daoName;
+	private Optional<String> daoName;
 
-    @Inject
+	@Inject
 	@Named("lookup")
-    private Optional<String> lookupName;
+	private Optional<String> lookupName;
 
-    @Inject
-    private Optional<String> query;
+	@Inject
+	private Optional<String> query;
 
-    @Inject
-    private OnNoResult onNoResult = OnNoResult.NULLIFY;
+	@Inject
+	private OnNoResult onNoResult = OnNoResult.NULLIFY;
 
-    @Inject
-    private Boolean uniqueResult = false;
+	@Inject
+	private Boolean uniqueResult = false;
 
-    @Inject
-    private ParameterListType parameterListType = ParameterListType.NAMED;
+	@Inject
+	private ParameterListType parameterListType = ParameterListType.NAMED;
 
-    @Inject
-    private ApplicationContext appContext;
+	@Inject
+	private ApplicationContext appContext;
 
-    private ApplicationContextObjectStore objectStore;
+	private ApplicationContextObjectStore objectStore;
 
-    private ParameterIndex<?, ?> parameterIndex;
+	private ParameterIndex<?, ?> parameterIndex;
 
-    private BeanId beanId;
-    
-    @PostConstruct
-    public void postConstruct() throws SmooksConfigException {
+	private BeanId beanId;
 
-    	if(StringUtils.isEmpty(lookupName.orElse(null)) && StringUtils.isEmpty(query.orElse(null))) {
-    		throw new SmooksConfigException("A lookup name or  a query  needs to be set to be able to lookup anything");
-    	}
+	@PostConstruct
+	public void postConstruct() throws SmooksConfigException {
 
-    	if(StringUtils.isNotEmpty(lookupName.orElse(null)) && StringUtils.isNotEmpty(query.orElse(null))) {
-    		throw new SmooksConfigException("Both the lookup name and the query can't be set at the same time");
-    	}
+		if (StringUtils.isEmpty(lookupName.orElse(null)) && StringUtils.isEmpty(query.orElse(null))) {
+			throw new SmooksConfigException("A lookup name or  a query  needs to be set to be able to lookup anything");
+		}
 
-    	beanId = appContext.getBeanIdStore().register(beanIdName);
+		if (StringUtils.isNotEmpty(lookupName.orElse(null)) && StringUtils.isNotEmpty(query.orElse(null))) {
+			throw new SmooksConfigException("Both the lookup name and the query can't be set at the same time");
+		}
 
-    	parameterIndex = ParameterManager.initializeParameterIndex(id, parameterListType, appContext);
+		beanId = appContext.getBeanIdStore().register(beanIdName);
 
-    	objectStore = new ApplicationContextObjectStore(appContext);
-    }
+		parameterIndex = ParameterManager.initializeParameterIndex(id, parameterListType, appContext);
 
-    /* (non-Javadoc)
+		objectStore = new ApplicationContextObjectStore(appContext);
+	}
+
+	/* (non-Javadoc)
 	 * @see org.smooks.api.delivery.ordering.Producer#getProducts()
 	 */
 	@Override
@@ -201,7 +201,7 @@ public class EntityLocator implements BeforeVisitor, AfterVisitor, Producer, Con
 	public void visitBefore(Element element, ExecutionContext executionContext) throws SmooksException {
 		initParameterContainer(executionContext);
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.smooks.delivery.sax.SAXVisitAfter#visitAfter(org.smooks.delivery.sax.SAXElement, org.smooks.api.ExecutionContext)
 	 */
@@ -220,37 +220,37 @@ public class EntityLocator implements BeforeVisitor, AfterVisitor, Producer, Con
 
 		Object dao = null;
 		try {
-			if(!daoName.isPresent()) {
+			if (!daoName.isPresent()) {
 				dao = emr.getDefaultDao();
 			} else {
 				dao = emr.getDao(daoName.get());
 			}
 
-			if(dao == null) {
+			if (dao == null) {
 				throw new IllegalStateException("The DAO register returned null while getting the DAO '" + daoName + "'");
 			}
 
 			Object result = lookup(dao, executionContext);
 
-			if(result != null && uniqueResult) {
-				if(result instanceof Collection){
+			if (result != null && uniqueResult) {
+				if (result instanceof Collection) {
 					Collection<Object> resultCollection = (Collection<Object>) result;
 
-					if(resultCollection.size() == 0) {
+					if (resultCollection.size() == 0) {
 						result = null;
-					} else if(resultCollection.size() == 1) {
-						for(Object value : resultCollection) {
+					} else if (resultCollection.size() == 1) {
+						for (Object value : resultCollection) {
 							result = value;
 						}
 					} else {
 						String exception;
-						if(!daoName.isPresent()) {
+						if (!daoName.isPresent()) {
 							exception = "The " + getDaoNameFromAdapter(dao) + " DAO";
 						} else {
 							exception = "The DAO '" + daoName.get() + "'";
 						}
 						exception += " returned multiple results for the ";
-						if(lookupName.isPresent()) {
+						if (lookupName.isPresent()) {
 							exception += "lookup '" + lookupName.get() + "'";
 						} else {
 							exception += "query '" + query + "'";
@@ -264,31 +264,31 @@ public class EntityLocator implements BeforeVisitor, AfterVisitor, Producer, Con
 				}
 			}
 
-			if(result == null && onNoResult == OnNoResult.EXCEPTION) {
+			if (result == null && onNoResult == OnNoResult.EXCEPTION) {
 				String exception;
-				if(daoName == null) {
+				if (daoName.isEmpty()) {
 					exception = "The " + getDaoNameFromAdapter(dao) + " DAO";
 				} else {
-					exception = "The DAO '" + daoName + "'";
+					exception = "The DAO '" + daoName.get() + "'";
 				}
-				exception += " returned no results for lookup ";
-				if(lookupName != null) {
-					exception += "lookup '" + query + "'";
+				exception += " returned no results for ";
+				if (lookupName.isPresent()) {
+					exception += "lookup '" + lookupName.get() + "'";
 				} else {
-					exception += "query '" + query + "'";
+					exception += "query '" + query.orElse("") + "'";
 				}
 				throw new NoLookupResultException(exception);
 			}
 
 			BeanContext beanContext = executionContext.getBeanContext();
 
-			if(result == null) {
+			if (result == null) {
 				beanContext.removeBean(beanId, source);
 			} else {
 				beanContext.addBean(beanId, result, source);
 			}
 		} finally {
-			if(dao != null) {
+			if (dao != null) {
 				emr.returnDao(dao);
 			}
 		}
@@ -298,14 +298,14 @@ public class EntityLocator implements BeforeVisitor, AfterVisitor, Producer, Con
 		ParameterContainer<?> container = ParameterManager.getParameterContainer(id, executionContext);
 		DaoInvoker daoInvoker = DaoInvokerFactory.getInstance().create(dao, objectStore);
 
-		if(!query.isPresent()) {
-			if(parameterListType == ParameterListType.NAMED) {
+		if (query.isEmpty()) {
+			if (parameterListType == ParameterListType.NAMED) {
 				return daoInvoker.lookup(lookupName.orElse(null), ((NamedParameterContainer) container).getParameterMap());
 			} else {
 				return daoInvoker.lookup(lookupName.orElse(null), ((PositionalParameterContainer) container).getValues());
 			}
 		} else {
-			if(parameterListType == ParameterListType.NAMED) {
+			if (parameterListType == ParameterListType.NAMED) {
 				return daoInvoker.lookupByQuery(query.orElse(null), ((NamedParameterContainer) container).getParameterMap());
 			} else {
 				return daoInvoker.lookupByQuery(query.orElse(null), ((PositionalParameterContainer) container).getValues());

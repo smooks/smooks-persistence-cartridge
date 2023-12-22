@@ -65,8 +65,7 @@ public class EntityLocatorIdResolver implements DOMVisitBefore {
 	/* (non-Javadoc)
 	 * @see org.smooks.delivery.dom.DOMVisitBefore#visitBefore(org.w3c.dom.Element, org.smooks.api.ExecutionContext)
 	 */
-	public void visitBefore(Element element, ExecutionContext executionContext)
-			throws SmooksException {
+	public void visitBefore(Element element, ExecutionContext executionContext) throws SmooksException {
 		ResourceConfig resourceConfig = executionContext.get(ExtensionContext.EXTENSION_CONTEXT_TYPED_KEY).getResourceStack().peek();
 
 		int index = LocatorIndex.getLocatorIndex(applicationContext).increment();

@@ -1,8 +1,8 @@
 /*-
  * ========================LICENSE_START=================================
- * Scribe :: Ibatis adapter
+ * Scribe :: MyBatis adapter
  * %%
- * Copyright (C) 2020 Smooks
+ * Copyright (C) 2020 - 2023 Smooks
  * %%
  * Licensed under the terms of the Apache License Version 2.0, or
  * the GNU Lesser General Public License version 3.0 or later.
@@ -40,45 +40,20 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  * =========================LICENSE_END==================================
  */
-package org.smooks.scribe.adapter.ibatis;
+package org.smooks.scribe.adapter.mybatis.test.util;
 
-import java.util.Map;
-
-import org.smooks.scribe.register.AbstractDaoAdapterRegister;
-
-import com.ibatis.sqlmap.client.SqlMapClient;
+import org.junit.Before;
+import org.mockito.MockitoAnnotations;
 
 /**
  * @author <a href="mailto:maurice.zeijen@smies.com">maurice.zeijen@smies.com</a>
  *
  */
-public class SqlMapClientRegister extends AbstractDaoAdapterRegister<SqlMapClientDaoAdapter, SqlMapClient>{
+public abstract class BaseTestCase {
 
-	/**
-	 *
-	 */
-	public SqlMapClientRegister(final SqlMapClient sqlMapClient) {
-		super(sqlMapClient);
-	}
-
-	/**
-	 *
-	 */
-	public SqlMapClientRegister(final SqlMapClient sqlMapClient, Map<String, ? extends SqlMapClient> sqlMapClientMap) {
-		super(sqlMapClient, sqlMapClientMap);
-	}
-
-
-	public SqlMapClientRegister(Map<String, ? extends SqlMapClient> sqlMapClientMap) {
-		super(sqlMapClientMap);
-	}
-
-	/* (non-Javadoc)
-	 * @see org.smooks.scribe.register.AbstractDaoAdapterRegister#createAdapter(java.lang.Object)
-	 */
-	@Override
-	protected SqlMapClientDaoAdapter createAdapter(SqlMapClient sqlMapClient) {
-		return new SqlMapClientDaoAdapter(sqlMapClient);
+	@Before
+	public void beforeMethod() {
+		MockitoAnnotations.initMocks(this);
 	}
 
 }

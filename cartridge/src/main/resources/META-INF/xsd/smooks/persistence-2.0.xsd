@@ -58,7 +58,7 @@
        					<xs:documentation xml:lang="en">
        						The name of the insert method. Depending of the adapter this can mean different things.
        						For instance when using annotated DAO's you can name the methods and target them with this property, but
-       						when using the Ibatis adapter you set the id of the Ibatis statement in this attribute.
+       						when using the MyBatis adapter you set the id of the Ibatis statement in this attribute.
        						This attribute is not supported by all scribe adapters.
        					</xs:documentation>
        				</xs:annotation>
@@ -129,7 +129,7 @@
        					<xs:documentation xml:lang="en">
        						The name of the update method. Depending of the adapter this can mean different things.
        						For instance when using annotated DAO's you can name the methods and target them with this property, but
-       						when using the Ibatis adapter you set the id of the Ibatis statement in this attribute.
+       						when using the MyBatis adapter you set the id of the Ibatis statement in this attribute.
        					</xs:documentation>
        				</xs:annotation>
        			</xs:attribute>
@@ -204,7 +204,7 @@
        					<xs:documentation xml:lang="en">
        						The name of the delete method. Depending of the adapter this can mean different things.
        						For instance when using annotated DAO's you can name the methods and target them with this property, but
-       						when using the Ibatis adapter you set the id of the Ibatis statement in this attribute.
+       						when using the MyBatis adapter you set the id of the Ibatis statement in this attribute.
        						This attribute is not supported by all scribe adapters.
        					</xs:documentation>
        				</xs:annotation>

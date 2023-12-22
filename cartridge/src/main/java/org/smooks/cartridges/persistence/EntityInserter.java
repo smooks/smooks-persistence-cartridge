@@ -92,7 +92,7 @@ import java.util.stream.Stream;
  * 	<li><b>dao</b> : The name of the DAO that will be used. If it is not set then the default DAO is used. (<i>optional</i>)
  *  <li><b>name*</b> : The name of the insert method. Depending of the adapter this can mean different things.
  *                     For instance when using annotated DAO's you can name the methods and target them with this property, but
- *                     when using the Ibatis adapter you set the id of the Ibatis statement in this attribute. (<i>optional</i>)
+ *                     when using the MyBatis adapter you set the id of the Ibatis statement in this attribute. (<i>optional</i>)
  *  <li><b>insertedBeanId</b> : The bean id under which the inserted bean will be stored. If not set then the object returned
  *                              by the insert method will not be stored in bean context. (<i>optional</i>)
  *  <li><b>insertBefore</b> : If the inserter should execute on the 'before' event. (<i>default: false</i>)
