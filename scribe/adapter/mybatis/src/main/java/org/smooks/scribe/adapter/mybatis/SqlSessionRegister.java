@@ -56,20 +56,20 @@ public class SqlSessionRegister extends AbstractDaoAdapterRegister<SqlSessionDao
 	/**
 	 *
 	 */
-	public SqlSessionRegister(final SqlSession sqlMapClient) {
-		super(sqlMapClient);
+	public SqlSessionRegister(final SqlSession sqlSession) {
+		super(sqlSession);
 	}
 
 	/**
 	 *
 	 */
-	public SqlSessionRegister(final SqlSession sqlMapClient, Map<String, ? extends SqlSession> sqlMapClientMap) {
-		super(sqlMapClient, sqlMapClientMap);
+	public SqlSessionRegister(final SqlSession sqlSession, Map<String, ? extends SqlSession> sqlSessionMap) {
+		super(sqlSession, sqlSessionMap);
 	}
 
 
-	public SqlSessionRegister(Map<String, ? extends SqlSession> sqlMapClientMap) {
-		super(sqlMapClientMap);
+	public SqlSessionRegister(Map<String, ? extends SqlSession> sqlSessionMap) {
+		super(sqlSessionMap);
 	}
 
 	/* (non-Javadoc)

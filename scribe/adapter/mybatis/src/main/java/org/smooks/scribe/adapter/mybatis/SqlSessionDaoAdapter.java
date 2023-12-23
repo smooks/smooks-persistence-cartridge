@@ -134,7 +134,7 @@ class SqlSessionDaoAdapter implements MappingDao<Object>, Locator  {
 	}
 
 	/**
-	 * @return the sqlMapClient
+	 * @return the sqlSession
 	 */
 	public SqlSession getSqlSession() {
 		return sqlSession;
