@@ -107,7 +107,6 @@ public class EntityLocatorParameterVisitor implements ElementVisitor, Consumer, 
 	private static final Logger LOGGER = LoggerFactory.getLogger(EntityLocatorParameterVisitor.class);
 
 	@Inject
-    @Named("entityLocatorId")
     private Integer entityLocatorId;
 
 	@Inject
