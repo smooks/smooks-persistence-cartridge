@@ -275,7 +275,7 @@
     <resource-config selector="persistence:locator/params/value">
         <resource>org.smooks.engine.resource.extension.MapToResourceConfigFromParentConfig</resource>
         <param name="mapFrom">id</param>
-        <param name="mapTo">entityLookupperId</param>
+        <param name="mapTo">entityLocatorId</param>
     </resource-config>
 
     <resource-config selector="persistence:locator/params/value">
@@ -330,7 +330,7 @@
     <resource-config selector="persistence:locator/params/wiring">
         <resource>org.smooks.engine.resource.extension.MapToResourceConfigFromParentConfig</resource>
         <param name="mapFrom">id</param>
-        <param name="mapTo">entityLookupperId</param>
+        <param name="mapTo">entityLocatorId</param>
     </resource-config>
 
     <resource-config selector="persistence:locator/params/wiring">
@@ -371,7 +371,7 @@
     <resource-config selector="persistence:locator/params/expression">
         <resource>org.smooks.engine.resource.extension.MapToResourceConfigFromParentConfig</resource>
         <param name="mapFrom">id</param>
-        <param name="mapTo">entityLookupperId</param>
+        <param name="mapTo">entityLocatorId</param>
     </resource-config>
 
 
