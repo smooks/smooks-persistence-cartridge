@@ -89,48 +89,48 @@ public abstract class AbstractDataSource implements DOMVisitBefore, BeforeVisito
     }
 
     protected void bind(ExecutionContext executionContext) {
-        executionContext.put(new TypedKey<>(DS_CONTEXT_KEY_PREFIX + getName()), this);
+        executionContext.put(TypedKey.of(DS_CONTEXT_KEY_PREFIX + getName()), this);
     }
 
     protected void unbind(ExecutionContext executionContext) {
         try {
-            Connection connection = executionContext.get(new TypedKey<>(CONNECTION_CONTEXT_KEY_PREFIX + getName()));
+            Connection connection = executionContext.get(TypedKey.of(CONNECTION_CONTEXT_KEY_PREFIX + getName()));
 
-            if(connection != null) {
-            	TransactionManager transactionManager = executionContext.get(new TypedKey<>(TRANSACTION_MANAGER_CONTEXT_KEY_PREFIX  + getName()));
-            	if(transactionManager == null) {
-            		throw new SmooksException("No TransactionManager is set for the datasource '" + getName() + "'");
-            	}
+            if (connection != null) {
+                TransactionManager transactionManager = executionContext.get(TypedKey.of(TRANSACTION_MANAGER_CONTEXT_KEY_PREFIX + getName()));
+                if (transactionManager == null) {
+                    throw new SmooksException("No TransactionManager is set for the datasource '" + getName() + "'");
+                }
                 try {
-                    if(!isAutoCommit()) {
+                    if (!isAutoCommit()) {
                         // If there's no termination error on the context, commit, otherwise rollback...
-                        if(executionContext.getTerminationError() == null) {
-                        	transactionManager.commit();
+                        if (executionContext.getTerminationError() == null) {
+                            transactionManager.commit();
                         } else {
-                        	transactionManager.rollback();
+                            transactionManager.rollback();
                         }
                     }
                 } finally {
-                    executionContext.remove(new TypedKey<>(CONNECTION_CONTEXT_KEY_PREFIX + getName()));
+                    executionContext.remove(TypedKey.of(CONNECTION_CONTEXT_KEY_PREFIX + getName()));
                     connection.close();
                 }
             }
         } catch (SQLException e) {
             throw new SmooksException("Unable to unbind DataSource '" + getName() + "'.", e);
         } finally {
-            executionContext.remove(new TypedKey<>(DS_CONTEXT_KEY_PREFIX + getName()));
-            executionContext.remove(new TypedKey<>(TRANSACTION_MANAGER_CONTEXT_KEY_PREFIX + getName()));
+            executionContext.remove(TypedKey.of(DS_CONTEXT_KEY_PREFIX + getName()));
+            executionContext.remove(TypedKey.of(TRANSACTION_MANAGER_CONTEXT_KEY_PREFIX + getName()));
         }
     }
 
     public static Connection getConnection(String dataSourceName, ExecutionContext executionContext) throws SmooksException {
-        Connection connection = executionContext.get(new TypedKey<>(CONNECTION_CONTEXT_KEY_PREFIX + dataSourceName));
+        Connection connection = executionContext.get(TypedKey.of(CONNECTION_CONTEXT_KEY_PREFIX + dataSourceName));
 
-        if(connection == null) {
-            AbstractDataSource datasource = executionContext.get(new TypedKey<>(DS_CONTEXT_KEY_PREFIX + dataSourceName));
+        if (connection == null) {
+            AbstractDataSource datasource = executionContext.get(TypedKey.of(DS_CONTEXT_KEY_PREFIX + dataSourceName));
 
-            if(datasource == null) {
-                throw new SmooksException("DataSource '" + dataSourceName + "' not bound to context.  Configure an '" + AbstractDataSource.class.getName() +  "' implementation and target it at '#document'.");
+            if (datasource == null) {
+                throw new SmooksException("DataSource '" + dataSourceName + "' not bound to context.  Configure an '" + AbstractDataSource.class.getName() + "' implementation and target it at '#document'.");
             }
             try {
                 connection = datasource.getConnection();
@@ -138,8 +138,8 @@ public abstract class AbstractDataSource implements DOMVisitBefore, BeforeVisito
                 TransactionManager transactionManager = datasource.createTransactionManager(connection);
                 transactionManager.begin();
 
-                executionContext.put(new TypedKey<>(CONNECTION_CONTEXT_KEY_PREFIX + dataSourceName), connection);
-                executionContext.put(new TypedKey<>(TRANSACTION_MANAGER_CONTEXT_KEY_PREFIX + dataSourceName), transactionManager);
+                executionContext.put(TypedKey.of(CONNECTION_CONTEXT_KEY_PREFIX + dataSourceName), connection);
+                executionContext.put(TypedKey.of(TRANSACTION_MANAGER_CONTEXT_KEY_PREFIX + dataSourceName), transactionManager);
             } catch (SQLException e) {
                 throw new SmooksException("Unable to open connection to dataSource '" + dataSourceName + "'.", e);
             }
@@ -161,7 +161,7 @@ public abstract class AbstractDataSource implements DOMVisitBefore, BeforeVisito
     public abstract boolean isAutoCommit();
 
     public TransactionManager createTransactionManager(Connection connection) {
-    	return new JdbcTransactionManager(connection, isAutoCommit());
+        return new JdbcTransactionManager(connection, isAutoCommit());
     }
 
 }

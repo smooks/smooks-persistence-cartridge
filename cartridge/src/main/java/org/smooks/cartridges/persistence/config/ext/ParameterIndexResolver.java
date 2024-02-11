@@ -64,11 +64,11 @@ public class ParameterIndexResolver implements DOMVisitBefore {
 
 		ResourceConfig resourceConfig = executionContext.get(ExtensionContext.EXTENSION_CONTEXT_TYPED_KEY).getResourceStack().peek();
 
-		Integer index = executionContext.get(new TypedKey<>(ParameterIndexInitializer.PARAMETER_INDEX));
+		Integer index = executionContext.get(TypedKey.of(ParameterIndexInitializer.PARAMETER_INDEX));
 
 		ResourceConfigUtil.setProperty(resourceConfig, "index", Integer.toString(index), executionContext);
 
-		executionContext.put(new TypedKey<>(ParameterIndexInitializer.PARAMETER_INDEX), index + 1);
+		executionContext.put(TypedKey.of(ParameterIndexInitializer.PARAMETER_INDEX), index + 1);
 	}
 
 }

@@ -60,7 +60,7 @@ public class ParameterIndexInitializer implements DOMVisitBefore {
 	 * @see org.smooks.delivery.dom.DOMVisitBefore#visitBefore(org.w3c.dom.Element, org.smooks.api.ExecutionContext)
 	 */
 	public void visitBefore(Element element, ExecutionContext executionContext)	throws SmooksException {
-		executionContext.put(new TypedKey<>(PARAMETER_INDEX), 0);
+		executionContext.put(TypedKey.of(PARAMETER_INDEX), 0);
 	}
 
 }
