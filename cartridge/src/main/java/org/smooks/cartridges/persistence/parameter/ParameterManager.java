@@ -105,7 +105,7 @@ public class ParameterManager {
 				throw new IllegalStateException("Unknown ParameterListType '" + type + "'.");
 			}
 
-			executionContext.put(new TypedKey<>(getParameterContainerName(id)), container);
+			executionContext.put(TypedKey.of(getParameterContainerName(id)), container);
 
 		} else {
 			container.clear();
@@ -115,7 +115,7 @@ public class ParameterManager {
 
 	@SuppressWarnings("unchecked")
 	public static ParameterContainer<Parameter<?>> getParameterContainer(int id, ExecutionContext executionContext) {
-		return executionContext.get(new TypedKey<>(getParameterContainerName(id)));
+		return executionContext.get(TypedKey.of(getParameterContainerName(id)));
 	}
 
 

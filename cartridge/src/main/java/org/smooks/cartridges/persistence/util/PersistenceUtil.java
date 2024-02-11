@@ -70,11 +70,11 @@ public final class PersistenceUtil {
 	}
 
 	public static DaoRegister<?> getDAORegister(final ExecutionContext executionContext) {
-		return executionContext.get(new TypedKey<>(PersistenceUtil.getDAORegisterAttributeName(executionContext.getContentDeliveryRuntime().getContentDeliveryConfig())));
+		return executionContext.get(TypedKey.of(PersistenceUtil.getDAORegisterAttributeName(executionContext.getContentDeliveryRuntime().getContentDeliveryConfig())));
 	}
 
 	public static void setDAORegister(final ExecutionContext executionContext, final DaoRegister<?> registery) {
-		executionContext.put(new TypedKey<>(getDAORegisterAttributeName(executionContext.getContentDeliveryRuntime().getContentDeliveryConfig())), registery);
+		executionContext.put(TypedKey.of(getDAORegisterAttributeName(executionContext.getContentDeliveryRuntime().getContentDeliveryConfig())), registery);
 	}
 
 }
