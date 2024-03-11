@@ -6,35 +6,35 @@
  * %%
  * Licensed under the terms of the Apache License Version 2.0, or
  * the GNU Lesser General Public License version 3.0 or later.
- * 
+ *
  * SPDX-License-Identifier: Apache-2.0 OR LGPL-3.0-or-later
- * 
+ *
  * ======================================================================
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * ======================================================================
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3 of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
@@ -78,6 +78,7 @@ import org.w3c.dom.CharacterData;
 import org.w3c.dom.Element;
 
 import jakarta.annotation.PostConstruct;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.List;
@@ -89,31 +90,30 @@ import java.util.stream.Stream;
 
 /**
  * @author <a href="mailto:maurice.zeijen@smies.com">maurice.zeijen@smies.com</a>
- *
  */
 @VisitBeforeReport(
-		condition = "parameters.containsKey('wireBeanId') || parameters.containsKey('valueAttributeName')",
-		summary = "<#if resource.parameters.wireBeanId??>Create bean lifecycle observer for the bean under the beanId '${resource.parameters.wireBeanId}'." +
-		"<#elseif resource.parameters.valueAttributeName??>Populating <#if resource.parameters.name??>the '${resource.parameters.name}'</#if> parameter " +
-		"from the '${resource.parameters.valueAttributeName}' attribute." +
-		"</#if>")
+        condition = "parameters.containsKey('wireBeanId') || parameters.containsKey('valueAttributeName')",
+        summary = "<#if resource.parameters.wireBeanId??>Create bean lifecycle observer for the bean under the beanId '${resource.parameters.wireBeanId}'." +
+                "<#elseif resource.parameters.valueAttributeName??>Populating <#if resource.parameters.name??>the '${resource.parameters.name}'</#if> parameter " +
+                "from the '${resource.parameters.valueAttributeName}' attribute." +
+                "</#if>")
 @VisitAfterReport(
-		condition = "!parameters.containsKey('valueAttributeName')",
-		summary = "<#if resource.parameters.wireBeanId??>Removing bean lifecycle observer for the bean under the beanId '${resource.parameters.wireBeanId}'." +
-		"<#else>Populating <#if resource.parameters.name??>the '${resource.parameters.name}'</#if> parameter " +
-		"from <#if resource.parameters.expression??>an expression<#else>this element.</#if></#if>.")
-public class EntityLocatorParameterVisitor implements ElementVisitor, Consumer, Producer  {
+        condition = "!parameters.containsKey('valueAttributeName')",
+        summary = "<#if resource.parameters.wireBeanId??>Removing bean lifecycle observer for the bean under the beanId '${resource.parameters.wireBeanId}'." +
+                "<#else>Populating <#if resource.parameters.name??>the '${resource.parameters.name}'</#if> parameter " +
+                "from <#if resource.parameters.expression??>an expression<#else>this element.</#if></#if>.")
+public class EntityLocatorParameterVisitor implements ElementVisitor, Consumer, Producer {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(EntityLocatorParameterVisitor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(EntityLocatorParameterVisitor.class);
 
-	@Inject
+    @Inject
     private Integer entityLocatorId;
 
-	@Inject
-	private Optional<String> name;
+    @Inject
+    private Optional<String> name;
 
-	@Inject
-	private Integer index;
+    @Inject
+    private Integer index;
 
     @Inject
     private ParameterListType parameterListType = ParameterListType.NAMED;
@@ -155,29 +155,30 @@ public class EntityLocatorParameterVisitor implements ElementVisitor, Consumer, 
 
     /**
      * Set the resource configuration on the bean populator.
+     *
      * @throws SmooksConfigException Incorrectly configured resource.
      */
     @PostConstruct
     public void postConstruct() throws SmooksConfigException {
 
-    	if(LOGGER.isDebugEnabled()) {
-    		LOGGER.debug("Initializing EntityLocatorParameterVisitor with name '"+ name +"'");
-    	}
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Initializing EntityLocatorParameterVisitor with name '" + name + "'");
+        }
 
         beanWiring = wireBeanIdName.isPresent();
         isAttribute = valueAttributeName.isPresent();
 
         beanIdStore = appContext.getBeanIdStore();
 
-        if(parameterListType == ParameterListType.NAMED) {
-        	NamedParameterIndex parameterIndex = (NamedParameterIndex) ParameterManager.getParameterIndex(entityLocatorId, appContext);
-        	parameter = parameterIndex.register(name.orElse(null));
+        if (parameterListType == ParameterListType.NAMED) {
+            NamedParameterIndex parameterIndex = (NamedParameterIndex) ParameterManager.getParameterIndex(entityLocatorId, appContext);
+            parameter = parameterIndex.register(name.orElse(null));
         } else {
-        	PositionalParameterIndex parameterIndex = (PositionalParameterIndex) ParameterManager.getParameterIndex(entityLocatorId, appContext);
-        	parameter = parameterIndex.register(index);
+            PositionalParameterIndex parameterIndex = (PositionalParameterIndex) ParameterManager.getParameterIndex(entityLocatorId, appContext);
+            parameter = parameterIndex.register(index);
         }
 
-		if(wireBeanIdName.isPresent()) {
+        if (wireBeanIdName.isPresent()) {
             wireBeanId = beanIdStore.register(wireBeanIdName.get());
         }
     }
@@ -198,9 +199,9 @@ public class EntityLocatorParameterVisitor implements ElementVisitor, Consumer, 
     /* (non-Javadoc)
      * @see org.smooks.api.delivery.ordering.Producer#getProducts()
      */
-	@SuppressWarnings("unchecked")
+    @SuppressWarnings("unchecked")
     @Override
-	public Set<? extends Object> getProducts() {
+    public Set<? extends Object> getProducts() {
         return Stream.of(parameter).collect(Collectors.toSet());
     }
 
@@ -217,11 +218,11 @@ public class EntityLocatorParameterVisitor implements ElementVisitor, Consumer, 
 
     @Override
     public void visitAfter(Element element, ExecutionContext executionContext) throws SmooksException {
-    	if(!beanWiring && !isAttribute) {
+        if (!beanWiring && !isAttribute) {
             bindDataValue(element, executionContext);
-    	}
+        }
     }
-    
+
     private void bindDataValue(Element element, ExecutionContext executionContext) {
         String dataString;
 
@@ -233,34 +234,34 @@ public class EntityLocatorParameterVisitor implements ElementVisitor, Consumer, 
             dataString = textAccumulatorMemento.getText();
         }
 
-        if(expression.isPresent()) {
+        if (expression.isPresent()) {
             bindExpressionValue(executionContext);
         } else {
             populateAndSetPropertyValue(dataString, executionContext);
         }
     }
-    
-    private void bindBeanValue(final ExecutionContext executionContext) {
-    	final BeanContext beanContext = executionContext.getBeanContext();
 
-    	Object bean = beanContext.getBean(wireBeanId);
-        if(bean == null) {
+    private void bindBeanValue(final ExecutionContext executionContext) {
+        final BeanContext beanContext = executionContext.getBeanContext();
+
+        Object bean = beanContext.getBean(wireBeanId);
+        if (bean == null) {
 
             // Register the observer which looks for the creation of the selected bean via its beanIdName. When this observer is triggered then
             // we look if we got something we can set immediately or that we got an array collection. For an array collection we need the array representation
             // and not the list representation. So we register and observer who looks for the change from the list to the array
-        	BeanRuntimeInfo wiredBeanRI = getWiredBeanRuntimeInfo();
-        	beanContext.addObserver(new BeanCreateLifecycleObserver(wireBeanId, this, wiredBeanRI));
+            BeanRuntimeInfo wiredBeanRI = getWiredBeanRuntimeInfo();
+            beanContext.addObserver(new BeanCreateLifecycleObserver(wireBeanId, this, wiredBeanRI));
         } else {
             populateAndSetPropertyValue(bean, executionContext);
         }
-	}
+    }
 
     private void bindExpressionValue(ExecutionContext executionContext) {
         Map<String, Object> beanMap = executionContext.getBeanContext().getBeanMap();
         Object dataObject = expression.get().getValue(beanMap);
 
-        if(dataObject instanceof String) {
+        if (dataObject instanceof String) {
             populateAndSetPropertyValue((String) dataObject, executionContext);
         } else {
             populateAndSetPropertyValue(dataObject, executionContext);
@@ -275,21 +276,20 @@ public class EntityLocatorParameterVisitor implements ElementVisitor, Consumer, 
         populateAndSetPropertyValue(dataObject, executionContext);
     }
 
-	public void populateAndSetPropertyValue(Object dataObject, ExecutionContext executionContext) {
-    	if ( dataObject == null )
-    	{
-    		return;
-    	}
+    public void populateAndSetPropertyValue(Object dataObject, ExecutionContext executionContext) {
+        if (dataObject == null) {
+            return;
+        }
 
-    	ParameterContainer<Parameter<?>> container = ParameterManager.getParameterContainer(entityLocatorId, executionContext);
-    	container.put(parameter, dataObject);
+        ParameterContainer<Parameter<?>> container = ParameterManager.getParameterContainer(entityLocatorId, executionContext);
+        container.put(parameter, dataObject);
     }
 
     private Object decodeDataString(String dataString, ExecutionContext executionContext) throws TypeConverterException {
-        if((dataString == null || dataString.equals("")) && defaultVal.isPresent()) {
-        	if(defaultVal.get().equals("null")) {
-        		return null;
-        	}
+        if ((dataString == null || dataString.equals("")) && defaultVal.isPresent()) {
+            if (defaultVal.get().equals("null")) {
+                return null;
+            }
             dataString = defaultVal.get();
         }
 
@@ -321,18 +321,18 @@ public class EntityLocatorParameterVisitor implements ElementVisitor, Consumer, 
         return typeConverter;
     }
 
-	private BeanRuntimeInfo getWiredBeanRuntimeInfo() {
-		if(wiredBeanRuntimeInfo == null) {
+    private BeanRuntimeInfo getWiredBeanRuntimeInfo() {
+        if (wiredBeanRuntimeInfo == null) {
             // Don't need to synchronize this.  Worse thing that can happen is we initialize it
             // more than once...
             wiredBeanRuntimeInfo = BeanRuntimeInfo.getBeanRuntimeInfo(wireBeanIdName.orElse(null), appContext);
-		}
-		return wiredBeanRuntimeInfo;
-	}
+        }
+        return wiredBeanRuntimeInfo;
+    }
 
-	public String getId() {
-		return EntityLocatorParameterVisitor.class.getName() + "#" + entityLocatorId + "#" + name;
-	}
+    public String getId() {
+        return EntityLocatorParameterVisitor.class.getName() + "#" + entityLocatorId + "#" + name;
+    }
 
     @Override
     public void visitChildText(CharacterData characterData, ExecutionContext executionContext) {

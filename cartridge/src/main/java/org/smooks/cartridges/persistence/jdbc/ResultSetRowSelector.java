@@ -6,35 +6,35 @@
  * %%
  * Licensed under the terms of the Apache License Version 2.0, or
  * the GNU Lesser General Public License version 3.0 or later.
- * 
+ *
  * SPDX-License-Identifier: Apache-2.0 OR LGPL-3.0-or-later
- * 
+ *
  * ======================================================================
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * ======================================================================
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3 of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
@@ -65,6 +65,7 @@ import org.smooks.support.FreeMarkerTemplate;
 import org.w3c.dom.Element;
 
 import jakarta.annotation.PostConstruct;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.HashMap;
@@ -118,7 +119,7 @@ public class ResultSetRowSelector implements BeforeVisitor, AfterVisitor, Produc
     public ResultSetRowSelector setSelector(SQLExecutor executor) {
         AssertArgument.isNotNull(executor, "executor");
         this.resultSetName = executor.getResultSetName();
-        if(this.resultSetName == null) {
+        if (this.resultSetName == null) {
             throw new IllegalArgumentException("Invalid 'executor' argument.  Executor must specify a 'resultSetName' in order to be used by a ResultsetRowSelector.");
         }
         return this;
@@ -157,13 +158,13 @@ public class ResultSetRowSelector implements BeforeVisitor, AfterVisitor, Produc
     public boolean getExecuteBefore() {
         return executeBefore;
     }
-    
+
     @PostConstruct
     public void postConstruct() throws SmooksConfigException {
-    	BeanIdStore beanIdStore = appContext.getBeanIdStore();
+        BeanIdStore beanIdStore = appContext.getBeanIdStore();
 
-    	beanIdObj = beanIdStore.register(beanId);
-    	resultSetBeanId = beanIdStore.register(resultSetName);
+        beanIdObj = beanIdStore.register(beanId);
+        resultSetBeanId = beanIdStore.register(resultSetName);
     }
 
     public Set<? extends Object> getProducts() {
@@ -171,9 +172,9 @@ public class ResultSetRowSelector implements BeforeVisitor, AfterVisitor, Produc
     }
 
     public boolean consumes(Object object) {
-        if(object.equals(resultSetName)) {
+        if (object.equals(resultSetName)) {
             return true;
-        } else if(whereEvaluator != null && whereEvaluator.getExpression().contains(object.toString())) {
+        } else if (whereEvaluator != null && whereEvaluator.getExpression().contains(object.toString())) {
             return true;
         } else {
             return failedSelectError != null && failedSelectError.isPresent() && failedSelectError.get().getTemplateText().contains(object.toString());
@@ -189,47 +190,47 @@ public class ResultSetRowSelector implements BeforeVisitor, AfterVisitor, Produc
     public void visitAfter(Element element, ExecutionContext executionContext) throws SmooksException {
         selectRow(executionContext, new NodeFragment(element));
     }
-    
-    private void selectRow(ExecutionContext executionContext, NodeFragment source) throws SmooksException {
-    	BeanContext beanRepository = executionContext.getBeanContext();
 
-    	Map<String, Object> beanMapClone = new HashMap<>(beanRepository.getBeanMap());
+    private void selectRow(ExecutionContext executionContext, NodeFragment source) throws SmooksException {
+        BeanContext beanRepository = executionContext.getBeanContext();
+
+        Map<String, Object> beanMapClone = new HashMap<>(beanRepository.getBeanMap());
 
         // Lookup the new current value for the bean...
         try {
-        	@SuppressWarnings("unchecked")
+            @SuppressWarnings("unchecked")
             List<Map<String, Object>> resultSet = (List<Map<String, Object>>) beanRepository.getBean(resultSetBeanId);
 
-            if(resultSet == null) {
+            if (resultSet == null) {
                 throw new SmooksException("Resultset '" + resultSetName + "' not found in bean context.  Make sure an appropriate SQLExecutor resource config wraps this selector config.");
             }
 
             try {
-            	Object selectedRow = null;
+                Object selectedRow = null;
 
-            	Iterator<Map<String, Object>> resultIter = resultSet.iterator();
+                Iterator<Map<String, Object>> resultIter = resultSet.iterator();
                 while (selectedRow == null && resultIter.hasNext()) {
-                	Map<String, Object> row = resultIter.next();
+                    Map<String, Object> row = resultIter.next();
 
-                	beanMapClone.put("row", row);
+                    beanMapClone.put("row", row);
 
-                    if(whereEvaluator.eval(beanMapClone)) {
-                    	selectedRow = row;
-                    	beanRepository.addBean(beanIdObj, selectedRow, source);
+                    if (whereEvaluator.eval(beanMapClone)) {
+                        selectedRow = row;
+                        beanRepository.addBean(beanIdObj, selectedRow, source);
                     }
                 }
 
-                if(selectedRow == null && failedSelectError.isPresent()) {
+                if (selectedRow == null && failedSelectError.isPresent()) {
                     throw new DataSelectionException(failedSelectError.get().apply(beanRepository.getBeanMap()));
                 }
 
-                if(LOGGER.isDebugEnabled()) {
+                if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug("Selected resultset where '" + whereEvaluator.getExpression() + "': [" + selectedRow + "].");
                 }
-            } catch(ClassCastException e) {
+            } catch (ClassCastException e) {
                 throw new SmooksException("Bean '" + resultSetName + "' cannot be used as a Reference Data resultset.  The resultset List must contain entries of type Map<String, Object>.");
             }
-        } catch(ClassCastException e) {
+        } catch (ClassCastException e) {
             throw new SmooksException("Bean '" + resultSetName + "' cannot be used as a Reference Data resultset.  A resultset must be of type List<Map<String, Object>>. '" + resultSetName + "' is of type '" + beanRepository.getBean(resultSetBeanId).getClass().getName() + "'.");
         }
     }

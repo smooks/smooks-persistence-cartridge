@@ -6,35 +6,35 @@
  * %%
  * Licensed under the terms of the Apache License Version 2.0, or
  * the GNU Lesser General Public License version 3.0 or later.
- * 
+ *
  * SPDX-License-Identifier: Apache-2.0 OR LGPL-3.0-or-later
- * 
+ *
  * ======================================================================
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * ======================================================================
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3 of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
@@ -72,13 +72,13 @@ public class SQLExecutorTest {
     private static HsqlServer hsqlServer;
 
     @BeforeClass
-	public static void afterClass() throws Exception {
+    public static void afterClass() throws Exception {
         hsqlServer = new HsqlServer(9992);
         hsqlServer.execScript(SQLExecutorTest.class.getResourceAsStream("test.script"));
     }
 
     @AfterClass
-	public static void beforeClass() throws Exception {
+    public static void beforeClass() throws Exception {
         hsqlServer.stop();
     }
 
@@ -95,7 +95,7 @@ public class SQLExecutorTest {
     @Test
     public void test_appContextTimeExtendedConfig() throws Exception {
         Smooks smooks = new Smooks(getClass().getResourceAsStream("smooks-extended-config.xml"));
-    	test_appContextTime(smooks);
+        test_appContextTime(smooks);
         try {
             test_appContextTime(smooks);
         } finally {
@@ -110,34 +110,34 @@ public class SQLExecutorTest {
         try {
             // Now programmaticly configure...
             DirectDataSource datasource = new DirectDataSource()
-                              .setDriver(jdbcDriver.class)
-                              .setName("OrdersDS")
-                              .setUrl("jdbc:hsqldb:hsql://localhost:9992/milyn-hsql-9992")
-                              .setUsername("sa")
-                              .setPassword("")
-                              .setAutoCommit(true);
+                    .setDriver(jdbcDriver.class)
+                    .setName("OrdersDS")
+                    .setUrl("jdbc:hsqldb:hsql://localhost:9992/milyn-hsql-9992")
+                    .setUsername("sa")
+                    .setPassword("")
+                    .setAutoCommit(true);
             SQLExecutor orderSelector = new SQLExecutor()
-                              .setDatasource(datasource)
-                              .setStatement("select * from ORDERS")
-                              .setResultSetName("orders1")
-                              .setExecuteBefore(true);
+                    .setDatasource(datasource)
+                    .setStatement("select * from ORDERS")
+                    .setResultSetName("orders1")
+                    .setExecuteBefore(true);
 
             smooks.addVisitor(datasource);
             smooks.addVisitor(orderSelector);
 
             smooks.addVisitor(new ResultSetRowSelector()
-                              .setSelector(orderSelector)
-                              .setBeanId("myOrder")
-                              .setWhereClause("row.ORDERNUMBER == 2")
-                              .setFailedSelectError("Order with ORDERNUMBER=2 not found in Database"));
+                    .setSelector(orderSelector)
+                    .setBeanId("myOrder")
+                    .setWhereClause("row.ORDERNUMBER == 2")
+                    .setFailedSelectError("Order with ORDERNUMBER=2 not found in Database"));
 
             smooks.addVisitor(new SQLExecutor()
-                              .setDatasource(datasource)
-                              .setStatement("select * from ORDERS")
-                              .setResultSetName("orders2")
-                              .setResultSetScope(ResultSetScope.APPLICATION)
-                              .setResultSetTTL(2000L)
-                              .setExecuteBefore(true));
+                    .setDatasource(datasource)
+                    .setStatement("select * from ORDERS")
+                    .setResultSetName("orders2")
+                    .setResultSetScope(ResultSetScope.APPLICATION)
+                    .setResultSetTTL(2000L)
+                    .setExecuteBefore(true));
 
             test_appContextTime(smooks);
         } finally {
@@ -146,7 +146,7 @@ public class SQLExecutorTest {
     }
 
     @SuppressWarnings("unchecked")
-	private void test_appContextTime(Smooks smooks) throws IOException, SAXException, InterruptedException {
+    private void test_appContextTime(Smooks smooks) throws IOException, SAXException, InterruptedException {
         ExecutionContext execContext = smooks.createExecutionContext();
         BeanContext beanContext = execContext.getBeanContext();
 
@@ -181,7 +181,7 @@ public class SQLExecutorTest {
 
     @Test
     @SuppressWarnings("unchecked")
-	public void test_ResultsetRowSelector_01() throws IOException, SAXException, InterruptedException {
+    public void test_ResultsetRowSelector_01() throws IOException, SAXException, InterruptedException {
         Smooks smooks = new Smooks(getClass().getResourceAsStream("smooks-config.xml"));
 
         try {
@@ -199,7 +199,7 @@ public class SQLExecutorTest {
 
     @Test
     @SuppressWarnings("unchecked")
-	public void test_ResultsetRowSelector_02() throws IOException, SAXException, InterruptedException {
+    public void test_ResultsetRowSelector_02() throws IOException, SAXException, InterruptedException {
         Smooks smooks = new Smooks(getClass().getResourceAsStream("smooks-config-failed-select-01.xml"));
 
         try {
@@ -222,7 +222,7 @@ public class SQLExecutorTest {
         try {
             ExecutionContext execContext = smooks.createExecutionContext();
             BeanContext beanContext = execContext.getBeanContext();
-            BeanIdStore beanIdStore =  execContext.getApplicationContext().getBeanIdStore();
+            BeanIdStore beanIdStore = execContext.getApplicationContext().getBeanIdStore();
 
             BeanId requiredOrderNumId = beanIdStore.register("requiredOrderNum");
 
@@ -230,7 +230,7 @@ public class SQLExecutorTest {
             try {
                 smooks.filterSource(execContext, new StringSource("<doc/>"), null);
                 fail("Expected DataSelectionException");
-            } catch(SmooksException e) {
+            } catch (SmooksException e) {
                 assertEquals("Order with ORDERNUMBER=9999 not found in Database", e.getCause().getMessage());
             }
         } finally {

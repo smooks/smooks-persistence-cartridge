@@ -154,7 +154,7 @@ public class DaoFlusherTest extends BaseTestCase {
 
     private void enableReporting(ExecutionContext executionContext, String reportFilePath) throws IOException {
         if (ENABLE_REPORTING) {
-            executionContext.getContentDeliveryRuntime().getExecutionEventListeners().add(new HtmlReportGenerator("target/" + reportFilePath));
+            executionContext.getContentDeliveryRuntime().addExecutionEventListener(new HtmlReportGenerator("target/" + reportFilePath, executionContext.getApplicationContext()));
         }
     }
 }

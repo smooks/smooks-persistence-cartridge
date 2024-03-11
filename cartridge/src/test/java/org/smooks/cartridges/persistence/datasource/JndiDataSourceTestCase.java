@@ -6,35 +6,35 @@
  * %%
  * Licensed under the terms of the Apache License Version 2.0, or
  * the GNU Lesser General Public License version 3.0 or later.
- * 
+ *
  * SPDX-License-Identifier: Apache-2.0 OR LGPL-3.0-or-later
- * 
+ *
  * ======================================================================
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * ======================================================================
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3 of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
@@ -90,7 +90,6 @@ public class JndiDataSourceTestCase {
 
     @Test
     public void test_jndi_autoCommit() throws Exception {
-
         when(connection.getAutoCommit()).thenReturn(false);
 
         executeSmooks("jndi_autocommit", "test_jndi_autoCommit", REPORT);
@@ -105,7 +104,6 @@ public class JndiDataSourceTestCase {
 
     @Test
     public void test_jndi() throws Exception {
-
         when(connection.getAutoCommit()).thenReturn(true);
 
         executeSmooks("jndi", "test_jndi", REPORT);
@@ -121,7 +119,6 @@ public class JndiDataSourceTestCase {
 
     @Test
     public void test_jndi_exception() throws Exception {
-
         when(connection.getAutoCommit()).thenReturn(false);
 
         executeSmooksWithException("jndi_exception", "test_jndi_exception");
@@ -136,7 +133,6 @@ public class JndiDataSourceTestCase {
 
     @Test
     public void test_jta_new_transaction() throws Exception {
-
         when(connection.getAutoCommit()).thenReturn(true);
         when(transaction.getStatus()).thenReturn(Status.STATUS_NO_TRANSACTION);
 
@@ -151,12 +147,10 @@ public class JndiDataSourceTestCase {
         verify(transaction, never()).rollback();
         verify(connection, never()).commit();
         verify(connection, never()).rollback();
-
     }
 
     @Test
     public void test_jta_existing_transaction() throws Exception {
-
         when(connection.getAutoCommit()).thenReturn(false);
         when(transaction.getStatus()).thenReturn(Status.STATUS_ACTIVE);
 
@@ -171,12 +165,10 @@ public class JndiDataSourceTestCase {
         verify(connection, never()).setAutoCommit(false);
         verify(connection, never()).commit();
         verify(connection, never()).rollback();
-
     }
 
     @Test
     public void test_jta_exception() throws Exception {
-
         when(connection.getAutoCommit()).thenReturn(false);
         when(transaction.getStatus()).thenReturn(Status.STATUS_NO_TRANSACTION);
 
@@ -192,12 +184,10 @@ public class JndiDataSourceTestCase {
         verify(connection, never()).setAutoCommit(false);
         verify(connection, never()).commit();
         verify(connection, never()).rollback();
-
     }
 
     @Test
     public void test_jta_existing_transaction_exception() throws Exception {
-
         when(connection.getAutoCommit()).thenReturn(false);
         when(transaction.getStatus()).thenReturn(Status.STATUS_ACTIVE);
 
@@ -213,7 +203,6 @@ public class JndiDataSourceTestCase {
         verify(connection, never()).setAutoCommit(false);
         verify(connection, never()).commit();
         verify(connection, never()).rollback();
-
     }
 
     @Test
@@ -231,7 +220,6 @@ public class JndiDataSourceTestCase {
 
     @Test
     public void test_jta_missing_transaction() {
-
         try {
             executeSmooks("jta_missing_transaction", "test_jta_missing_transaction", REPORT);
         } catch (Exception e) {
@@ -244,7 +232,6 @@ public class JndiDataSourceTestCase {
 
     @Test
     public void test_external() throws Exception {
-
         when(connection.getAutoCommit()).thenReturn(true);
 
         executeSmooks("external", "external", true);
@@ -259,7 +246,6 @@ public class JndiDataSourceTestCase {
 
     @Test
     public void test_external_autocommit() throws Exception {
-
         when(connection.getAutoCommit()).thenReturn(false);
 
         executeSmooks("external_autocommit", "test_external_autocommit", REPORT);
@@ -274,7 +260,6 @@ public class JndiDataSourceTestCase {
 
     @Test
     public void test_external_set_autocommit_not_allowed() throws Exception {
-
         executeSmooks("external_set_autocommit_not_allowed", "test_external_set_autocommit_not_allowed", true);
 
         verify(dataSource).getConnection();
@@ -288,7 +273,6 @@ public class JndiDataSourceTestCase {
 
     @Test
     public void test_external_exception() throws Exception {
-
         when(connection.getAutoCommit()).thenReturn(false);
 
         executeSmooksWithException("external_exception", "test_external_exception");
@@ -302,18 +286,17 @@ public class JndiDataSourceTestCase {
     }
 
     private void executeSmooks(String profile, String testName, boolean report) throws Exception {
-
         Smooks smooks = new Smooks(getClass().getResourceAsStream("jndi-ds-lifecycle.xml"));
-        ExecutionContext ec = smooks.createExecutionContext(profile);
+        ExecutionContext executionContext = smooks.createExecutionContext(profile);
 
         if (report) {
-            ec.getContentDeliveryRuntime().addExecutionEventListener(new HtmlReportGenerator("target/report/" + testName + ".html"));
+            executionContext.getContentDeliveryRuntime().addExecutionEventListener(new HtmlReportGenerator("target/report/" + testName + ".html", executionContext.getApplicationContext()));
         }
 
-        smooks.filterSource(ec, source);
+        smooks.filterSource(executionContext, source);
     }
 
-    private void executeSmooksWithException(String profile, String testName) throws Exception {
+    private void executeSmooksWithException(String profile, String testName) {
         try {
             executeSmooks(profile, testName, JndiDataSourceTestCase.REPORT);
         } catch (Exception e) {
@@ -332,7 +315,6 @@ public class JndiDataSourceTestCase {
 
         when(dataSource.getConnection()).thenReturn(connection);
         source = new StringSource("<root><a /><b /></root>");
-
     }
 
     @After
