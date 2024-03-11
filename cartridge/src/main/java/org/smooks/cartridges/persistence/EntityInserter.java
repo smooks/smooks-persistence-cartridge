@@ -6,35 +6,35 @@
  * %%
  * Licensed under the terms of the Apache License Version 2.0, or
  * the GNU Lesser General Public License version 3.0 or later.
- * 
+ *
  * SPDX-License-Identifier: Apache-2.0 OR LGPL-3.0-or-later
- * 
+ *
  * ======================================================================
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * ======================================================================
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3 of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
@@ -68,6 +68,7 @@ import org.smooks.scribe.register.DaoRegister;
 import org.w3c.dom.Element;
 
 import jakarta.annotation.PostConstruct;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.Collections;
@@ -78,7 +79,7 @@ import java.util.stream.Stream;
 
 /**
  * DAO Inserter
- * <p />
+ * <p/>
  * This DAO inserter calls the insert method of a DAO, using a entity bean from
  * the bean context as parameter.
  *
@@ -113,24 +114,24 @@ import java.util.stream.Stream;
  *
  * @author <a href="mailto:maurice.zeijen@smies.com">maurice.zeijen@smies.com</a>
  */
-@VisitBeforeIf(	condition = "insertBefore")
-@VisitAfterIf( condition = "!insertBefore")
-@VisitBeforeReport(summary = "Inserting bean under beanId '${resource.parameters.beanId}'.", detailTemplate="reporting/EntityInserter.html")
-@VisitAfterReport(summary = "Inserting bean under beanId '${resource.parameters.beanId}'.", detailTemplate="reporting/EntityInserter.html")
+@VisitBeforeIf(condition = "insertBefore")
+@VisitAfterIf(condition = "!insertBefore")
+@VisitBeforeReport(summary = "Inserting bean under beanId '${resource.parameters.beanId}'.", detailTemplate = "reporting/EntityInserter.html")
+@VisitAfterReport(summary = "Inserting bean under beanId '${resource.parameters.beanId}'.", detailTemplate = "reporting/EntityInserter.html")
 public class EntityInserter implements BeforeVisitor, AfterVisitor, Consumer, Producer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EntityInserter.class);
 
     @Inject
-	@Named("beanId")
+    @Named("beanId")
     private String beanIdName;
 
     @Inject
-	@Named("insertedBeanId")
-	private Optional<String> insertedBeanIdName;
+    @Named("insertedBeanId")
+    private Optional<String> insertedBeanIdName;
 
     @Inject
-	@Named("dao")
+    @Named("dao")
     private Optional<String> daoName;
 
     @Inject
@@ -139,9 +140,9 @@ public class EntityInserter implements BeforeVisitor, AfterVisitor, Consumer, Pr
     @Inject
     private ApplicationContext appContext;
 
-	@Inject
-	private Boolean insertBefore = false;
-	
+    @Inject
+    private Boolean insertBefore = false;
+
     private ObjectStore objectStore;
 
     private BeanId beanId;
@@ -150,95 +151,95 @@ public class EntityInserter implements BeforeVisitor, AfterVisitor, Consumer, Pr
 
     @PostConstruct
     public void postConstruct() throws SmooksConfigException {
-    	BeanIdStore beanIdStore = appContext.getBeanIdStore();
+        BeanIdStore beanIdStore = appContext.getBeanIdStore();
 
-    	beanId = beanIdStore.register(beanIdName);
+        beanId = beanIdStore.register(beanIdName);
 
-		insertedBeanIdName.ifPresent(s -> insertedBeanId = beanIdStore.register(s));
+        insertedBeanIdName.ifPresent(s -> insertedBeanId = beanIdStore.register(s));
 
-    	objectStore = new ApplicationContextObjectStore(appContext);
+        objectStore = new ApplicationContextObjectStore(appContext);
     }
 
     /* (non-Javadoc)
-	 * @see org.smooks.api.delivery.ordering.Producer#getProducts()
-	 */
-	@Override
-	public Set<? extends Object> getProducts() {
-		if(!insertedBeanIdName.isPresent()) {
-			return Collections.emptySet();
-		} else {
-			return Stream.of(insertedBeanIdName).collect(Collectors.toSet());
-		}
-	}
-
-	/* (non-Javadoc)
-	 * @see org.smooks.api.delivery.ordering.Consumer#consumes(java.lang.String)
-	 */
-	@Override
-	public boolean consumes(Object object) {
-		return object.equals(beanIdName);
-	}
-
-	@Override
-	public void visitBefore(final Element element, final ExecutionContext executionContext) throws SmooksException {
-    	insert(executionContext, new NodeFragment(element));
+     * @see org.smooks.api.delivery.ordering.Producer#getProducts()
+     */
+    @Override
+    public Set<? extends Object> getProducts() {
+        if (!insertedBeanIdName.isPresent()) {
+            return Collections.emptySet();
+        } else {
+            return Stream.of(insertedBeanIdName).collect(Collectors.toSet());
+        }
     }
 
-	@Override
-	public void visitAfter(final Element element, final ExecutionContext executionContext) throws SmooksException {
-    	insert(executionContext, new NodeFragment(element));
+    /* (non-Javadoc)
+     * @see org.smooks.api.delivery.ordering.Consumer#consumes(java.lang.String)
+     */
+    @Override
+    public boolean consumes(Object object) {
+        return object.equals(beanIdName);
     }
 
-	/**
-	 * @param executionContext
-	 * @param source
-	 * @return
-	 */
-	@SuppressWarnings("unchecked")
-	private void insert(final ExecutionContext executionContext, final NodeFragment source) {
+    @Override
+    public void visitBefore(final Element element, final ExecutionContext executionContext) throws SmooksException {
+        insert(executionContext, new NodeFragment(element));
+    }
 
-		if(LOGGER.isDebugEnabled()) {
-			LOGGER.debug("Inserting bean under BeanId '" + beanIdName + "' with DAO '" + daoName + "'.");
-		}
+    @Override
+    public void visitAfter(final Element element, final ExecutionContext executionContext) throws SmooksException {
+        insert(executionContext, new NodeFragment(element));
+    }
 
-		BeanContext beanRepository = executionContext.getBeanContext();
+    /**
+     * @param executionContext
+     * @param source
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    private void insert(final ExecutionContext executionContext, final NodeFragment source) {
 
-		Object bean = beanRepository.getBean(beanId);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Inserting bean under BeanId '" + beanIdName + "' with DAO '" + daoName + "'.");
+        }
 
-		final DaoRegister emr = PersistenceUtil.getDAORegister(executionContext);
+        BeanContext beanRepository = executionContext.getBeanContext();
 
-		Object dao = null;
-		try {
-			if(!daoName.isPresent()) {
-				dao = emr.getDefaultDao();
-			} else {
-				dao = emr.getDao(daoName.get());
-			}
+        Object bean = beanRepository.getBean(beanId);
 
-			if(dao == null) {
-				throw new IllegalStateException("The DAO register returned null while getting the DAO '" + daoName + "'");
-			}
+        final DaoRegister emr = PersistenceUtil.getDAORegister(executionContext);
 
-			final DaoInvoker daoInvoker = DaoInvokerFactory.getInstance().create(dao, objectStore);
+        Object dao = null;
+        try {
+            if (!daoName.isPresent()) {
+                dao = emr.getDefaultDao();
+            } else {
+                dao = emr.getDao(daoName.get());
+            }
 
-			Object result = !name.isPresent() ? daoInvoker.insert(bean) : daoInvoker.insert(name.get(), bean) ;
+            if (dao == null) {
+                throw new IllegalStateException("The DAO register returned null while getting the DAO '" + daoName + "'");
+            }
 
-			if(insertedBeanId != null) {
-				if(result == null) {
-					result = bean;
-				}
-				beanRepository.addBean(insertedBeanId, result, source);
-			} else if(result != null && bean != result) {
-				beanRepository.changeBean(beanId, bean, source);
-			}
-		} finally {
-			if(dao != null) {
-				emr.returnDao(dao);
-			}
-		}
-	}
+            final DaoInvoker daoInvoker = DaoInvokerFactory.getInstance().create(dao, objectStore);
 
-	public Boolean getInsertBefore() {
-		return insertBefore;
-	}
+            Object result = !name.isPresent() ? daoInvoker.insert(bean) : daoInvoker.insert(name.get(), bean);
+
+            if (insertedBeanId != null) {
+                if (result == null) {
+                    result = bean;
+                }
+                beanRepository.addBean(insertedBeanId, result, source);
+            } else if (result != null && bean != result) {
+                beanRepository.changeBean(beanId, bean, source);
+            }
+        } finally {
+            if (dao != null) {
+                emr.returnDao(dao);
+            }
+        }
+    }
+
+    public Boolean getInsertBefore() {
+        return insertBefore;
+    }
 }

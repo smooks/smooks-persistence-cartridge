@@ -6,35 +6,35 @@
  * %%
  * Licensed under the terms of the Apache License Version 2.0, or
  * the GNU Lesser General Public License version 3.0 or later.
- * 
+ *
  * SPDX-License-Identifier: Apache-2.0 OR LGPL-3.0-or-later
- * 
+ *
  * ======================================================================
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * ======================================================================
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3 of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
@@ -68,6 +68,7 @@ import org.smooks.scribe.register.DaoRegister;
 import org.w3c.dom.Element;
 
 import jakarta.annotation.PostConstruct;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.Collections;
@@ -79,7 +80,7 @@ import java.util.stream.Stream;
 
 /**
  * DAO Updater
- * <p />
+ * <p/>
  * This DAO updater calls the update method of a DAO, using a entity bean from
  * the bean context as parameter.
  *
@@ -114,34 +115,34 @@ import java.util.stream.Stream;
  *
  * @author <a href="mailto:maurice.zeijen@smies.com">maurice.zeijen@smies.com</a>
  */
-@VisitBeforeIf(	condition = "updateBefore")
-@VisitAfterIf( condition = "!updateBefore")
-@VisitBeforeReport(summary = "Updating bean under beanId '${resource.parameters.beanId}'.", detailTemplate="reporting/EntityUpdater.html")
-@VisitAfterReport(summary = "Updating bean under beanId '${resource.parameters.beanId}'.", detailTemplate="reporting/EntityUpdater.html")
+@VisitBeforeIf(condition = "updateBefore")
+@VisitAfterIf(condition = "!updateBefore")
+@VisitBeforeReport(summary = "Updating bean under beanId '${resource.parameters.beanId}'.", detailTemplate = "reporting/EntityUpdater.html")
+@VisitAfterReport(summary = "Updating bean under beanId '${resource.parameters.beanId}'.", detailTemplate = "reporting/EntityUpdater.html")
 public class EntityUpdater implements AfterVisitor, BeforeVisitor, Producer, Consumer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EntityUpdater.class);
 
     @Inject
-	@Named("beanId")
+    @Named("beanId")
     private String beanIdName;
 
     @Inject
-	@Named("updatedBeanId")
-	private Optional<String> updatedBeanIdName;
+    @Named("updatedBeanId")
+    private Optional<String> updatedBeanIdName;
 
     @Inject
-	@Named("dao")
-	private Optional<String> daoName;
+    @Named("dao")
+    private Optional<String> daoName;
 
     @Inject
     private Optional<String> name;
 
     @Inject
     private ApplicationContext appContext;
-    
+
     @Inject
-	private Boolean updateBefore = false;
+    private Boolean updateBefore = false;
 
     private ObjectStore objectStore;
 
@@ -151,93 +152,93 @@ public class EntityUpdater implements AfterVisitor, BeforeVisitor, Producer, Con
 
     @PostConstruct
     public void initialize() throws SmooksConfigException {
-    	BeanIdStore beanIdStore = appContext.getBeanIdStore();
+        BeanIdStore beanIdStore = appContext.getBeanIdStore();
 
-    	beanId = beanIdStore.register(beanIdName);
+        beanId = beanIdStore.register(beanIdName);
 
-		updatedBeanIdName.ifPresent(s -> updatedBeanId = beanIdStore.register(s));
+        updatedBeanIdName.ifPresent(s -> updatedBeanId = beanIdStore.register(s));
 
-    	objectStore = new ApplicationContextObjectStore(appContext);
+        objectStore = new ApplicationContextObjectStore(appContext);
     }
 
-	public Boolean getUpdateBefore() {
-		return updateBefore;
-	}
+    public Boolean getUpdateBefore() {
+        return updateBefore;
+    }
 
-	/* (non-Javadoc)
-	 * @see org.smooks.api.delivery.ordering.Producer#getProducts()
-	 */
-	public Set<? extends Object> getProducts() {
-		if(!updatedBeanIdName.isPresent()) {
-			return Collections.emptySet();
-		} else {
-			return Stream.of(updatedBeanIdName.get()).collect(Collectors.toSet());
-		}
-	}
+    /* (non-Javadoc)
+     * @see org.smooks.api.delivery.ordering.Producer#getProducts()
+     */
+    public Set<? extends Object> getProducts() {
+        if (!updatedBeanIdName.isPresent()) {
+            return Collections.emptySet();
+        } else {
+            return Stream.of(updatedBeanIdName.get()).collect(Collectors.toSet());
+        }
+    }
 
-	/* (non-Javadoc)
-	 * @see org.smooks.api.delivery.ordering.Consumer#consumes(java.lang.String)
-	 */
-	public boolean consumes(Object object) {
-		return object.equals(beanIdName);
-	}
+    /* (non-Javadoc)
+     * @see org.smooks.api.delivery.ordering.Consumer#consumes(java.lang.String)
+     */
+    public boolean consumes(Object object) {
+        return object.equals(beanIdName);
+    }
 
-	@Override
+    @Override
     public void visitBefore(final Element element, final ExecutionContext executionContext) throws SmooksException {
-    	update(executionContext, new NodeFragment(element));
+        update(executionContext, new NodeFragment(element));
     }
 
     @Override
     public void visitAfter(final Element element, final ExecutionContext executionContext) throws SmooksException {
-    	update(executionContext, new NodeFragment(element));
+        update(executionContext, new NodeFragment(element));
     }
 
-	/**
-	 * @param executionContext
-	 * @param source
+    /**
+     * @param executionContext
+     * @param source
      * @return
-	 */
-	@SuppressWarnings("unchecked")
-	private void update(final ExecutionContext executionContext, NodeFragment source) {
+     */
+    @SuppressWarnings("unchecked")
+    private void update(final ExecutionContext executionContext, NodeFragment source) {
 
-		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug("Updating bean under BeanId '" + beanIdName + "' with DAO '" + daoName + "'.");
-		}
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Updating bean under BeanId '" + beanIdName + "' with DAO '" + daoName + "'.");
+        }
 
-		BeanContext beanContext = executionContext.getBeanContext();
+        BeanContext beanContext = executionContext.getBeanContext();
 
-		Object bean = beanContext.getBean(beanId);
+        Object bean = beanContext.getBean(beanId);
 
-		final DaoRegister emr = PersistenceUtil.getDAORegister(executionContext);
+        final DaoRegister emr = PersistenceUtil.getDAORegister(executionContext);
 
-		Object dao = null;
-		try {
-			if (!daoName.isPresent()) {
-				dao = emr.getDefaultDao();
-			} else {
-				dao = emr.getDao(daoName.get());
-			}
+        Object dao = null;
+        try {
+            if (!daoName.isPresent()) {
+                dao = emr.getDefaultDao();
+            } else {
+                dao = emr.getDao(daoName.get());
+            }
 
-			if (dao == null) {
-				throw new IllegalStateException("The DAO register returned null while getting the DAO '" + daoName + "'");
-			}
+            if (dao == null) {
+                throw new IllegalStateException("The DAO register returned null while getting the DAO '" + daoName + "'");
+            }
 
-			final DaoInvoker daoInvoker = DaoInvokerFactory.getInstance().create(dao, objectStore);
+            final DaoInvoker daoInvoker = DaoInvokerFactory.getInstance().create(dao, objectStore);
 
-			Object result = !name.isPresent() ? daoInvoker.update(bean) : daoInvoker.update(name.get(), bean);
+            Object result = !name.isPresent() ? daoInvoker.update(bean) : daoInvoker.update(name.get(), bean);
 
-			if (updatedBeanId != null) {
-				if (result == null) {
-					result = bean;
-				}
-				beanContext.addBean(updatedBeanId, result, source);
-			} else if (result != null && bean != result) {
-				beanContext.changeBean(beanId, bean, source);
-			}
-		} finally {
-			if (dao != null) {
-				emr.returnDao(dao);
-			}
-		}
-	}
+            if (updatedBeanId != null) {
+                if (result == null) {
+                    result = bean;
+                }
+                beanContext.addBean(updatedBeanId, result, source);
+            } else if (result != null && bean != result) {
+                beanContext.changeBean(beanId, bean, source);
+            }
+        } finally {
+            if (dao != null) {
+                emr.returnDao(dao);
+            }
+        }
+    }
 }

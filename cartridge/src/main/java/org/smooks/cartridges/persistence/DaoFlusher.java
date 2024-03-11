@@ -6,35 +6,35 @@
  * %%
  * Licensed under the terms of the Apache License Version 2.0, or
  * the GNU Lesser General Public License version 3.0 or later.
- * 
+ *
  * SPDX-License-Identifier: Apache-2.0 OR LGPL-3.0-or-later
- * 
+ *
  * ======================================================================
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * ======================================================================
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3 of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
@@ -60,13 +60,14 @@ import org.smooks.scribe.register.DaoRegister;
 import org.w3c.dom.Element;
 
 import jakarta.annotation.PostConstruct;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.Optional;
 
 /**
  * DAO Flusher
- * <p />
+ * <p/>
  * This DAO flusher calls the flush method of a DAO.
  *
  * <h3>Configuration</h3>
@@ -90,91 +91,91 @@ import java.util.Optional;
  *
  * @author <a href="mailto:maurice.zeijen@smies.com">maurice.zeijen@smies.com</a>
  */
-@VisitBeforeIf(	condition = "flushBefore")
-@VisitAfterIf( condition = "!flushBefore")
-@VisitBeforeReport(summary = "Flushing <#if !resource.parameters.dao??>default </#if>DAO<#if resource.parameters.dao??> '${resource.parameters.dao}'</#if>.", detailTemplate="reporting/DaoFlusher.html")
-@VisitAfterReport(summary = "Flushing <#if !resource.parameters.dao??>default </#if>DAO<#if resource.parameters.dao??> '${resource.parameters.dao}'</#if>.", detailTemplate="reporting/DaoFlusher.html")
+@VisitBeforeIf(condition = "flushBefore")
+@VisitAfterIf(condition = "!flushBefore")
+@VisitBeforeReport(summary = "Flushing <#if !resource.parameters.dao??>default </#if>DAO<#if resource.parameters.dao??> '${resource.parameters.dao}'</#if>.", detailTemplate = "reporting/DaoFlusher.html")
+@VisitAfterReport(summary = "Flushing <#if !resource.parameters.dao??>default </#if>DAO<#if resource.parameters.dao??> '${resource.parameters.dao}'</#if>.", detailTemplate = "reporting/DaoFlusher.html")
 public class DaoFlusher implements BeforeVisitor, AfterVisitor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DaoFlusher.class);
 
     @Inject
-	@Named("dao")
+    @Named("dao")
     private Optional<String> daoName;
 
     @Inject
     private ApplicationContext appContext;
 
-	@Inject
-	private Boolean flushBefore = false;
-    
+    @Inject
+    private Boolean flushBefore = false;
+
     private ApplicationContextObjectStore objectStore;
 
     @PostConstruct
     public void postConstruct() {
-    	objectStore = new ApplicationContextObjectStore(appContext);
+        objectStore = new ApplicationContextObjectStore(appContext);
     }
-    
+
     @Override
     public void visitBefore(final Element element, final ExecutionContext executionContext) throws SmooksException {
-    	flush(executionContext);
+        flush(executionContext);
     }
 
-	@Override
-	public void visitAfter(final Element element, final ExecutionContext executionContext) throws SmooksException {
-    	flush(executionContext);
+    @Override
+    public void visitAfter(final Element element, final ExecutionContext executionContext) throws SmooksException {
+        flush(executionContext);
     }
 
-	/**
-	 * @param executionContext
-	 * @param bean
-	 * @return
-	 */
-	@SuppressWarnings("unchecked")
-	private void flush(final ExecutionContext executionContext) {
+    /**
+     * @param executionContext
+     * @param bean
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    private void flush(final ExecutionContext executionContext) {
 
-		if(LOGGER.isDebugEnabled()) {
-			String msg = "Flushing org.smooks.persistence.test.dao";
-			if(daoName.isPresent()) {
-				msg += " with name '" + daoName.get() + "'";
-			}
-			msg += ".";
-			LOGGER.debug(msg);
-		}
+        if (LOGGER.isDebugEnabled()) {
+            String msg = "Flushing org.smooks.persistence.test.dao";
+            if (daoName.isPresent()) {
+                msg += " with name '" + daoName.get() + "'";
+            }
+            msg += ".";
+            LOGGER.debug(msg);
+        }
 
-		final DaoRegister emr = PersistenceUtil.getDAORegister(executionContext);
+        final DaoRegister emr = PersistenceUtil.getDAORegister(executionContext);
 
-		Object dao = null;
-		try {
-			if(!daoName.isPresent()) {
-				dao = emr.getDefaultDao();
-			} else {
-				dao = emr.getDao(daoName.get());
-			}
+        Object dao = null;
+        try {
+            if (!daoName.isPresent()) {
+                dao = emr.getDefaultDao();
+            } else {
+                dao = emr.getDao(daoName.get());
+            }
 
-			if(dao == null) {
-				throw new IllegalStateException("The DAO register returned null while getting the DAO [" + daoName.orElse(null) + "]");
-			}
+            if (dao == null) {
+                throw new IllegalStateException("The DAO register returned null while getting the DAO [" + daoName.orElse(null) + "]");
+            }
 
-			flush(dao);
+            flush(dao);
 
-		} finally {
-			if(dao != null) {
-				emr.returnDao(dao);
-			}
-		}
-	}
+        } finally {
+            if (dao != null) {
+                emr.returnDao(dao);
+            }
+        }
+    }
 
-	/**
-	 * @param org.smooks.persistence.test.dao
-	 */
-	private void flush(Object dao) {
-		final DaoInvoker daoInvoker = DaoInvokerFactory.getInstance().create(dao, objectStore);
+    /**
+     * @param org.smooks.persistence.test.dao
+     */
+    private void flush(Object dao) {
+        final DaoInvoker daoInvoker = DaoInvokerFactory.getInstance().create(dao, objectStore);
 
-		daoInvoker.flush();
-	}
+        daoInvoker.flush();
+    }
 
-	public Boolean getFlushBefore() {
-		return flushBefore;
-	}
+    public Boolean getFlushBefore() {
+        return flushBefore;
+    }
 }

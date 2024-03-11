@@ -6,35 +6,35 @@
  * %%
  * Licensed under the terms of the Apache License Version 2.0, or
  * the GNU Lesser General Public License version 3.0 or later.
- * 
+ *
  * SPDX-License-Identifier: Apache-2.0 OR LGPL-3.0-or-later
- * 
+ *
  * ======================================================================
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * ======================================================================
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3 of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
@@ -51,7 +51,7 @@ import org.smooks.api.resource.visitor.dom.DOMVisitBefore;
 import org.smooks.cartridges.persistence.Constants;
 import org.smooks.engine.lookup.converter.NameTypeConverterFactoryLookup;
 import org.smooks.engine.resource.config.DefaultResourceConfig;
-import org.smooks.engine.resource.extension.ExtensionContext;
+import org.smooks.engine.resource.config.loader.xml.extension.ExtensionContext;
 import org.smooks.support.DomUtils;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -62,8 +62,8 @@ import java.util.UUID;
 
 /**
  * @author <a href="mailto:maurice.zeijen@smies.com">maurice.zeijen@smies.com</a>
- *
  */
+
 /**
  * Type decoder parameter mapping visitor.
  *
@@ -82,7 +82,7 @@ public class DecodeParamResolver implements DOMVisitBefore {
             ResourceConfig populatorConfig = extensionContext.getResourceStack().peek();
             ResourceConfig decoderConfig = new DefaultResourceConfig();
 
-            extensionContext.addResource(decoderConfig);
+            extensionContext.addResourceConfig(decoderConfig);
             try {
                 String type = populatorConfig.getParameterValue("type", String.class);
                 TypeConverter<?, ?> typeConverter = applicationContext.getRegistry().lookup(new NameTypeConverterFactoryLookup<>(type)).createTypeConverter();
@@ -96,7 +96,7 @@ public class DecodeParamResolver implements DOMVisitBefore {
 
                 // Configure the new decoder config...
                 decoderConfig.setSelector("decoder:" + reType, new Properties());
-                decoderConfig.setTargetProfile(extensionContext.getDefaultProfile());
+                decoderConfig.setProfile(extensionContext.getDefaultProfile());
                 decoderConfig.setResource(typeConverter.getClass().getName());
                 for (int i = 0; i < decodeParams.getLength(); i++) {
                     Element decoderParam = (Element) decodeParams.item(i);
