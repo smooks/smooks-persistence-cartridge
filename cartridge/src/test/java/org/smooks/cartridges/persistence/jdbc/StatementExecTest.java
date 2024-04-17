@@ -46,7 +46,7 @@ package org.smooks.cartridges.persistence.jdbc;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.smooks.tck.HsqlServer;
+import org.smooks.testkit.HsqlServer;
 
 import java.sql.Connection;
 import java.sql.SQLException;

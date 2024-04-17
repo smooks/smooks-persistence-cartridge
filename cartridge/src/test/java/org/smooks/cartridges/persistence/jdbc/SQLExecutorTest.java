@@ -54,7 +54,7 @@ import org.smooks.api.bean.context.BeanIdStore;
 import org.smooks.api.bean.repository.BeanId;
 import org.smooks.cartridges.persistence.datasource.DirectDataSource;
 import org.smooks.io.payload.StringSource;
-import org.smooks.tck.HsqlServer;
+import org.smooks.testkit.HsqlServer;
 import org.xml.sax.SAXException;
 
 import javax.xml.transform.Result;
