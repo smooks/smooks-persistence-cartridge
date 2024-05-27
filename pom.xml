@@ -44,7 +44,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <gpg.skip>true</gpg.skip>
-        <persistence-api.version>3.1.0</persistence-api.version>
+        <persistence-api.version>3.2.0</persistence-api.version>
         <maven.compiler.release>11</maven.compiler.release>
     </properties>
 
