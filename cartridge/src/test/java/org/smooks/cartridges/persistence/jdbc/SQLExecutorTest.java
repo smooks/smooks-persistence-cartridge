@@ -53,11 +53,10 @@ import org.smooks.api.bean.context.BeanContext;
 import org.smooks.api.bean.context.BeanIdStore;
 import org.smooks.api.bean.repository.BeanId;
 import org.smooks.cartridges.persistence.datasource.DirectDataSource;
-import org.smooks.io.payload.StringSource;
+import org.smooks.io.source.StringSource;
 import org.smooks.testkit.HsqlServer;
 import org.xml.sax.SAXException;
 
-import javax.xml.transform.Result;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -188,7 +187,7 @@ public class SQLExecutorTest {
             ExecutionContext execContext = smooks.createExecutionContext();
             BeanContext beanContext = execContext.getBeanContext();
 
-            smooks.filterSource(execContext, new StringSource("<doc/>"), (Result) null);
+            smooks.filterSource(execContext, new StringSource("<doc/>"));
             Map<String, Object> myOrder = (Map<String, Object>) beanContext.getBean("myOrder");
 
             assertEquals("{ORDERNUMBER=2, CUSTOMERNUMBER=2, PRODUCTCODE=456}", myOrder.toString());
@@ -206,7 +205,7 @@ public class SQLExecutorTest {
             ExecutionContext execContext = smooks.createExecutionContext();
             BeanContext beanContext = execContext.getBeanContext();
 
-            smooks.filterSource(execContext, new StringSource("<doc/>"), (Result) null);
+            smooks.filterSource(execContext, new StringSource("<doc/>"));
             Map<String, Object> myOrder = (Map<String, Object>) beanContext.getBean("myOrder");
 
             assertEquals(null, myOrder);

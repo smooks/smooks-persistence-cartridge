@@ -49,8 +49,8 @@ import org.smooks.api.ExecutionContext;
 import org.smooks.cartridges.persistence.test.util.BaseTestCase;
 import org.smooks.cartridges.persistence.util.PersistenceUtil;
 import org.smooks.engine.report.HtmlReportGenerator;
-import org.smooks.io.payload.JavaResult;
-import org.smooks.io.payload.StringSource;
+import org.smooks.io.sink.JavaSink;
+import org.smooks.io.source.StringSource;
 import org.smooks.scribe.Dao;
 import org.smooks.scribe.register.SingleDaoRegister;
 
@@ -84,10 +84,10 @@ public class EntityInserterTest extends BaseTestCase {
 
             enableReporting(executionContext, "report_test_entity_insert_no_selector.html");
 
-            JavaResult result = new JavaResult();
-            smooks.filterSource(executionContext, new StringSource(SIMPLE_XML), result);
+            JavaSink sink = new JavaSink();
+            smooks.filterSource(executionContext, new StringSource(SIMPLE_XML), sink);
 
-            verify(dao).insert(same((String) result.getBean("toInsert")));
+            verify(dao).insert(same((String) sink.getBean("toInsert")));
         } finally {
             smooks.close();
         }

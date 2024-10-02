@@ -51,7 +51,7 @@ import org.smooks.cartridges.persistence.test.dao.FullInterfaceMappedDao;
 import org.smooks.cartridges.persistence.test.util.BaseTestCase;
 import org.smooks.cartridges.persistence.util.PersistenceUtil;
 import org.smooks.engine.report.HtmlReportGenerator;
-import org.smooks.io.payload.StringSource;
+import org.smooks.io.source.StringSource;
 import org.smooks.scribe.register.MapDaoRegister;
 import org.smooks.scribe.register.SingleDaoRegister;
 
@@ -88,7 +88,7 @@ public class DaoFlusherTest extends BaseTestCase {
 
             enableReporting(executionContext, "report_test_dao_flush.html");
 
-            smooks.filterSource(executionContext, new StringSource(SIMPLE_XML), null);
+            smooks.filterSource(executionContext, new StringSource(SIMPLE_XML));
 
             verify(dao).flush();
         } finally {
@@ -111,7 +111,7 @@ public class DaoFlusherTest extends BaseTestCase {
 
             enableReporting(executionContext, "report_test_dao_flush_with_named_dao.html");
 
-            smooks.filterSource(executionContext, new StringSource(SIMPLE_XML), null);
+            smooks.filterSource(executionContext, new StringSource(SIMPLE_XML));
 
             verify(dao).flush();
         } finally {
@@ -135,7 +135,7 @@ public class DaoFlusherTest extends BaseTestCase {
 
             enableReporting(executionContext, "report_test_dao_flush_with_flushBefore.html");
 
-            smooks.filterSource(executionContext, new StringSource(SIMPLE_XML), null);
+            smooks.filterSource(executionContext, new StringSource(SIMPLE_XML));
 
             verify(dao).flush();
         } finally {

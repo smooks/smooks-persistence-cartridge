@@ -50,8 +50,8 @@ import org.smooks.cartridges.persistence.test.dao.FullInterfaceDao;
 import org.smooks.cartridges.persistence.test.util.BaseTestCase;
 import org.smooks.cartridges.persistence.util.PersistenceUtil;
 import org.smooks.engine.report.HtmlReportGenerator;
-import org.smooks.io.payload.JavaResult;
-import org.smooks.io.payload.StringSource;
+import org.smooks.io.sink.JavaSink;
+import org.smooks.io.source.StringSource;
 import org.smooks.scribe.register.MapDaoRegister;
 
 import java.io.IOException;
@@ -97,13 +97,13 @@ public class EntityLocatorTest extends BaseTestCase {
 
             enableReporting(executionContext, "test_entity_locate_no_selector.html");
 
-            JavaResult result = new JavaResult();
+            JavaSink sink = new JavaSink();
 
-            smooks.filterSource(executionContext, new StringSource(SIMPLE_XML), result);
+            smooks.filterSource(executionContext, new StringSource(SIMPLE_XML), sink);
 
             verify(dao).lookup(eq("test"), eq("value-1"));
 
-            List<String> resultList = (List<String>) result.getBean("theList");
+            List<String> resultList = (List<String>) sink.getBean("theList");
 
             assertNotNull(resultList);
             assertSame(searchResult, resultList.get(0));

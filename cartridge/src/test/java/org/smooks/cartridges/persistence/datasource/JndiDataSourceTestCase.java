@@ -52,13 +52,13 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.smooks.Smooks;
 import org.smooks.api.ExecutionContext;
+import org.smooks.api.io.Source;
 import org.smooks.engine.report.HtmlReportGenerator;
-import org.smooks.io.payload.StringSource;
+import org.smooks.io.source.StringSource;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.sql.DataSource;
-import javax.xml.transform.Source;
 import java.sql.Connection;
 
 import static org.junit.Assert.assertEquals;

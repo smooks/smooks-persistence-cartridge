@@ -49,8 +49,8 @@ import org.smooks.api.ExecutionContext;
 import org.smooks.cartridges.persistence.test.util.BaseTestCase;
 import org.smooks.cartridges.persistence.util.PersistenceUtil;
 import org.smooks.engine.report.HtmlReportGenerator;
-import org.smooks.io.payload.JavaResult;
-import org.smooks.io.payload.StringSource;
+import org.smooks.io.sink.JavaSink;
+import org.smooks.io.source.StringSource;
 import org.smooks.scribe.Dao;
 import org.smooks.scribe.MappingDao;
 import org.smooks.scribe.register.MapDaoRegister;
@@ -84,7 +84,7 @@ public class EntityInserterTest extends BaseTestCase {
 
     @Test
     public void test_entity_insert() throws Exception {
-        String toInsert1 = new String("toInsert1");
+        String toInsert1 = "toInsert1";
 
         Smooks smooks = new Smooks(getResourceAsStream("entity-inserter-01.xml"));
 
@@ -95,10 +95,10 @@ public class EntityInserterTest extends BaseTestCase {
 
             enableReporting(executionContext, "report_test_entity_insert.html");
 
-            JavaResult result = new JavaResult();
-            result.getResultMap().put("toInsert1", toInsert1);
+            JavaSink sink = new JavaSink();
+            sink.getResultMap().put("toInsert1", toInsert1);
 
-            smooks.filterSource(executionContext, new StringSource(SIMPLE_XML), result);
+            smooks.filterSource(executionContext, new StringSource(SIMPLE_XML), sink);
 
             verify(dao).insert(same(toInsert1));
         } finally {
@@ -108,7 +108,7 @@ public class EntityInserterTest extends BaseTestCase {
 
     @Test
     public void test_entity_insert_with_named_dao() throws Exception {
-        String toInsert1 = new String("toInsert1");
+        String toInsert1 = "toInsert1";
 
         Smooks smooks = new Smooks(getResourceAsStream("entity-inserter-02.xml"));
 
@@ -122,10 +122,10 @@ public class EntityInserterTest extends BaseTestCase {
 
             enableReporting(executionContext, "report_test_entity_insert_with_named_dao.html");
 
-            JavaResult result = new JavaResult();
-            result.getResultMap().put("toInsert1", toInsert1);
+            JavaSink sink = new JavaSink();
+            sink.getResultMap().put("toInsert1", toInsert1);
 
-            smooks.filterSource(executionContext, new StringSource(SIMPLE_XML), result);
+            smooks.filterSource(executionContext, new StringSource(SIMPLE_XML), sink);
 
             verify(dao).insert(same(toInsert1));
         } finally {
@@ -135,9 +135,9 @@ public class EntityInserterTest extends BaseTestCase {
 
     @Test
     public void test_entity_insert_to_other_beanId() throws Exception {
-        String toInsert1 = new String("toInsert1");
+        String toInsert1 = "toInsert1";
 
-        String inserted1 = new String("inserted1");
+        String inserted1 = "inserted1";
 
         Smooks smooks = new Smooks(getResourceAsStream("entity-inserter-03.xml"));
 
@@ -150,12 +150,12 @@ public class EntityInserterTest extends BaseTestCase {
 
             when(dao.insert(toInsert1)).thenReturn(inserted1);
 
-            JavaResult result = new JavaResult();
-            result.getResultMap().put("toInsert1", toInsert1);
+            JavaSink sink = new JavaSink();
+            sink.getResultMap().put("toInsert1", toInsert1);
 
-            smooks.filterSource(executionContext, new StringSource(SIMPLE_XML), result);
+            smooks.filterSource(executionContext, new StringSource(SIMPLE_XML), sink);
 
-            assertSame(inserted1, result.getBean("inserted1"));
+            assertSame(inserted1, sink.getBean("inserted1"));
         } finally {
             smooks.close();
         }
@@ -163,7 +163,7 @@ public class EntityInserterTest extends BaseTestCase {
 
     @Test
     public void test_entity_insert_with_mapped_dao() throws Exception {
-        String toInsert1 = new String("toInsert1");
+        String toInsert1 = "toInsert1";
 
         Smooks smooks = new Smooks(getResourceAsStream("entity-inserter-04.xml"));
 
@@ -174,10 +174,10 @@ public class EntityInserterTest extends BaseTestCase {
 
             enableReporting(executionContext, "report_test_entity_insert_with_mapped_dao.html");
 
-            JavaResult result = new JavaResult();
-            result.getResultMap().put("toInsert1", toInsert1);
+            JavaSink sink = new JavaSink();
+            sink.getResultMap().put("toInsert1", toInsert1);
 
-            smooks.filterSource(executionContext, new StringSource(SIMPLE_XML), result);
+            smooks.filterSource(executionContext, new StringSource(SIMPLE_XML), sink);
 
             verify(mappedDao).insert(eq("insert1"), same(toInsert1));
         } finally {
@@ -187,7 +187,7 @@ public class EntityInserterTest extends BaseTestCase {
 
     @Test
     public void test_entity_insert_with_insertBefore() throws Exception {
-        String toInsert1 = new String("toInsert1");
+        String toInsert1 = "toInsert1";
 
         Smooks smooks = new Smooks(getResourceAsStream("entity-inserter-05.xml"));
 
@@ -198,10 +198,10 @@ public class EntityInserterTest extends BaseTestCase {
 
             enableReporting(executionContext, "report_test_entity_insert_with_insertBefore.html");
 
-            JavaResult result = new JavaResult();
-            result.getResultMap().put("toInsert1", toInsert1);
+            JavaSink sink = new JavaSink();
+            sink.getResultMap().put("toInsert1", toInsert1);
 
-            smooks.filterSource(executionContext, new StringSource(SIMPLE_XML), result);
+            smooks.filterSource(executionContext, new StringSource(SIMPLE_XML), sink);
 
             verify(dao).insert(same(toInsert1));
         } finally {
@@ -222,10 +222,10 @@ public class EntityInserterTest extends BaseTestCase {
 
             enableReporting(executionContext, "report_test_entity_insert_producer_consumer.html");
 
-            JavaResult result = new JavaResult();
-            smooks.filterSource(executionContext, new StringSource(SIMPLE_XML), result);
+            JavaSink sink = new JavaSink();
+            smooks.filterSource(executionContext, new StringSource(SIMPLE_XML), sink);
 
-            verify(dao).insert(same((String) result.getBean("toInsert")));
+            verify(dao).insert(same((String) sink.getBean("toInsert")));
         } finally {
             smooks.close();
         }
