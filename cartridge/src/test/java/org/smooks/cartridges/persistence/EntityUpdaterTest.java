@@ -49,8 +49,8 @@ import org.smooks.api.ExecutionContext;
 import org.smooks.cartridges.persistence.test.util.BaseTestCase;
 import org.smooks.cartridges.persistence.util.PersistenceUtil;
 import org.smooks.engine.report.HtmlReportGenerator;
-import org.smooks.io.payload.JavaResult;
-import org.smooks.io.payload.StringSource;
+import org.smooks.io.sink.JavaSink;
+import org.smooks.io.source.StringSource;
 import org.smooks.scribe.Dao;
 import org.smooks.scribe.MappingDao;
 import org.smooks.scribe.register.MapDaoRegister;
@@ -84,36 +84,30 @@ public class EntityUpdaterTest extends BaseTestCase {
 
     @Test
     public void test_entity_update() throws Exception {
-        String toUpdate1 = new String("toUpdate1");
+        String toUpdate1 = "toUpdate1";
 
-        Smooks smooks = new Smooks(getResourceAsStream("entity-updater-01.xml"));
-
-        try {
+        try (Smooks smooks = new Smooks(getResourceAsStream("entity-updater-01.xml"))) {
             ExecutionContext executionContext = smooks.createExecutionContext();
 
             PersistenceUtil.setDAORegister(executionContext, new SingleDaoRegister<Object>(dao));
 
             enableReporting(executionContext, "report_test_entity_update.html");
 
-            JavaResult result = new JavaResult();
-            result.getResultMap().put("toUpdate1", toUpdate1);
+            JavaSink sink = new JavaSink();
+            sink.getResultMap().put("toUpdate1", toUpdate1);
 
-            smooks.filterSource(executionContext, new StringSource(SIMPLE_XML), result);
+            smooks.filterSource(executionContext, new StringSource(SIMPLE_XML), sink);
 
             verify(dao).update(same(toUpdate1));
-        } finally {
-            smooks.close();
         }
     }
 
     @Test
     public void test_entity_update_with_named_dao() throws Exception {
-        String toUpdate1 = new String("toUpdate1");
+        String toUpdate1 = "toUpdate1";
 
-        Smooks smooks = new Smooks(getResourceAsStream("entity-updater-02.xml"));
-
-        try {
-            Map<String, Object> daoMap = new HashMap<String, Object>();
+        try (Smooks smooks = new Smooks(getResourceAsStream("entity-updater-02.xml"))) {
+            Map<String, Object> daoMap = new HashMap<>();
             daoMap.put("dao1", dao);
 
             ExecutionContext executionContext = smooks.createExecutionContext();
@@ -122,26 +116,21 @@ public class EntityUpdaterTest extends BaseTestCase {
 
             enableReporting(executionContext, "report_test_entity_update_with_named_dao.html");
 
-            JavaResult result = new JavaResult();
-            result.getResultMap().put("toUpdate1", toUpdate1);
+            JavaSink sink = new JavaSink();
+            sink.getResultMap().put("toUpdate1", toUpdate1);
 
-            smooks.filterSource(executionContext, new StringSource(SIMPLE_XML), result);
+            smooks.filterSource(executionContext, new StringSource(SIMPLE_XML), sink);
 
             verify(dao).update(same(toUpdate1));
-        } finally {
-            smooks.close();
         }
     }
 
     @Test
     public void test_entity_update_to_other_beanId() throws Exception {
-        String toUpdate1 = new String("toUpdate1");
+        String toUpdate1 = "toUpdate1";
+        String updated1 = "updated1";
 
-        String updated1 = new String("updated1");
-
-        Smooks smooks = new Smooks(getResourceAsStream("entity-updater-03.xml"));
-
-        try {
+        try (Smooks smooks = new Smooks(getResourceAsStream("entity-updater-03.xml"))) {
             ExecutionContext executionContext = smooks.createExecutionContext();
 
             PersistenceUtil.setDAORegister(executionContext, new SingleDaoRegister<Object>(dao));
@@ -150,83 +139,68 @@ public class EntityUpdaterTest extends BaseTestCase {
 
             when(dao.update(toUpdate1)).thenReturn(updated1);
 
-            JavaResult result = new JavaResult();
-            result.getResultMap().put("toUpdate1", toUpdate1);
+            JavaSink sink = new JavaSink();
+            sink.getResultMap().put("toUpdate1", toUpdate1);
 
-            smooks.filterSource(executionContext, new StringSource(SIMPLE_XML), result);
+            smooks.filterSource(executionContext, new StringSource(SIMPLE_XML), sink);
 
-            assertSame(updated1, result.getBean("updated1"));
-        } finally {
-            smooks.close();
+            assertSame(updated1, sink.getBean("updated1"));
         }
     }
 
     @Test
     public void test_entity_update_with_mapped_dao() throws Exception {
-        String toUpdate1 = new String("toUpdate1");
+        String toUpdate1 = "toUpdate1";
 
-        Smooks smooks = new Smooks(getResourceAsStream("entity-updater-04.xml"));
-
-        try {
+        try (Smooks smooks = new Smooks(getResourceAsStream("entity-updater-04.xml"))) {
             ExecutionContext executionContext = smooks.createExecutionContext();
 
             PersistenceUtil.setDAORegister(executionContext, new SingleDaoRegister<Object>(mappedDao));
 
             enableReporting(executionContext, "report_test_entity_update_with_mapped_dao.html");
 
-            JavaResult result = new JavaResult();
-            result.getResultMap().put("toUpdate1", toUpdate1);
+            JavaSink sink = new JavaSink();
+            sink.getResultMap().put("toUpdate1", toUpdate1);
 
-            smooks.filterSource(executionContext, new StringSource(SIMPLE_XML), result);
+            smooks.filterSource(executionContext, new StringSource(SIMPLE_XML), sink);
 
             verify(mappedDao).update(eq("update1"), same(toUpdate1));
-        } finally {
-            smooks.close();
         }
     }
 
     @Test
     public void test_entity_update_with_updateBefore() throws Exception {
-        String toUpdate1 = new String("toUpdate1");
+        String toUpdate1 = "toUpdate1";
 
-        Smooks smooks = new Smooks(getResourceAsStream("entity-updater-05.xml"));
-
-        try {
+        try (Smooks smooks = new Smooks(getResourceAsStream("entity-updater-05.xml"))) {
             ExecutionContext executionContext = smooks.createExecutionContext();
 
             PersistenceUtil.setDAORegister(executionContext, new SingleDaoRegister<Object>(dao));
 
             enableReporting(executionContext, "report_test_entity_update_with_updateBefore.html");
 
-            JavaResult result = new JavaResult();
-            result.getResultMap().put("toUpdate1", toUpdate1);
+            JavaSink sink = new JavaSink();
+            sink.getResultMap().put("toUpdate1", toUpdate1);
 
-            smooks.filterSource(executionContext, new StringSource(SIMPLE_XML), result);
+            smooks.filterSource(executionContext, new StringSource(SIMPLE_XML), sink);
 
             verify(dao).update(same(toUpdate1));
-        } finally {
-            smooks.close();
         }
     }
 
     @Test
     public void test_entity_update_producer_consumer() throws Exception {
-
-        Smooks smooks = new Smooks(getResourceAsStream("entity-updater-06.xml"));
-
-        try {
+        try (Smooks smooks = new Smooks(getResourceAsStream("entity-updater-06.xml"))) {
             ExecutionContext executionContext = smooks.createExecutionContext();
 
             PersistenceUtil.setDAORegister(executionContext, new SingleDaoRegister<Object>(dao));
 
             enableReporting(executionContext, "report_test_entity_update_producer_consumer.html");
 
-            JavaResult result = new JavaResult();
-            smooks.filterSource(executionContext, new StringSource(SIMPLE_XML), result);
+            JavaSink sink = new JavaSink();
+            smooks.filterSource(executionContext, new StringSource(SIMPLE_XML), sink);
 
-            verify(dao).update(same((String) result.getBean("toUpdate")));
-        } finally {
-            smooks.close();
+            verify(dao).update(same((String) sink.getBean("toUpdate")));
         }
     }
 

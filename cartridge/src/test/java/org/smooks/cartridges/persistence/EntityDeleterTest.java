@@ -49,8 +49,8 @@ import org.smooks.api.ExecutionContext;
 import org.smooks.cartridges.persistence.test.util.BaseTestCase;
 import org.smooks.cartridges.persistence.util.PersistenceUtil;
 import org.smooks.engine.report.HtmlReportGenerator;
-import org.smooks.io.payload.JavaResult;
-import org.smooks.io.payload.StringSource;
+import org.smooks.io.sink.JavaSink;
+import org.smooks.io.source.StringSource;
 import org.smooks.scribe.Dao;
 import org.smooks.scribe.MappingDao;
 import org.smooks.scribe.register.MapDaoRegister;
@@ -84,35 +84,29 @@ public class EntityDeleterTest extends BaseTestCase {
 
     @Test
     public void test_entity_delete() throws Exception {
-        String toDelete1 = new String("toDelete1");
+        String toDelete1 = "toDelete1";
 
-        Smooks smooks = new Smooks(getResourceAsStream("entity-deleter-01.xml"));
-
-        try {
+        try (Smooks smooks = new Smooks(getResourceAsStream("entity-deleter-01.xml"))) {
             ExecutionContext executionContext = smooks.createExecutionContext();
 
             PersistenceUtil.setDAORegister(executionContext, new SingleDaoRegister<Object>(dao));
 
             enableReporting(executionContext, "report_test_entity_delete.html");
 
-            JavaResult result = new JavaResult();
-            result.getResultMap().put("toDelete1", toDelete1);
+            JavaSink sink = new JavaSink();
+            sink.getResultMap().put("toDelete1", toDelete1);
 
-            smooks.filterSource(executionContext, new StringSource(SIMPLE_XML), result);
+            smooks.filterSource(executionContext, new StringSource(SIMPLE_XML), sink);
 
             verify(dao).delete(same(toDelete1));
-        } finally {
-            smooks.close();
         }
     }
 
     @Test
     public void test_entity_delete_with_named_dao() throws Exception {
-        String toDelete1 = new String("toDelete1");
+        String toDelete1 = "toDelete1";
 
-        Smooks smooks = new Smooks(getResourceAsStream("entity-deleter-02.xml"));
-
-        try {
+        try (Smooks smooks = new Smooks(getResourceAsStream("entity-deleter-02.xml"))) {
             Map<String, Object> daoMap = new HashMap<String, Object>();
             daoMap.put("dao1", dao);
 
@@ -122,22 +116,19 @@ public class EntityDeleterTest extends BaseTestCase {
 
             enableReporting(executionContext, "report_test_entity_delete_with_named_dao.html");
 
-            JavaResult result = new JavaResult();
-            result.getResultMap().put("toDelete1", toDelete1);
+            JavaSink sink = new JavaSink();
+            sink.getResultMap().put("toDelete1", toDelete1);
 
-            smooks.filterSource(executionContext, new StringSource(SIMPLE_XML), result);
+            smooks.filterSource(executionContext, new StringSource(SIMPLE_XML), sink);
 
             verify(dao).delete(same(toDelete1));
-        } finally {
-            smooks.close();
         }
     }
 
     @Test
     public void test_entity_delete_to_other_beanId() throws Exception {
-        String toDelete1 = new String("toDelete1");
-
-        String deleted1 = new String("deleted1");
+        String toDelete1 = "toDelete1";
+        String deleted1 = "deleted1";
 
         Smooks smooks = new Smooks(getResourceAsStream("entity-deleter-03.xml"));
 
@@ -150,12 +141,12 @@ public class EntityDeleterTest extends BaseTestCase {
 
             when(dao.delete(toDelete1)).thenReturn(deleted1);
 
-            JavaResult result = new JavaResult();
-            result.getResultMap().put("toDelete1", toDelete1);
+            JavaSink sink = new JavaSink();
+            sink.getResultMap().put("toDelete1", toDelete1);
 
-            smooks.filterSource(executionContext, new StringSource(SIMPLE_XML), result);
+            smooks.filterSource(executionContext, new StringSource(SIMPLE_XML), sink);
 
-            assertSame(deleted1, result.getBean("deleted1"));
+            assertSame(deleted1, sink.getBean("deleted1"));
         } finally {
             smooks.close();
         }
@@ -174,10 +165,10 @@ public class EntityDeleterTest extends BaseTestCase {
 
             enableReporting(executionContext, "report_test_entity_delete_with_mapped_dao.html");
 
-            JavaResult result = new JavaResult();
-            result.getResultMap().put("toDelete1", toDelete1);
+            JavaSink sink = new JavaSink();
+            sink.getResultMap().put("toDelete1", toDelete1);
 
-            smooks.filterSource(executionContext, new StringSource(SIMPLE_XML), result);
+            smooks.filterSource(executionContext, new StringSource(SIMPLE_XML), sink);
 
             verify(mappedDao).delete(eq("delete1"), same(toDelete1));
         } finally {
@@ -187,25 +178,21 @@ public class EntityDeleterTest extends BaseTestCase {
 
     @Test
     public void test_entity_delete_with_deleteBefore() throws Exception {
-        String toDelete1 = new String("toDelete1");
+        String toDelete1 = "toDelete1";
 
-        Smooks smooks = new Smooks(getResourceAsStream("entity-deleter-05.xml"));
-
-        try {
+        try (Smooks smooks = new Smooks(getResourceAsStream("entity-deleter-05.xml"))) {
             ExecutionContext executionContext = smooks.createExecutionContext();
 
             PersistenceUtil.setDAORegister(executionContext, new SingleDaoRegister<Object>(dao));
 
             enableReporting(executionContext, "report_test_entity_delete_with_deleteBefore.html");
 
-            JavaResult result = new JavaResult();
-            result.getResultMap().put("toDelete1", toDelete1);
+            JavaSink sink = new JavaSink();
+            sink.getResultMap().put("toDelete1", toDelete1);
 
-            smooks.filterSource(executionContext, new StringSource(SIMPLE_XML), result);
+            smooks.filterSource(executionContext, new StringSource(SIMPLE_XML), sink);
 
             verify(dao).delete(same(toDelete1));
-        } finally {
-            smooks.close();
         }
 
     }
@@ -222,10 +209,10 @@ public class EntityDeleterTest extends BaseTestCase {
 
             enableReporting(executionContext, "report_test_entity_delete_producer_consumer.html");
 
-            JavaResult result = new JavaResult();
-            smooks.filterSource(executionContext, new StringSource(SIMPLE_XML), result);
+            JavaSink sink = new JavaSink();
+            smooks.filterSource(executionContext, new StringSource(SIMPLE_XML), sink);
 
-            verify(dao).delete(same((String) result.getBean("toDelete")));
+            verify(dao).delete(same((String) sink.getBean("toDelete")));
         } finally {
             smooks.close();
         }
