@@ -42,7 +42,6 @@
  */
 package org.smooks.cartridges.persistence;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.smooks.Smooks;
@@ -161,7 +160,7 @@ public class EntityLocatorTest extends BaseTestCase {
             smooks.filterSource(executionContext, source);
 
         } catch (SmooksException e) {
-            assertSame(ExceptionUtils.getCause(e).getClass(), NoLookupResultException.class);
+            assertSame(e.getCause().getCause().getClass(), NoLookupResultException.class);
 
             return;
         }
