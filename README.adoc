@@ -122,7 +122,7 @@ The datasource schema describes and documents how you can configure the datasour
 </smooks-resource-list>
 ----
 
-A functional version of this example is available https://github.com/smooks/smooks-examples/tree/v1.0.2/db-extract-transform-load[online].
+A functional version of this example is available https://github.com/smooks/smooks-examples/tree/v4/db-extract-transform-load[online].
 
 == Persistence
 
@@ -419,7 +419,7 @@ tx.commit();
 <dependency>
     <groupId>org.smooks.cartridges.persistence</groupId>
     <artifactId>smooks-persistence-cartridge</artifactId>
-    <version>2.0.0</version>
+    <version>2.0.1</version>
 </dependency>
 ----
 
