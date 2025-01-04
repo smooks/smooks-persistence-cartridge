@@ -11,7 +11,6 @@
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>smooks-persistence-cartridge</artifactId>
-    <packaging>bundle</packaging>
 
     <dependencies>
         <dependency>
@@ -37,7 +36,7 @@
         <dependency>
             <groupId>org.smooks</groupId>
             <artifactId>smooks-test-kit</artifactId>
-            <version>2.1.1-SNAPSHOT</version>
+            <version>${smooks.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
