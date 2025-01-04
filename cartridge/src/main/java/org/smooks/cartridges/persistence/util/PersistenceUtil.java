@@ -44,8 +44,7 @@ package org.smooks.cartridges.persistence.util;
 
 import org.smooks.api.ExecutionContext;
 import org.smooks.api.TypedKey;
-import org.smooks.api.delivery.ContentDeliveryConfig;
-import org.smooks.engine.resource.config.ParameterAccessor;
+import org.smooks.engine.lookup.GlobalParamsLookup;
 import org.smooks.scribe.register.DaoRegister;
 
 
@@ -64,16 +63,16 @@ public final class PersistenceUtil {
     private PersistenceUtil() {
     }
 
-    public static String getDAORegisterAttributeName(final ContentDeliveryConfig config) {
-        return ParameterAccessor.getParameterValue(PARAM_NAME_DAO_REGISTERY, String.class, PARAM_VALUE_DAO_REGISTERY, config);
+    public static String getDAORegisterAttributeName(final ExecutionContext executionContext) {
+        return executionContext.getApplicationContext().getRegistry().lookup(new GlobalParamsLookup()).getParameterValue(PARAM_NAME_DAO_REGISTERY, PARAM_VALUE_DAO_REGISTERY);
     }
 
     public static DaoRegister<?> getDAORegister(final ExecutionContext executionContext) {
-        return executionContext.get(TypedKey.of(PersistenceUtil.getDAORegisterAttributeName(executionContext.getContentDeliveryRuntime().getContentDeliveryConfig())));
+        return executionContext.get(TypedKey.of(PersistenceUtil.getDAORegisterAttributeName(executionContext)));
     }
 
     public static void setDAORegister(final ExecutionContext executionContext, final DaoRegister<?> registery) {
-        executionContext.put(TypedKey.of(getDAORegisterAttributeName(executionContext.getContentDeliveryRuntime().getContentDeliveryConfig())), registery);
+        executionContext.put(TypedKey.of(getDAORegisterAttributeName(executionContext)), registery);
     }
 
 }
